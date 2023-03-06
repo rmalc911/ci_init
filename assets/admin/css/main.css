@@ -1,0 +1,252 @@
+:root {
+	--theme-color: #257dff;
+}
+
+.text-black {
+	color: #000 !important;
+}
+
+.sidebar .nav > .nav-item.active a i,
+.sidebar .nav > .nav-item a:focus i,
+.sidebar .nav > .nav-item a:hover i,
+.sidebar .nav > .nav-item a[data-toggle="collapse"][aria-expanded="true"] i {
+	color: var(--theme-color) !important;
+}
+
+.sidebar .nav > .nav-item a[data-toggle="collapse"][aria-expanded="true"]:before,
+.sidebar .nav > .nav-item.active:hover > a:before,
+.sidebar .nav > .nav-item.active > a:before {
+	background: var(--theme-color);
+}
+
+.form-control {
+	/* font-size: 16px; */
+	height: calc(2em + 0.75rem);
+}
+
+.form-control-sm {
+	height: calc(1.7em + 0.5rem + 2px);
+}
+
+.form-group label.error {
+	margin-bottom: 0;
+}
+
+.select2-input label.error,
+.select2-input label.success {
+	bottom: -25px;
+}
+
+.select2-input .select2 {
+	margin-bottom: 0;
+	max-width: 100%;
+}
+
+.table .select2-input .select2 {
+	min-width: 100%;
+}
+
+.select2-input .select-widget.error ~ .select2 {
+	margin-bottom: 25px;
+}
+
+.table-sm td,
+.table-sm th {
+	padding: 0.3rem !important;
+}
+
+.table-btn-spinner {
+	width: 1.25em;
+	height: 1.25em;
+}
+
+.swal-wide {
+	width: 60rem;
+}
+
+.swal-xl {
+	width: 80rem;
+}
+
+.swal-md {
+	width: 40rem;
+}
+
+.input-group > .select2-container--bootstrap {
+	width: auto;
+	flex: 1 1 auto;
+}
+
+.input-group > .select2-container--bootstrap .select2-selection--single {
+	height: 100%;
+	line-height: inherit;
+	padding: 0.5rem 1rem;
+}
+
+.swal-form-popup .swal2-html-container {
+	font-size: 13px;
+	text-align: left !important;
+	z-index: 2;
+}
+
+.custom-control.custom-checkbox,
+.custom-control.custom-radio {
+	cursor: default;
+}
+
+.custom-control-label {
+	cursor: pointer;
+}
+
+.input-group-append .select2-hidden-accessible + .select2-container--bootstrap > .selection > .select2-selection {
+	border-bottom-left-radius: 0;
+	border-top-left-radius: 0;
+}
+
+.list-group-item {
+	margin-bottom: -1px;
+}
+
+.table-responsive,
+table {
+	margin-top: 10px !important;
+	margin-bottom: 10px !important;
+}
+
+.table-responsive table.table {
+	margin-top: 0 !important;
+	margin-bottom: 0 !important;
+}
+
+table.table-bordered th {
+	color: #000;
+	font-weight: 600;
+}
+
+table.table-bordered thead th {
+	text-align: center;
+	background-color: #cecece;
+	white-space: nowrap;
+}
+
+table.table-bordered thead tr + tr th {
+	border-top: 0;
+}
+
+div.dataTables_wrapper div.dataTables_length .form-control,
+div.dataTables_wrapper div.dataTables_filter .form-control {
+	margin-left: 5px;
+	flex: auto;
+}
+
+.datatable-view tbody tr[role="row"] td:first-child,
+.sl-table tbody td:first-child {
+	text-align: center;
+}
+
+.dataTables_length {
+	position: relative;
+}
+
+div.dataTables_wrapper div.dataTables_length label {
+	width: 100%;
+	display: flex;
+	align-items: center;
+}
+
+.dataTables_length select.form-control {
+	appearance: none;
+	padding-right: 15px !important;
+}
+
+.dataTables_length::after {
+	content: "";
+	position: absolute;
+	top: 50%;
+	right: 12px;
+	border-top: 5px solid #777;
+	border-left: 5px solid transparent;
+	border-right: 5px solid transparent;
+	border-bottom: 5px solid transparent;
+	margin-top: -2px;
+}
+
+.swal2-html-container {
+	z-index: 10;
+	font-size: 13px;
+	text-align: left;
+}
+
+body.swal2-shown > .select2-container--bootstrap {
+	z-index: 1100;
+}
+
+.swal-responsive-table {
+	max-width: calc(100vw - 40px);
+}
+
+.table-responsive.swal-responsive-table {
+	white-space: nowrap;
+}
+
+.is-loading::before {
+	content: "";
+	z-index: 2;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.form-file-label-group {
+	position: relative;
+	display: inline-block;
+	margin-bottom: 10px;
+}
+
+.form-file-label-group input.form-control-file[type="file"] {
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+}
+
+.form-file-label-group .label-input-file {
+	margin-bottom: 0;
+}
+
+.txn-id-btn.btn-failed,
+.txn-status-badge.badge-failed {
+	color: #fff;
+	background-color: #f3545d !important;
+	border: none;
+}
+
+.txn-id-btn.btn-captured,
+.txn-id-btn.btn-SUCCESS {
+	color: #fff;
+	background-color: #35cd3a !important;
+	border: none;
+}
+
+.popover {
+	width: 400px;
+	max-width: none;
+}
+
+.popover pre {
+	height: 100vh;
+	max-height: 450px;
+	overflow: auto;
+}
+
+.vr {
+	display: inline-block;
+	align-self: stretch;
+	width: 1px;
+	margin-right: -0.5px;
+	margin-left: -0.5px;
+	min-height: 1em;
+	background-color: currentColor;
+	opacity: 0.25;
+}

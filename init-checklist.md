@@ -1,0 +1,11 @@
+- [ ] [RewriteBase](./.htaccess#L3)
+- [ ] [environment](./index.php#L58)
+- [ ] [libraries](./application/config/autoload.php#L61) ['database', 'form_validation', 'session']
+- [ ] [helper](./application/config/autoload.php#L92) ['url', 'form', 'html', 'version']
+- [ ] [model](./application/config/autoload.php#L135) ['TemplateModel']
+- [ ] [sess_cookie_name](./application/config/config.php#L389)
+- [ ] [constants](./application/config/constants.php#L87)
+- [ ] [database](./application/config/database.php#L79)
+- [ ] [routes](./application/config/routes.php#L4)
+- [ ] [controllers](./application/controllers/index.html)
+- [ ] [models](./application/models/index.html)
