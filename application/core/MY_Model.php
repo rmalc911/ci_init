@@ -2,7 +2,7 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 
 class MY_Model extends CI_Model {
-	protected $db_setup = true;
+	public $db_setup = true;
 	protected function __construct() {
 		parent::__construct();
 		$this->form_validation->set_error_delimiters('<label class="error">', '</label>');
@@ -125,7 +125,7 @@ class MY_Model extends CI_Model {
 	// Generals
 	//======================================================================
 
-	protected function set_validation($data) {
+	public function set_validation($data) {
 		foreach ($data  as $field) {
 			$rules = [];
 			$field_name = $field['name'];
@@ -156,7 +156,7 @@ class MY_Model extends CI_Model {
 	 * @param string $filter_in WHERE IN Conditions Optional
 	 * @param string $select First Option as Select
 	 */
-	protected function select_options($table, $option_value, $option_name = '', $filter = [], $filter_in = [], $select = true, $order = '') {
+	public function select_options($table, $option_value, $option_name = '', $filter = [], $filter_in = [], $select = true, $order = '') {
 		$select_0 = [
 			'option_name' => 'Select',
 			'option_value' => '',
@@ -190,7 +190,7 @@ class MY_Model extends CI_Model {
 		return $result;
 	}
 
-	protected function select_category_options($select = true) {
+	public function select_category_options($select = true) {
 		$category_nested_names = [];
 		for ($cat_i = CATEGORY_VIEW_DEPTH; $cat_i > 0; $cat_i--) {
 			$category_nested_names[] = "cp$cat_i.category_name";
@@ -217,7 +217,7 @@ class MY_Model extends CI_Model {
 		return $result;
 	}
 
-	protected function select_options_array($options, $field1, $field2, $type = 'S') {
+	public function select_options_array($options, $field1, $field2, $type = 'S') {
 		$opt_array = array();
 		if ($type == 'S')
 			$opt_array = array('' => 'Select');
@@ -227,7 +227,7 @@ class MY_Model extends CI_Model {
 		return $opt_array;
 	}
 
-	protected function get_edit_row($table, $edit = '', $key = 'id') {
+	public function get_edit_row($table, $edit = '', $key = 'id') {
 		if (!$this->db_setup) {
 			return [];
 		}
@@ -237,7 +237,7 @@ class MY_Model extends CI_Model {
 		return $this->db->where($key, $edit)->get($table)->row_array();
 	}
 
-	protected function get_edit_blank($table) {
+	public function get_edit_blank($table) {
 		if (!$this->db_setup) {
 			return [];
 		}
@@ -249,7 +249,7 @@ class MY_Model extends CI_Model {
 		return $fields;
 	}
 
-	protected function get_edit_map($table, $key, $value = '') {
+	public function get_edit_map($table, $key, $value = '') {
 		if (!$this->db_setup) {
 			return [];
 		}
@@ -259,7 +259,7 @@ class MY_Model extends CI_Model {
 		return $this->db->get_where($table, [$key => $value])->result_array();
 	}
 
-	protected function save_table_data($table, $post_data, $template, $key) {
+	public function save_table_data($table, $post_data, $template, $key) {
 		if (!$this->db_setup) {
 			return 1;
 		}
@@ -312,7 +312,7 @@ class MY_Model extends CI_Model {
 	 * 
 	 * @return array insert ID/Key
 	 */
-	protected function save_table_data_multiple($table, $table_data, $template, $key, $select = 0) {
+	public function save_table_data_multiple($table, $table_data, $template, $key, $select = 0) {
 		$this->form_validation->set_error_delimiters('<label class="error mt-0">', '</label>');
 		$id = [];
 		$errors = [];
@@ -333,7 +333,7 @@ class MY_Model extends CI_Model {
 		return ['ids' => $id, 'errors' => $errors];
 	}
 
-	protected function save_image($field, $path = 'assets/uploads', $accept = null, $max_size = null, $unlink_image = null) {
+	public function save_image($field, $path = 'assets/uploads', $accept = null, $max_size = null, $unlink_image = null) {
 		if (isset($_FILES[$field]) && $_FILES[$field]['name'] != '') {
 			if (!file_exists($path)) {
 				mkdir($path, 0777, true);
@@ -379,7 +379,7 @@ class MY_Model extends CI_Model {
 		return false;
 	}
 
-	protected function save_files($field, $path = 'assets/uploads', $accept = null, $max_size = null, $preserve_index = false, $db_images = null, $old_images = null) {
+	public function save_files($field, $path = 'assets/uploads', $accept = null, $max_size = null, $preserve_index = false, $db_images = null, $old_images = null) {
 		if (!file_exists($path)) {
 			mkdir($path, 0777, true);
 		}
@@ -438,7 +438,7 @@ class MY_Model extends CI_Model {
 		return $images;
 	}
 
-	protected function save_table_map($table, $foreign_key, $foreign_value, $fields) {
+	public function save_table_map($table, $foreign_key, $foreign_value, $fields) {
 		if (!$this->db_setup) {
 			return [];
 		}
@@ -461,7 +461,7 @@ class MY_Model extends CI_Model {
 		}
 	}
 
-	protected function save_table_map_manual($table, $foreign_key, $foreign_value, $data) {
+	public function save_table_map_manual($table, $foreign_key, $foreign_value, $data) {
 		$post_map = $data;
 		$this->db->delete($table, [$foreign_key => $foreign_value]);
 
@@ -470,7 +470,7 @@ class MY_Model extends CI_Model {
 		}
 	}
 
-	protected function get_data_rows($table, $select = '*', $where = [], $order_by = null, $limit = null, $offset = null) {
+	public function get_data_rows($table, $select = '*', $where = [], $order_by = null, $limit = null, $offset = null) {
 		if (!$this->db_setup) {
 			return [];
 		}
@@ -489,7 +489,7 @@ class MY_Model extends CI_Model {
 		return $this->db->select($select)->get_where($table, $where)->result_array();
 	}
 
-	protected function edit_unique($value, $params) {
+	public function edit_unique($value, $params) {
 		$this->form_validation->set_message('edit_unique', "%s Must be unique.");
 
 		list($table, $field, $current_id) = explode(".", $params);
@@ -503,7 +503,7 @@ class MY_Model extends CI_Model {
 		}
 	}
 
-	protected function show_alert($type, $message) {
+	public function show_alert($type, $message) {
 		$alert_class = 'alert-info';
 		switch ($type) {
 			case 'suc':
@@ -530,7 +530,7 @@ class MY_Model extends CI_Model {
 	 * 
 	 * @return void
 	 */
-	protected function excel_data_to_db_map($table_data, $map_data) {
+	public function excel_data_to_db_map($table_data, $map_data) {
 		$db_data = [];
 		if (count($map_data) == 0) {
 			return $table_data;
@@ -559,7 +559,7 @@ class MY_Model extends CI_Model {
 		return $db_data;
 	}
 
-	protected function submit_import($master, $master_name = "") {
+	public function submit_import($master, $master_name = "") {
 		if ($master_name == "") {
 			$master_name = $master;
 		}
@@ -581,7 +581,7 @@ class MY_Model extends CI_Model {
 		return $message;
 	}
 
-	protected function get_config($config_key = null) {
+	public function get_config($config_key = null) {
 		if ($config_key) {
 			$this->db->where_in('config_key', $config_key);
 		}
@@ -592,7 +592,7 @@ class MY_Model extends CI_Model {
 		return $config;
 	}
 
-	protected function set_config($config_items, $post_data) {
+	public function set_config($config_items, $post_data) {
 		$status = false;
 		foreach ($config_items as $config) {
 			$set_config = [

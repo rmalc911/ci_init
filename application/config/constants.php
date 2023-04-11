@@ -89,7 +89,7 @@ define('ADMIN_PATH', 'admin/');
 define('ADMIN_VIEWS_PATH', 'admin/');
 define('ADMIN_ASSETS_PATH', 'assets/admin/');
 
-define('ADMIN_LOGIN_REDIRECT', ADMIN_PATH . 'home/dashboard');
+define('ADMIN_LOGIN_REDIRECT', ADMIN_PATH);
 
 define('BANNER_UPLOAD_PATH', 'assets/uploads/banners/');
 define('GALLERY_UPLOAD_PATH', 'assets/uploads/gallery/');

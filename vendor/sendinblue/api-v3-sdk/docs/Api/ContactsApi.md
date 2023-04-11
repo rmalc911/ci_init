@@ -660,7 +660,7 @@ This endpoint does not need any parameter.
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **getContactInfo**
-> \SendinBlue\Client\Model\GetExtendedContactDetails getContactInfo($identifier, $startDate, $endDate)
+> \SendinBlue\Client\Model\GetExtendedContactDetails getContactInfo($identifier)
 
 Get a contact's details
 
@@ -687,11 +687,9 @@ $apiInstance = new SendinBlue\Client\Api\ContactsApi(
     $config
 );
 $identifier = "identifier_example"; // string | Email (urlencoded) OR ID of the contact OR its SMS attribute value
-$startDate = new \stdClass; // object | **Mandatory if endDate is used.** Starting date (YYYY-MM-DD) of the statistic events specific to campaigns. Must be lower than equal to endDate
-$endDate = new \stdClass; // object | **Mandatory if startDate is used.** Ending date (YYYY-MM-DD) of the statistic events specific to campaigns. Must be greater than equal to startDate.
 
 try {
-    $result = $apiInstance->getContactInfo($identifier, $startDate, $endDate);
+    $result = $apiInstance->getContactInfo($identifier);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling ContactsApi->getContactInfo: ', $e->getMessage(), PHP_EOL;
@@ -704,8 +702,6 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **identifier** | **string**| Email (urlencoded) OR ID of the contact OR its SMS attribute value |
- **startDate** | [**object**](../Model/.md)| **Mandatory if endDate is used.** Starting date (YYYY-MM-DD) of the statistic events specific to campaigns. Must be lower than equal to endDate | [optional]
- **endDate** | [**object**](../Model/.md)| **Mandatory if startDate is used.** Ending date (YYYY-MM-DD) of the statistic events specific to campaigns. Must be greater than equal to startDate. | [optional]
 
 ### Return type
 

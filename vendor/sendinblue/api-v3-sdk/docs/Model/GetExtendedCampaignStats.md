@@ -3,7 +3,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**globalStats** | [**\SendinBlue\Client\Model\GetExtendedCampaignStatsGlobalStats**](GetExtendedCampaignStatsGlobalStats.md) |  | 
+**globalStats** | **object** | Overall statistics of the campaign | 
 **campaignStats** | **object[]** | List-wise statistics of the campaign. | 
 **mirrorClick** | **int** | Number of clicks on mirror link | 
 **remaining** | **int** | Number of remaning emails to send | 

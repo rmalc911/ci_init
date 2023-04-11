@@ -34,7 +34,7 @@ $login_username = $login['user_name'];
 	<link rel="stylesheet" href="<?= aa_base_url('theme/css/azzara.min.css') ?>">
 	<link rel="stylesheet" href="<?= aa_base_url('css/main.css?v=') . css_version() ?>">
 	<!--   Core JS Files   -->
-	<script src="<?= as_base_url('plugins/jquery-3.6.0.min.js') ?>"></script>
+	<script src="<?= as_base_url('plugins/jquery-3.6.3.min.js') ?>"></script>
 	<script src="<?= as_base_url('plugins/bootstrap/js/bootstrap.bundle.min.js') ?>"></script>
 
 	<script>
@@ -52,7 +52,7 @@ $login_username = $login['user_name'];
 			<!-- Logo Header -->
 			<div class="logo-header">
 
-				<a href="index.html" class="logo">
+				<a href="<?= ad_base_url() ?>" class="logo">
 					<img src="<?= base_url(LOGO_IMG) ?>" width="175" alt="<?= CLIENT_NAME ?>" class="navbar-brand">
 					<!-- <h1 class="navbar-brand text-light"><?= CLIENT_NAME ?></h1> -->
 				</a>
