@@ -1,7 +1,7 @@
 - [ ] [RewriteBase](./.htaccess#L3)
 - [ ] [environment](./index.php#L58)
 - [ ] [libraries](./application/config/autoload.php#L5) ['database', 'form_validation', 'session']
-- [ ] [helper](./application/config/autoload.php#L7) ['url', 'form', 'html', 'version', 'base_url']
+- [ ] [helper](./application/config/autoload.php#L7) ['url', 'form', 'html', 'base_url', 'file_path', 'currency', 'version']
 - [ ] [model](./application/config/autoload.php#L10) ['TemplateModel']
 - [ ] [sess_cookie_name](./application/config/config.php#L31)
 - [ ] [constants](./application/config/constants.php#L87)

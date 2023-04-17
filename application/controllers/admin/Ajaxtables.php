@@ -7,14 +7,14 @@ class Ajaxtables extends MY_Controller {
 		$this->load->library('datatables');
 	}
 
-	public function web_banners() {
-		/**
-		 * $options 
-		 * @var TemplateConfig
-		 */
-		$options = $this->TemplateModel->banner_config;
-		$this->_ajaxtable_template($options, [1]);
-	}
+	// public function web_banners() {
+	// 	/**
+	// 	 * $options 
+	// 	 * @var TemplateConfig
+	// 	 */
+	// 	$options = $this->TemplateModel->banner_config;
+	// 	$this->_ajaxtable_template($options, [1]);
+	// }
 
 	function __destruct() {
 		$response = $this->datatables->generate();

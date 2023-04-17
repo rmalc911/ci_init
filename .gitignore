@@ -35,5 +35,6 @@ logs/*
 mail/*
 !mail/index.html
 assets/uploads/*
+!assets/uploads/index.html
 .vscode/
 

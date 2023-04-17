@@ -29,7 +29,7 @@ class TemplateModel extends MY_Model {
 		return [
 			'heads' => ['Sl. no', 'Name', 'Image', 'Action'],
 			'src' => 'ajax',
-			'data' => 'ajaxtables/web_banners',
+			'data' => 'ajaxtables/dt_banners',
 			'text_fields' => ['banner_name'],
 			'img_fields' => ['banner_img' => BANNER_UPLOAD_PATH],
 		];
@@ -42,6 +42,12 @@ class TemplateModel extends MY_Model {
 			['type' => 'textarea', 'label' => 'Banner Text', 'name' => 'banner_text', 'required' => false, 'attributes' => ['maxlength' => 150]],
 			['type' => 'input', 'label' => 'Link', 'name' => 'banner_link', 'required' => false],
 			['type' => 'key', 'label' => 'ID', 'name' => 'id'],
+		];
+	}
+
+	public function banner_img_config() {
+		return [
+			'banner_img' => BANNER_UPLOAD_PATH,
 		];
 	}
 }

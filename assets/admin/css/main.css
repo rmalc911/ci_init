@@ -171,6 +171,16 @@ div.dataTables_wrapper div.dataTables_length label {
 	margin-top: -2px;
 }
 
+.dt-image-col {
+	max-width: 100px;
+	max-height: 80px;
+}
+
+.dt-image-col[data-original=""],
+.dt-file-col[data-original=""] {
+	display: none !important;
+}
+
 .swal2-html-container {
 	z-index: 10;
 	font-size: 13px;

@@ -13,24 +13,24 @@ CREATE TABLE `users` (
 	PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;
 CREATE TABLE `user_access_map` (
-	`id` int(11) NOT NULL AUTO_INCREMENT,
-	`user` int(11) NOT NULL,
-	`page` varchar(150) NOT NULL,
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`user` INT NOT NULL,
+	`page` VARCHAR(150) NOT NULL,
 	`view_data` enum('1', '0') NOT NULL DEFAULT '0',
 	`add_data` enum('1', '0') NOT NULL DEFAULT '0',
 	`edit_data` enum('1', '0') NOT NULL DEFAULT '0',
 	`block_data` enum('1', '0') NOT NULL DEFAULT '0',
 	`delete_data` enum('1', '0') NOT NULL DEFAULT '0',
-	`updated_date` datetime NOT NULL,
-	`updated_by` int(11) NOT NULL,
+	`updated_date` DATETIME NOT NULL,
+	`updated_by` INT NOT NULL,
 	PRIMARY KEY (`id`),
 	UNIQUE KEY `user` (`user`, `page`),
 	KEY `updated_by` (`updated_by`)
 );
 CREATE TABLE `admin_config` (
-	`config_key` varchar(50) NOT NULL,
-	`config_value` text NOT NULL,
-	`config_date` datetime NOT NULL,
-	`config_user` int(11) NOT NULL,
+	`config_key` VARCHAR(50) NOT NULL,
+	`config_value` TEXT NOT NULL,
+	`config_date` DATETIME NOT NULL,
+	`config_user` INT NOT NULL,
 	PRIMARY KEY (`config_key`)
 );

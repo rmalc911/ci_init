@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class Ajax extends CI_Controller {
+class Ajax extends MY_Controller {
 	public function __construct() {
 		parent::__construct();
 	}
@@ -14,6 +14,12 @@ class Ajax extends CI_Controller {
 
 	public $skip_access_check = [
 		// 'media_albums', 'careers', 'infrastructure_gallery', 'web_banners', 'media_images'
+	];
+
+	public $delete_images = [
+		'web_banners' => [
+			'banner_img' => BANNER_UPLOAD_PATH,
+		],
 	];
 
 	public function delete_record() {
@@ -44,7 +50,13 @@ class Ajax extends CI_Controller {
 				$this->db->delete($di, [$dtable => $row]);
 			}
 		}
+		$row_data = $this->db->get_where($table, [$key => $row])->row_array();
 		$res = $this->db->delete($table, [$key => $row]);
+		if ($res) {
+			foreach ($this->delete_images[$table] ?? [] as $img_field => $img_path) {
+				$file_deleted = @unlink($img_path . $row_data[$img_field]);
+			}
+		}
 		echo json_encode(['success' => $res, 'error' => $this->db->error(), 'error_message' => '']);
 	}
 

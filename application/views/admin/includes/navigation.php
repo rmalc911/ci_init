@@ -4,7 +4,7 @@
 		<div class="sidebar-content">
 			<ul class="nav">
 				<li class="nav-item">
-					<a href="<?= ad_base_url('home/dashboard') ?>">
+					<a href="<?= ad_base_url() ?>">
 						<i class="fas fa-home"></i>
 						<p>Dashboard</p>
 					</a>

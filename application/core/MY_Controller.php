@@ -8,6 +8,9 @@ class MY_Controller extends CI_Controller {
 
 	public function __construct() {
 		parent::__construct();
+		$this->load->helper('inflector');
+		$this->load->helper('text');
+		$this->load->helper('common');
 		$this->popover_btn = '<button class="btn btn-$3 btn-border btn-sm btn-rounded json-format txn-id-btn" type="button" data-toggle="popover" data-content=\'$2\' data-label="$1" data-original-title="$1 <span class=\'close \'>&times;</span">$1</button>';
 	}
 
@@ -89,6 +92,61 @@ class MY_Controller extends CI_Controller {
 		}
 	}
 
+	public function view_wildcard($path, $option) {
+		$option = singular($option);
+		if (method_exists($path, "view_{$option}")) {
+			$this->{"view_{$option}"}();
+		} else {
+			$this->_view_template($this->TemplateModel->{"{$option}_config"});
+		}
+	}
+
+	public function add_wildcard($path, $option) {
+		$option = singular($option);
+		if (method_exists($path, "add_{$option}")) {
+			$this->{"add_{$option}"}();
+		} else {
+			$this->_add_template($this->TemplateModel->{"{$option}_config"});
+		}
+	}
+
+	public function submit_wildcard($path, $option) {
+		$option = singular($option);
+		if (method_exists($path, "submit_{$option}")) {
+			$this->{"submit_{$option}"}();
+		} else {
+			$this->_submit_template($this->TemplateModel->{"{$option}_config"}, function ($post_data) use ($option) {
+				if (method_exists("TemplateModel", "{$option}_img_config")) {
+					$img_configs = $this->TemplateModel->{"{$option}_img_config"}();
+					foreach ($img_configs as $img_field => $value) {
+						$edit = $this->TemplateModel->{$option . "_config"}->get_row($this->input->post('id'));
+						$image = $this->TemplateModel->save_image($img_field, $value, null, null, $edit[$img_field] ?? null);
+						if ($image) {
+							$post_data[$img_field] = $image;
+						}
+					}
+					return $post_data;
+				}
+				return $post_data;
+			});
+		}
+	}
+
+	public function dt_wildcard($path, $option) {
+		$option = singular($option);
+		if (method_exists($path, "dt_{$option}")) {
+			$this->{"dt_{$option}"}();
+		} else {
+			/** @var TemplateConfig */
+			$options = $this->TemplateModel->{"{$option}_config"};
+			$table_template = $this->TemplateModel->{$options->table_template}();
+			$text_fields = $table_template['text_fields'];
+			$select_fields = $table_template['select_fields'] ?? "";
+			$search_fields = range(1, count($text_fields));
+			$this->_ajaxtable_template($options, $search_fields, $select_fields);
+		}
+	}
+
 	protected function add_action_col($cols) {
 		$action_col = '<div class="btn-group" role="group" aria-label="Button group">';
 		foreach ($cols as $col_name => $col_value) {
@@ -134,7 +192,7 @@ class MY_Controller extends CI_Controller {
 
 		$status_field = "";
 		if ($this->action_field) {
-			$status_field = $table_alias . "." . $options->status_field;
+			$status_field = ", " . $table_alias . "." . $options->status_field;
 		}
 
 		$id_field = $options->id;
@@ -162,7 +220,7 @@ class MY_Controller extends CI_Controller {
 
 		$this->datatables
 			->from($table . " $table_alias")
-			->select("1 as sl, $select_fields $text_fields_select $img_fields_select $table_alias.$id_field, $status_field")
+			->select("1 as sl, $select_fields $text_fields_select $img_fields_select $table_alias.$id_field $status_field")
 			->unset_column($id_field);
 
 		if ($this->action_field) {

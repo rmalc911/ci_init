@@ -3,12 +3,12 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class MY_Model extends CI_Model {
 	public $db_setup = true;
-	protected function __construct() {
+	public function __construct() {
 		parent::__construct();
 		$this->form_validation->set_error_delimiters('<label class="error">', '</label>');
 	}
 
-	protected function verify_admin() {
+	public function verify_admin() {
 		$login = !$this->db_setup;
 		if (null != ($this->session->userdata('user'))) {
 			$access = [
@@ -19,12 +19,12 @@ class MY_Model extends CI_Model {
 			$login = true;
 		}
 		if (!$login) {
-			redirect_base(ADMIN_PATH);
+			redirect_base(ADMIN_LOGIN_PATH);
 		}
 		return $access;
 	}
 
-	protected function verify_access($access_page, $access_type, $redirect = true) {
+	public function verify_access($access_page, $access_type, $redirect = true) {
 		return true;
 		$login_id = $this->session->userdata('user')['id'];
 		$access_data = $this->db->get_where('user_access_map', ['user' => $login_id, 'page' => $access_page], 1)->row_array();
@@ -36,10 +36,10 @@ class MY_Model extends CI_Model {
 				return false;
 			}
 			$this->session->set_flashdata('message', $this->show_alert('err', 'You do not have access to the page/action'));
-			$redirect_url = $_SERVER['HTTP_REFERER'] ?? base_url();
+			$redirect_url = $_SERVER['HTTP_REFERER'] ?? base_url(ADMIN_PATH);
 			$current_url = current_url();
 			if ($redirect_url == $current_url) {
-				$redirect_url = base_url();
+				$redirect_url = base_url(ADMIN_PATH);
 			}
 			redirect($redirect_url);
 		}

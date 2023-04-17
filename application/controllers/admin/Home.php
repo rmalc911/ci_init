@@ -6,7 +6,7 @@ class Home extends CI_Controller {
 		parent::__construct();
 	}
 
-	public function dashboard() {
+	public function index() {
 		$this->data['message'] = $this->session->flashdata('message');
 		$this->load->template('home', $this->data);
 	}
@@ -25,7 +25,7 @@ class Home extends CI_Controller {
 		];
 		if ($this->form_validation->run()) {
 			$post_data = $this->input->post();
-            $status = $this->TemplateModel->set_config($config_items, $post_data);
+			$status = $this->TemplateModel->set_config($config_items, $post_data);
 			$alert = $status ? $this->TemplateModel->show_alert('suc', 'Successfully updated') : $this->TemplateModel->show_alert('err', 'Failed to update');
 			$this->session->set_flashdata('message', $alert);
 			redirect(ad_base_url('home/email_config'));

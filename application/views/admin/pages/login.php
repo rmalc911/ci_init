@@ -32,8 +32,8 @@
 <body class="login">
 	<div class="wrapper wrapper-login">
 		<div class="container container-login animated fadeIn">
-			<!-- <img src="<?= as_base_url('img/logo.jpg') ?>" alt="Company Name" style="width: 150px; display: block; margin: 0 auto 20px;"> -->
-			<h1 class="display-4 text-center mb-4">ADMIN</h1>
+			<img src="<?= base_url(LOGO_IMG) ?>" alt="<?= CLIENT_NAME ?>" style="width: 150px; display: block; margin: 0 auto 20px;">
+			<!-- <h1 class="display-4 text-center mb-4">ADMIN</h1> -->
 			<h3 class="text-center">Sign In To Admin</h3>
 			<form class="login-form" action="<?= ad_base_url('login/validate') ?>" method="POST">
 				<div class="form-group form-floating-label">
