@@ -6,6 +6,22 @@ class Ajax extends MY_Controller {
 		parent::__construct();
 	}
 
+	public function view_career_about() {
+		$application_id = $this->input->post('value');
+		$this->data['application'] = $this->TemplateModel->get_edit_row('career_applications', $application_id);
+		$this->data['title'] = $this->data['application']['applicant_fname'];
+		$this->data['content'] = nl2br($this->data['application']['applicant_about']);
+		echo json_encode($this->data);
+	}
+
+	public function view_contact_message() {
+		$form_id = $this->input->post('value');
+		$this->data['form'] = $this->TemplateModel->get_edit_row('contact_us', $form_id);
+		$this->data['title'] = $this->data['form']['contact_name'];
+		$this->data['content'] = $this->data['form']['contact_message'];
+		echo json_encode($this->data);
+	}
+
 	public $table_pages = [
 		'tax_vat' => 'vat',
 		'tax_gst' => 'gst',
@@ -197,14 +213,6 @@ class Ajax extends MY_Controller {
 				'options' => $this->TemplateModel->select_options($table, $key, $option_name),
 			]);
 		}
-	}
-
-	public function view_contact_message() {
-		$form_id = $this->input->post('value');
-		$this->data['form'] = $this->TemplateModel->get_edit_row('contact', $form_id);
-		$this->data['title'] = $this->data['form']['contact_name'];
-		$this->data['content'] = $this->data['form']['contact_message'];
-		echo json_encode($this->data);
 	}
 
 	public function placeholder_img() {

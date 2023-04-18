@@ -58,6 +58,28 @@
 					</a>
 					<a href="<?= ad_base_url('website/add_banner') ?>" class="d-none"></a>
 				</li>
+				<!-- Careers -->
+				<li class="nav-item">
+					<a href="<?= ad_base_url('website/view_careers') ?>">
+						<i class="fas fa-briefcase"></i>
+						<p>Job Corner</p>
+					</a>
+					<a href="<?= ad_base_url('website/add_career') ?>" class="d-none"></a>
+				</li>
+				<!-- Career Applications -->
+				<li class="nav-item">
+					<a href="<?= ad_base_url('website/view_career_applications') ?>">
+						<i class="fas fa-user-tie"></i>
+						<p>Job Applications</p>
+					</a>
+				</li>
+				<!-- Contact Us -->
+				<li class="nav-item">
+					<a href="<?= ad_base_url('website/view_contact_us') ?>">
+						<i class="fas fa-phone"></i>
+						<p>Contact Us</p>
+					</a>
+				</li>
 			</ul>
 			<ul class="nav">
 				<li class="nav-section">

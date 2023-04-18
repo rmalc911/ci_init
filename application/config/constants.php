@@ -95,12 +95,14 @@ define('ADMIN_LOGIN_REDIRECT', ADMIN_PATH);
 define('BANNER_UPLOAD_PATH', 'assets/uploads/banners/');
 define('GALLERY_UPLOAD_PATH', 'assets/uploads/gallery/');
 define('PRODUCT_IMG_UPLOAD_PATH', 'assets/uploads/products/');
+define('RESUME_UPLOAD_PATH', 'assets/uploads/resume/');
 
 define('CLIENT_NAME', '');
 define('CLIENT_NAME_SHORT', '');
 define('CLIENT_ADDRESS', '');
 define('DEFAULT_EMAIL_NAME', CLIENT_NAME);
 define('DEFAULT_EMAIL_ID', '');
+define('DEFAULT_PHONE', '');
 
 define('LOGO_IMG', 'assets/images/logo.png');
 define('LOGO_IMG_MIN', 'assets/images/logo-min.png');

@@ -188,6 +188,7 @@ class MY_Controller extends CI_Controller {
 		$text_fields = $this->TemplateModel->{$options->table_template}()['text_fields'] ?? [];
 		$img_fields = $this->TemplateModel->{$options->table_template}()['img_fields'] ?? [];
 		$table_alias = $this->TemplateModel->{$options->table_template}()['table_alias'] ?? "a";
+		$joins = $this->TemplateModel->{$options->table_template}()['joins'] ?? [];
 		$table = $options->table;
 
 		$status_field = "";
@@ -236,6 +237,14 @@ class MY_Controller extends CI_Controller {
 		foreach ($img_fields as $img_field => $img_path) {
 			$this->datatables
 				->edit_column($img_field, $this->add_image_col($img_path), $img_field);
+		}
+
+		foreach ($joins as $join) {
+			$join_table = $join['table'];
+			$join_alias = $join['alias'];
+			$join_condition = $join['condition'];
+			$join_type = $join['type'] ?? "";
+			$this->datatables->join("$join_table $join_alias", $join_condition, $join_type);
 		}
 
 		$this->setSearchableColumns($searchable_columns);

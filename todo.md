@@ -6,6 +6,7 @@
 - [x] Template for image uploads
 - [x] Template for routes
 - [ ] Template for navigation
+- [ ] Change password
 
 - [ ] Template config generator
 - [ ] DB create table query generator
