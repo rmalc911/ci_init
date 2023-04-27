@@ -106,7 +106,25 @@ class MY_Controller extends CI_Controller {
 		if (method_exists($path, "add_{$option}")) {
 			$this->{"add_{$option}"}();
 		} else {
-			$this->_add_template($this->TemplateModel->{"{$option}_config"});
+			/** @var TemplateConfig */
+			$config = $this->TemplateModel->{"{$option}_config"};
+			$this->_add_template($config, function ($edit) use ($option, $config) {
+				$input_tables = array_filter(
+					array_column($this->TemplateModel->{$config->form_template}(), null, 'name'),
+					function ($val) {
+						return $val['type'] == 'input-table';
+					}
+				);
+				foreach ($input_tables as $ti => $input_table) {
+					if (($input_table['table'] ?? "") != "") {
+						$edit[$input_table['name']] = $this->TemplateModel->get_edit_map($input_table['table'], $input_table['key'], $edit[$input_table['edit_key']]);
+					}
+				}
+				if (method_exists($this, "{$option}_edit_map")) {
+					$edit = $this->{"{$option}_edit_map"}($edit);
+				}
+				return $edit;
+			});
 		}
 	}
 
@@ -118,16 +136,27 @@ class MY_Controller extends CI_Controller {
 			$this->_submit_template($this->TemplateModel->{"{$option}_config"}, function ($post_data) use ($option) {
 				if (method_exists("TemplateModel", "{$option}_img_config")) {
 					$img_configs = $this->TemplateModel->{"{$option}_img_config"}();
-					foreach ($img_configs as $img_field => $value) {
-						$edit = $this->TemplateModel->{$option . "_config"}->get_row($this->input->post('id'));
-						$image = $this->TemplateModel->save_image($img_field, $value, null, null, $edit[$img_field] ?? null);
+					foreach ($img_configs as $img_field => $path) {
+						$edit = $this->TemplateModel->{$option . "_config"}->get_row($post_data['id']);
+						if (is_array($_FILES[$img_field]['name'])) {
+							$images = $this->TemplateModel->save_files($img_field, $path, null, null, true, explode(IMG_SPLIT, $edit[$img_field] ?? ''), $post_data['old_img']);
+							$image = join(IMG_SPLIT, array_column($images, 'image'));
+						} else {
+							$image = $this->TemplateModel->save_image($img_field, $path, null, null, $edit[$img_field] ?? null);
+						}
 						if ($image) {
 							$post_data[$img_field] = $image;
 						}
 					}
-					return $post_data;
+				}
+				if (method_exists($this, "{$option}_process_submit")) {
+					$post_data = $this->{"{$option}_process_submit"}($post_data);
 				}
 				return $post_data;
+			}, function ($post_data, $update) use ($option) {
+				if (method_exists($this, "{$option}_after_submit")) {
+					$this->{"{$option}_after_submit"}($post_data, $update);
+				}
 			});
 		}
 	}
@@ -148,7 +177,7 @@ class MY_Controller extends CI_Controller {
 	}
 
 	protected function add_action_col($cols) {
-		$action_col = '<div class="btn-group" role="group" aria-label="Button group">';
+		$action_col = '<div class="text-center"><div class="btn-group" role="group" aria-label="Button group">';
 		foreach ($cols as $col_name => $col_value) {
 			if ($col_name == 'edit') {
 				$action_col .= '<a href="' . ad_base_url($col_value . '?edit=$1') . '" class="btn btn-warning btn-sm"><i class="fa fa-fw fa-pencil-alt"></i></a>';
@@ -160,12 +189,12 @@ class MY_Controller extends CI_Controller {
 				$action_col .= '<button data-id="' . $col_value . '" data-status="$2" class="btn btn-success btn-sm update-status"><i class="fa fa-fw fa-check"></i></button>';
 			}
 		}
-		$action_col .= '</div>';
+		$action_col .= '</div></div>';
 		return $action_col;
 	}
 
 	protected function add_image_col($path) {
-		return '<img src="' . base_url($path . '$1') . '" data-original="$1" class="dt-image-col">';
+		return '<div class="text-center"><img src="' . base_url($path . '$1') . '" data-original="$1" class="dt-image-col"></div>';
 	}
 
 	protected function setSearchableColumns(array $columns) {
@@ -188,6 +217,7 @@ class MY_Controller extends CI_Controller {
 		$text_fields = $this->TemplateModel->{$options->table_template}()['text_fields'] ?? [];
 		$img_fields = $this->TemplateModel->{$options->table_template}()['img_fields'] ?? [];
 		$table_alias = $this->TemplateModel->{$options->table_template}()['table_alias'] ?? "a";
+		$sort_order = $this->TemplateModel->{$options->table_template}()['sort_order'] ?? "{$options->id} DESC";
 		$joins = $this->TemplateModel->{$options->table_template}()['joins'] ?? [];
 		$table = $options->table;
 
@@ -219,6 +249,7 @@ class MY_Controller extends CI_Controller {
 			return $table_alias . "." . $key . " AS " . $key;
 		}, array_keys($img_fields))) . "," : "";
 
+		$this->db->order_by($sort_order);
 		$this->datatables
 			->from($table . " $table_alias")
 			->select("1 as sl, $select_fields $text_fields_select $img_fields_select $table_alias.$id_field $status_field")

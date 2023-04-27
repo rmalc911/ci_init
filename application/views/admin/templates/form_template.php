@@ -293,6 +293,11 @@ foreach ($template as $template_row) {
 			<?= get_label($template_row) ?>
 			<div class="<?= $col_class ?>">
 				<input type="file" class="form-control p-2 h-auto <?= $class_list ?>" id="input-<?= $template_row['name'] ?>" name="<?= $template_row['name'] . ($multiple ? '[]' : '') ?>" <?= $required ?> <?= $attributes ?>>
+				<?php
+				if (isset($template_row['download'])) {
+					echo anchor(base_url($template_row['download']['path'] . $value), $template_row['download']['label'], ['target' => '_blank']);
+				}
+				?>
 				<?= form_error($template_row['name']) ?>
 			</div>
 		</div>

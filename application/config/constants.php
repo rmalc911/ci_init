@@ -118,3 +118,4 @@ define('db_user_date', '%D %b %Y');
 define('db_user_date_time', '%D %b %Y - %l:%i %p');
 
 define('CATEGORY_VIEW_DEPTH', 3);
+define('IMG_SPLIT', '~##~');

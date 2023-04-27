@@ -18,6 +18,7 @@ class MY_Exceptions extends CI_Exceptions {
 			!in_array($page, [
 				"Assets/uploads",
 				"Assets/admin",
+				"Assets/plugins",
 			])
 			&&
 			$log_error

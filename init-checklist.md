@@ -1,3 +1,4 @@
+- [ ] [ReadMe](./readme.md)
 - [ ] [RewriteBase](./.htaccess#L3)
 - [ ] [environment](./index.php#L58)
 - [ ] [libraries](./application/config/autoload.php#L5) ['database', 'form_validation', 'session']

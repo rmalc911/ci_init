@@ -190,20 +190,20 @@ class MY_Model extends CI_Model {
 		return $result;
 	}
 
-	public function select_category_options($select = true) {
+	public function select_category_options($select = true, $table = "categories", $option_name = "category_name", $option_value = "id", $parent_field = "parent_category") {
 		$category_nested_names = [];
 		for ($cat_i = CATEGORY_VIEW_DEPTH; $cat_i > 0; $cat_i--) {
-			$category_nested_names[] = "cp$cat_i.category_name";
+			$category_nested_names[] = "cp$cat_i.$option_name";
 		}
 		$this->db
-			->from('categories cp1');
+			->from("$table cp1");
 		for ($cat_i = 2; $cat_i <= CATEGORY_VIEW_DEPTH; $cat_i++) {
 			$cat_ip = $cat_i - 1;
 			$this->db
-				->join("categories cp$cat_i", "cp$cat_i.id = cp$cat_ip.parent_category", 'LEFT');
+				->join("$table cp$cat_i", "cp$cat_i.$option_value = cp$cat_ip.$parent_field", 'LEFT');
 		}
 		$result = $this->db
-			->select('CONCAT_WS(" > ", ' . join(', ', $category_nested_names) . ') as option_name, cp1.id as option_value')
+			->select('CONCAT_WS(" > ", ' . join(', ', $category_nested_names) . ") as option_name, cp1.$option_value as option_value")
 			->order_by('option_name', 'ASC')
 			->get()
 			->result_array();
@@ -253,10 +253,11 @@ class MY_Model extends CI_Model {
 		if (!$this->db_setup) {
 			return [];
 		}
-		if ($value == '') {
-			return [];
+
+		if ($key !== null) {
+			$this->db->where($key, $value);
 		}
-		return $this->db->get_where($table, [$key => $value])->result_array();
+		return $this->db->get($table)->result_array();
 	}
 
 	public function save_table_data($table, $post_data, $template, $key) {
@@ -309,7 +310,7 @@ class MY_Model extends CI_Model {
 	 * @param mixed $table_data
 	 * @param mixed $template
 	 * @param mixed $key
-	 * 
+	 *
 	 * @return array insert ID/Key
 	 */
 	public function save_table_data_multiple($table, $table_data, $template, $key, $select = 0) {
@@ -372,7 +373,8 @@ class MY_Model extends CI_Model {
 				return $image;
 			} else {
 				// $data['message'] = $this->generals_func->show_alert('err', 'Error!' . $this->upload->display_errors());
-				// echo json_encode($this->upload->display_errors('', ''));
+				echo $field;
+				echo json_encode($this->upload->display_errors('', ''));
 			}
 		}
 		// echo json_encode($_FILES[$field]['name']);
@@ -438,22 +440,31 @@ class MY_Model extends CI_Model {
 		return $images;
 	}
 
-	public function save_table_map($table, $foreign_key, $foreign_value, $fields) {
+	public function save_table_map($table, $foreign_key, $foreign_value, $fields, $formatting = null) {
 		if (!$this->db_setup) {
 			return [];
 		}
 		$post_map = [];
-		$field_rows = $this->input->post($fields[0]);
+		$field_rows = $this->input->post($fields[0]) ?? [];
 		foreach ($field_rows as $ii => $name) {
-			$post_row = [
-				$foreign_key => $foreign_value,
-			];
-			foreach ($fields as $field_name) {
+			if ($foreign_key !== null) {
+				$post_row = [
+					$foreign_key => $foreign_value,
+				];
+			}
+			foreach ($fields as $fi => $field_name) {
 				$post_row[$field_name] = $this->input->post($field_name)[$ii];
+				if (isset($formatting[$fi]) && $formatting[$fi] != "") {
+					$post_row[$field_name] = call_user_func($formatting[$fi], $post_row[$field_name]);
+				}
 			}
 			$post_map[] = $post_row;
 		}
 
+		if ($foreign_key === null) {
+			$foreign_key = 1;
+			$foreign_value = 1;
+		}
 		$this->db->delete($table, [$foreign_key => $foreign_value]);
 
 		if (count($post_map) > 0) {
@@ -527,7 +538,7 @@ class MY_Model extends CI_Model {
 	 * * `key` - primary key of ref table
 	 * * `field` - search text of ref table
 	 * * `name` - foriegn key of main table
-	 * 
+	 *
 	 * @return void
 	 */
 	public function excel_data_to_db_map($table_data, $map_data) {

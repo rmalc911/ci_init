@@ -62,7 +62,7 @@
 			</form>
 		</div>
 	</div>
-	<script src="<?= as_base_url('plugins/jquery-3.6.0.min.js') ?>"></script>
+	<script src="<?= as_base_url('plugins/jquery-3.6.3.min.js') ?>"></script>
 	<script src="<?= as_base_url('plugins/bootstrap/js/bootstrap.bundle.min.js') ?>"></script>
 	<script src="<?= aa_base_url('theme/js/ready.js') ?>"></script>
 </body>

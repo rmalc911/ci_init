@@ -34,3 +34,37 @@ CREATE TABLE `admin_config` (
 	`config_user` INT NOT NULL,
 	PRIMARY KEY (`config_key`)
 );
+CREATE TABLE `careers` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`career_name` VARCHAR(250) NOT NULL,
+	`career_desc` TEXT NOT NULL,
+	`career_desc_preview` VARCHAR(250) NOT NULL,
+	`career_status` ENUM('1', '0') NOT NULL DEFAULT '1',
+	`created_date` DATETIME NULL DEFAULT NULL,
+	`updated_date` DATETIME NULL DEFAULT NULL,
+	PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+CREATE TABLE `career_applications` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`career_id` INT NOT NULL,
+	`applicant_fname` VARCHAR(250) NOT NULL,
+	`applicant_lname` VARCHAR(250) NOT NULL,
+	`applicant_email` VARCHAR(250) NOT NULL,
+	`applicant_phone` VARCHAR(15) NOT NULL,
+	`applicant_resume` VARCHAR(250) NOT NULL,
+	`applicant_about` VARCHAR(1000) NOT NULL,
+	`date` DATETIME NOT NULL,
+	PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+CREATE TABLE `contact_us` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`contact_name` VARCHAR(250) NOT NULL,
+	`contact_email` VARCHAR(250) NOT NULL,
+	`contact_phone` VARCHAR(50) NOT NULL,
+	`contact_subject` VARCHAR(250) NOT NULL,
+	`contact_message` VARCHAR(500) NOT NULL,
+	`submit_page` VARCHAR(50) NOT NULL,
+	`contact_date` DATETIME NOT NULL,
+	`contact_ip` VARCHAR(50) NOT NULL,
+	PRIMARY KEY (`id`)
+) ENGINE = InnoDB;

@@ -28,7 +28,7 @@ class Home extends CI_Controller {
 			$status = $this->TemplateModel->set_config($config_items, $post_data);
 			$alert = $status ? $this->TemplateModel->show_alert('suc', 'Successfully updated') : $this->TemplateModel->show_alert('err', 'Failed to update');
 			$this->session->set_flashdata('message', $alert);
-			redirect(ad_base_url('home/email_config'));
+			redirect(base_url(uri_string()));
 		}
 		$this->data['config'] = $this->TemplateModel->get_config($config_items);
 		$this->load->template('config/manage', $this->data);
@@ -110,7 +110,7 @@ class Home extends CI_Controller {
 				];
 				$this->db->replace('admin_config', $set_config);
 			}
-			redirect(ad_base_url('home/payment_config'));
+			redirect(base_url(uri_string()));
 		}
 		$this->data['config'] = $this->TemplateModel->get_config($config_items);
 		$this->load->template('config/payment', $this->data);
