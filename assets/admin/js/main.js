@@ -3,7 +3,17 @@ let select2Config = {
 	placeholder: "Select",
 	theme: "bootstrap",
 	allowClear: true,
+	templateResult: formatIcon,
+	templateSelection: formatIcon,
 }
+function formatIcon(state) {
+	let img = $(state.element).data('img-path')
+	if (img) {
+		return $('<span class="select2-icon"><img src="' + img + '" height="20" class="img-responsive mr-2" />' + state.text + '</span>');
+	}
+	return state.text;
+}
+
 let validatorConfig = {
 	ignore: ":hidden, [contenteditable='true']:not([name])",
 	errorPlacement: function (error, element) {
@@ -108,7 +118,7 @@ $(function () {
 
 
 	var href = window.location.origin + window.location.pathname;
-	var activePage = $('a[href="' + href + '"');
+	var activePage = $('a[href="' + href + '"]');
 	var activeLi = activePage.parent("li");
 	var activeSubnav = activePage.parents(".collapse.subnav-collapse").parent("li");
 	activeLi.addClass("active");
@@ -571,6 +581,9 @@ $(function () {
 		var inputListLength = $(".input-group-list-item", inputList).length;
 		if (inputListLength > 1) {
 			$(this).parents(".input-group-list-item").remove();
+		}
+		if (inputListLength <= 2) {
+			$(".input-list-serial", inputList).text(1);
 		}
 	});
 });

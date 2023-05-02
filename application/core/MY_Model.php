@@ -12,10 +12,26 @@ class MY_Model extends CI_Model {
 		$login = !$this->db_setup;
 		if (null != ($this->session->userdata('user'))) {
 			$access = [
-				'user_name' => 'admin',
-				'user_id' => $this->session->userdata('user')['user_name'],
-				// 'page_access' => array_column($this->get_user_access_map($this->session->userdata('user')), null, 'page'),
+				'user_name' => $this->session->userdata('user')['display_name'],
+				'user_id' => $this->session->userdata('user')['id'],
 			];
+			if ($this->session->userdata('user')['user_mobile'] == 'admin') {
+				$navs = $this->TemplateModel->get_user_access_navs();
+				foreach ($navs as $pages) {
+					foreach ($pages as $page) {
+						$access['page_access'][$page['name']] = [
+							'page' => $page['name'],
+							'view_data' => '1',
+							'add_data' => '1',
+							'edit_data' => '1',
+							'block_data' => '1',
+							'delete_data' => '1',
+						];
+					}
+				}
+			} else {
+				$access['page_access'] = array_column($this->get_user_access_map($this->session->userdata('user')), null, 'page');
+			}
 			$login = true;
 		}
 		if (!$login) {
@@ -25,7 +41,10 @@ class MY_Model extends CI_Model {
 	}
 
 	public function verify_access($access_page, $access_type, $redirect = true) {
-		return true;
+		$username = $this->session->userdata('user')['user_mobile'];
+		if ($username == 'admin') {
+			return true;
+		}
 		$login_id = $this->session->userdata('user')['id'];
 		$access_data = $this->db->get_where('user_access_map', ['user' => $login_id, 'page' => $access_page], 1)->row_array();
 		$access_verified = $access_data[$access_type] ?? '0' == '1';
@@ -43,6 +62,14 @@ class MY_Model extends CI_Model {
 			}
 			redirect($redirect_url);
 		}
+	}
+
+	public function get_user_access_map($edit_data) {
+		if (!$edit_data) return [];
+
+		$user_id = $edit_data['id'];
+		$page_access = $this->db->get_where('user_access_map', ['user' => $user_id])->result_array();
+		return $page_access;
 	}
 
 	// Example
