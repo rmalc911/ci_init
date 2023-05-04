@@ -36,12 +36,35 @@ var select2AjaxConfig = {
 		cache: true,
 	},
 };
+var select2AjaxConfig = {
+	ajax: {
+		url: function (params) {
+			return ADMIN_PATH + "ajax/" + $(this).data("ajax-options");
+		},
+		processResults: function (data, params) {
+			params.page = params.page || 1;
+			return {
+				results: data.map((option) => {
+					return {
+						id: option.option_value,
+						text: option.option_name,
+					};
+				}),
+				pagination: {
+					more: params.page * 30 < data.total_count,
+				},
+			};
+		},
+		delay: 250,
+		cache: true,
+	},
+};
 
 let validatorConfig = {
 	ignore: ":hidden, [contenteditable='true']:not([name])",
 	errorPlacement: function (error, element) {
 		let appendAfter = element;
-		let toggleBtnParent = element.parents(".btn-group-toggle");
+		let toggleBtnParent = element.parents(".btn-group-toggle");;
 		if (toggleBtnParent.length > 0) {
 			let errorContainer = $("<div class='btn-toggle-error' />");
 			errorContainer.append(error);
@@ -86,10 +109,10 @@ $(function () {
 								icon: "error",
 							});
 						}
-					},
+					},,
 				});
 				return false;
-			},
+			},,
 		});
 	} else {
 		const validator = $(".validate-form").validate({
@@ -139,8 +162,8 @@ $(function () {
 					var divContent = div.html();
 					document.execCommand("insertHtml", false, divContent);
 				}, 30);
-			},
-		},
+			},,
+		},,
 	});
 
 	var href = window.location.origin + window.location.pathname;
@@ -151,12 +174,12 @@ $(function () {
 	if (activeLi[0]) {
 		activeLi[0].scrollIntoView({
 			behavior: "instant",
-			block: "center",
+			block: "center",,
 		});
 		setTimeout(() => {
 			activeLi[0].scrollIntoView({
 				behavior: "instant",
-				block: "center",
+				block: "center",,
 			});
 		}, 200);
 	}
@@ -253,13 +276,13 @@ $(function () {
 			html: " ",
 			showConfirmButton: showBtn,
 			customClass: {
-				popup: modalSize,
+				popup: modalSize,,
 			},
 			showCloseButton: true,
 			didOpen: () => {
-				Swal.showLoading();
-			},
-		});
+				Swal.showLoading();;
+			},,
+		});;
 		$.post({
 			url: ADMIN_PATH + "ajax/" + url,
 			data: {
@@ -278,7 +301,7 @@ $(function () {
 				if (res.reload) {
 					dtable.ajax.reload();
 				}
-			},
+			},,
 		});
 	});
 
@@ -304,7 +327,7 @@ $(function () {
 					},
 					dataType: "JSON",
 					success: function (res) {
-						dtable.ajax.reload();
+						dtable.ajax.reload();;
 						if (res.success) {
 							Swal.fire("Deleted!", "", "success");
 						} else if (res.map_view) {
@@ -338,7 +361,7 @@ $(function () {
 			},
 			dataType: "JSON",
 			success: function (res) {
-				dtable.ajax.reload();
+				dtable.ajax.reload();;
 				if (!res.success) {
 					var error_message = res.error_message;
 					if (!error_message) {
@@ -346,9 +369,9 @@ $(function () {
 					}
 					Swal.fire("Could not update!", error_message, "error");
 				}
-			},
+			},,
 		});
-	});
+	});;
 
 	var pagingType = "full_numbers";
 	if (window.innerWidth < 761) {
@@ -361,7 +384,7 @@ $(function () {
 	var processingStatusClass = "btn-border btn-primary";
 	var disabledStatusIcon = '<i class="fa fa-fw fa-ban"></i>';
 	var enabledStatusIcon = '<i class="fa fa-fw fa-check"></i>';
-	var processingStatusIcon = '<i class="loader loader-sm table-btn-spinner"></i>';
+	var processingStatusIcon = '<i class="loader loader-sm table-btn-spinner"></i>';;
 	dtable = $("[data-ajax-url]").DataTable({
 		bProcessing: true,
 		bServerSide: true,
@@ -389,7 +412,7 @@ $(function () {
 			if (currentStatus == "0") {
 				$(statusBtn).removeClass(enabledStatusClass).addClass(disabledStatusClass).html(disabledStatusIcon);
 			} else {
-				$(statusBtn).removeClass(disabledStatusClass).addClass(enabledStatusClass).html(enabledStatusIcon);
+				$(statusBtn).removeClass(disabledStatusClass).addClass(enabledStatusClass).html(enabledStatusIcon);;
 			}
 		},
 		fnServerData: function (sSource, aoData, fnCallback) {
@@ -424,7 +447,7 @@ $(function () {
 				},
 				success: fnCallback,
 			});
-		},
+		},,
 	});
 
 	// Input File Image
@@ -570,7 +593,7 @@ $(function () {
 							}
 						});
 				}
-			},
+			},,
 		});
 	});
 
@@ -593,9 +616,13 @@ $(function () {
 			$(".input-list-serial", ie).text(ix + 1);
 			$(".input-list-serial-value", ie).val(ix);
 		});
+		$(".input-group-list-item", inputListContainer).each(function (ix, ie) {
+			$(".input-list-serial", ie).text(ix + 1);
+			$(".input-list-serial-value", ie).val(ix);
+		});
 	});
 
-	$("body").on('click', ".input-list-remove", function () {
+	$("body").on("click", ".input-list-remove", function () {
 		var inputListContainer = $(this).parents(".input-list-container");
 		var inputList = $(".input-group-list", inputListContainer);
 		var inputListLength = $(".input-group-list-item", inputList).length;
@@ -629,5 +656,5 @@ const Processing = Swal.mixin({
 	icon: "info",
 	didOpen: (processing) => {
 		Processing.showLoading();
-	},
+	},,
 });
