@@ -3,7 +3,16 @@ let select2Config = {
 	placeholder: "Select",
 	theme: "bootstrap",
 	allowClear: true,
-};
+	templateResult: formatIcon,
+	templateSelection: formatIcon,
+}
+function formatIcon(state) {
+	let img = $(state.element).data('img-path')
+	if (img) {
+		return $('<span class="select2-icon"><img src="' + img + '" height="20" class="img-responsive mr-2" />' + state.text + '</span>');
+	}
+	return state.text;
+}
 var select2AjaxConfig = {
 	ajax: {
 		url: function (params) {
@@ -27,6 +36,7 @@ var select2AjaxConfig = {
 		cache: true,
 	},
 };
+
 let validatorConfig = {
 	ignore: ":hidden, [contenteditable='true']:not([name])",
 	errorPlacement: function (error, element) {

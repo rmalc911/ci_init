@@ -34,6 +34,13 @@ foreach ($links as $type => $link) {
 		</a>
 	<?php
 	}
+	if ($type == 'export') {
+	?>
+		<a href="<?= $url ?>" class="btn btn-success <?= $url_match ? '' : 'btn-border' ?> ml-2">
+			<i class="fa fa-file-excel"></i> Download
+		</a>
+	<?php
+	}
 	if ($type == 'other') {
 	?>
 		<a href="<?= $url ?>" class="btn btn-primary <?= $url_match ? '' : 'btn-border' ?> ml-2">

@@ -12,10 +12,10 @@ final class Excel_export {
 	 * @param mixed $file_name export file name
 	 * @param bool $total_row ddefault false
 	 * @param bool $heading_rows ddefault false
-	 * 
+	 *
 	 * @return void
 	 */
-	public function exportExcelTable($table, $table_heads, $file_name, $total_row = false, $heading_rows = false) {
+	static function exportExcelTable($table, $table_heads, $file_name, $total_row = false, $heading_rows = false) {
 		$save_file = new PHPExcel();
 
 		$save_file->setActiveSheetIndex(0);
@@ -105,7 +105,7 @@ final class Excel_export {
 	 * @param string $file_path File Path or Input Name
 	 * @param bool $form_upload From form file upload
 	 * @param array|null $get_associative_data Convert imported data to associative using provided keys
-	 * 
+	 *
 	 * @return array
 	 */
 	static function importExcelFile(string $file_path, bool $form_upload = false, ?array $get_associative_data = null) {
@@ -128,7 +128,7 @@ final class Excel_export {
 			$val = array();
 			for ($col = 0; $col < $highestColumnIndex; ++$col) {
 				$cell = $sheet->getCellByColumnAndRow($col, $row);
-				$val[] = $cell->getValue();
+				$val[] = trim($cell->getFormattedValue());
 			}
 			$import_data[] = $val;
 		}
@@ -157,8 +157,26 @@ final class Excel_export {
 		}
 		return $table_data;
 	}
+
+	/**
+	 * Convert excel date value to unix timestamp
+	 * @param int $excel_date
+	 * @return int
+	 */
+	static function from_excel_to_unix($excel_date) {
+		return ($excel_date - 25569) * 86400;
+	}
+
+	/**
+	 * Convert unix timestamp to excel date value
+	 * @param int $unix_date
+	 * @return int
+	 */
+	static function from_unix_to_excel($unix_date) {
+		return 25569 + ($unix_date / 86400);
+	}
 }
 
 function has_string_keys(array $array) {
 	return count(array_filter(array_keys($array), 'is_string')) > 0;
-  }
+}
