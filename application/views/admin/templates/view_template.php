@@ -12,7 +12,7 @@
 	?>
 		<div class="collapse" id="collapse-view-filter">
 			<div class="card-body border-bottom">
-				<?= $this->load->view(ADMIN_VIEWS_PATH . 'templates/filter_template', ['filter_columns' => $view_template['filter']], true) ?>
+				<?= $this->load->view(ADMIN_VIEWS_PATH . 'templates/filter_template', ['table' => $table_template, 'filter_columns' => $view_template['filter'] ?? '', 'export' => $view_template['export'] ?? ''], true) ?>
 			</div>
 		</div>
 	<?php

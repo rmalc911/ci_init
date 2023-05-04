@@ -40,6 +40,28 @@ class Login extends CI_Controller {
 		}
 		$this->session->set_userdata('user', $user);
 		$this->db->update('users', ['last_login' => date('Y-m-d H:i:s')], ['user_mobile' => $post_data['username']]);
+		if ($user['user_mobile'] != 'admin') {
+			$view_access = $this->db->get_where('user_access_map', ['user' => $user['id'], 'view_data' => '1'], 1)->row_array();
+			if (!$view_access) {
+				$this->session->set_flashdata('login', 'No access provided, please ask admin to update your user rights');
+				$this->logout();
+			} else {
+				$navs = $this->TemplateModel->get_user_access_navs();
+				$break = 0;
+				foreach ($navs as $pages) {
+					foreach ($pages as $page) {
+						if ($view_access['page'] == $page['name']) {
+							$this->login_redirect = ADMIN_PATH . $page['url'];
+							$break = 1;
+							break;
+						}
+					}
+					if ($break == 1) {
+						break;
+					}
+				}
+			}
+		}
 		redirect_base($this->login_redirect);
 	}
 
