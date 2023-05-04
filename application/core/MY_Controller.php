@@ -26,7 +26,7 @@ class MY_Controller extends CI_Controller {
 		$this->data['message'] = $this->session->flashdata('message');
 		$this->data['form_template'] = $this->TemplateModel->{$options->form_template}();
 		$this->data['view_template'] = $this->TemplateModel->{$options->view_template}();
-		$this->data['edit'] = $this->TemplateModel->get_edit_row($options->table);
+		$this->data['edit'] = $this->TemplateModel->get_edit_row($options->table, '', $options->id);
 		if ($this->data['edit']) {
 			if ($edit_map) {
 				$this->data['edit'] = $edit_map($this->data['edit']);
@@ -80,7 +80,7 @@ class MY_Controller extends CI_Controller {
 				// Return post data is required!
 				$post_data = $process_post_data($post_data);
 			}
-			$update = $this->TemplateModel->save_table_data($options->table, $post_data, $this->data['form_template'], 'id');
+			$update = $this->TemplateModel->save_table_data($options->table, $post_data, $this->data['form_template'], $options->id);
 			if ($after_submit) {
 				$after_submit($post_data, $update);
 			}
