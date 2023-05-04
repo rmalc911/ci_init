@@ -574,15 +574,19 @@ $(function () {
 		});
 	});
 
-	$("body").on("click", ".input-list-add", function () {
+	$("body").on('click', ".input-list-add", function () {
 		var inputListContainer = $(this).parents(".input-list-container");
 		var inputList = $(".input-group-list", inputListContainer);
-		$(".select-widget", inputListContainer).select2("destroy");
-		$(".select-widget", inputListContainer).removeAttr("data-live-search").removeAttr("data-select2-id").removeAttr("aria-hidden").removeAttr("tabindex");
+		$(".select-widget", inputListContainer).select2('destroy');
+		$(".select-widget", inputListContainer)
+			.removeAttr('data-live-search')
+			.removeAttr('data-select2-id')
+			.removeAttr('aria-hidden')
+			.removeAttr('tabindex');
 		var inputListItem = $(".input-group-list-item:first-child", inputList).clone();
 		var resetSrc = $(".reset-src", inputListItem).val();
-		$(".form-control", inputListItem).val("");
-		$(".img-upload-preview", inputListItem).attr("src", resetSrc);
+		$(".form-control", inputListItem).val('');
+		$(".img-upload-preview", inputListItem).attr('src', resetSrc);
 		inputList.append(inputListItem);
 		$(".select-widget", inputListContainer).select2(select2Config);
 		$(".input-group-list-item", inputListContainer).each(function (ix, ie) {
@@ -591,7 +595,7 @@ $(function () {
 		});
 	});
 
-	$("body").on("click", ".input-list-remove", function () {
+	$("body").on('click', ".input-list-remove", function () {
 		var inputListContainer = $(this).parents(".input-list-container");
 		var inputList = $(".input-group-list", inputListContainer);
 		var inputListLength = $(".input-group-list-item", inputList).length;
