@@ -14,6 +14,7 @@ function get_label($template_row) {
 	return '<label for="input-' . $name . '" class="col-md-3 mt-2 text-left">' . $template_row['label'] . ($required == true ? ' <span class="required-label">*</span>' : '') . $help_text_html . '</label>';
 }
 $col_class = ($popup_mode ?? false) ? 'col-md-9' : 'col-xl-5 col-lg-6 col-md-9';
+$edit_id = $this->input->get('edit');
 foreach ($template as $template_row) {
 	$readonly = (isset($template_row['readonly']) && $template_row['readonly'] == true) ? 'readonly' : '';
 	$required = (isset($template_row['required']) && $template_row['required'] == true) ? 'required' : '';
@@ -24,15 +25,11 @@ foreach ($template as $template_row) {
 	$edit_block = false;
 	if (isset($edit['post_fill']) && $edit['post_fill'] == true) {
 		$post_fill = true;
-		$edit_id = $this->input->get('edit');
 	}
 	if (isset($template_row['no_edit']) && $template_row['no_edit'] == true && $value != '' && !$post_fill) {
 		$readonly = 'readonly';
 	}
 	$attributes = '';
-	if ($template_row['rows'] ?? "" == "") {
-		$template_row['rows'] = 3;
-	}
 	if (isset($template_row['attributes'])) {
 		foreach ($template_row['attributes'] as $attr_key => $attr_value) {
 			$attributes .= $attr_key . '="' . $attr_value . '" ';
@@ -43,7 +40,7 @@ foreach ($template as $template_row) {
 		<div class="form-group row">
 			<?= get_label($template_row) ?>
 			<div class="<?= $col_class ?>">
-				<input type="text" class="form-control <?= $class_list ?>" id="input-<?= $template_row['name'] ?>" name="<?= $template_row['name'] ?>" placeholder="" <?= $required ?> <?= $readonly ?> value="<?= $value ?>" <?= $attributes ?>>
+				<input type="text" class="form-control <?= $class_list ?>" id="input-<?= $template_row['name'] ?>" name="<?= $template_row['name'] ?>" <?= $required ?> <?= $readonly ?> value="<?= $value ?>" <?= $attributes ?>>
 				<?= form_error($template_row['name']) ?>
 			</div>
 		</div>
@@ -55,7 +52,7 @@ foreach ($template as $template_row) {
 		<div class="form-group row">
 			<?= get_label($template_row) ?>
 			<div class="<?= $col_class ?>">
-				<input type="email" class="form-control <?= $class_list ?>" id="input-<?= $template_row['name'] ?>" name="<?= $template_row['name'] ?>" placeholder="" <?= $required ?> <?= $readonly ?> value="<?= $value ?>" <?= $attributes ?>>
+				<input type="email" class="form-control <?= $class_list ?>" id="input-<?= $template_row['name'] ?>" name="<?= $template_row['name'] ?>" <?= $required ?> <?= $readonly ?> value="<?= $value ?>" <?= $attributes ?>>
 				<?= form_error($template_row['name']) ?>
 			</div>
 		</div>
@@ -67,7 +64,7 @@ foreach ($template as $template_row) {
 		<div class="form-group row">
 			<?= get_label($template_row) ?>
 			<div class="<?= $col_class ?>">
-				<input type="number" step="any" class="form-control <?= $class_list ?>" id="input-<?= $template_row['name'] ?>" name="<?= $template_row['name'] ?>" placeholder="" <?= $required ?> <?= $readonly ?> value="<?= $value ?>" <?= $attributes ?>>
+				<input type="number" step="any" class="form-control <?= $class_list ?>" id="input-<?= $template_row['name'] ?>" name="<?= $template_row['name'] ?>" <?= $required ?> <?= $readonly ?> value="<?= $value ?>" <?= $attributes ?>>
 				<?= form_error($template_row['name']) ?>
 			</div>
 		</div>
@@ -81,7 +78,7 @@ foreach ($template as $template_row) {
 			<?= get_label($template_row) ?>
 			<div class="<?= $col_class ?>">
 				<div class="input-group">
-					<input type="text" class="form-control time-widget <?= $class_list ?>" id="input-<?= $template_row['name'] ?>" name="<?= $template_row['name'] ?>" placeholder="" <?= $required ?> <?= $readonly ?> value="<?= $value ?>" <?= $attributes ?>>
+					<input type="text" class="form-control time-widget <?= $class_list ?>" id="input-<?= $template_row['name'] ?>" name="<?= $template_row['name'] ?>" <?= $required ?> <?= $readonly ?> value="<?= $value ?>" <?= $attributes ?>>
 					<div class="input-group-append">
 						<label for="input-<?= $template_row['name'] ?>" class="input-group-text m-0">
 							<i class="fa fa-clock"></i>
@@ -120,7 +117,7 @@ foreach ($template as $template_row) {
 			<?= get_label($template_row) ?>
 			<div class="<?= $col_class ?>">
 				<div class="input-group">
-					<input type="text" class="form-control date-widget <?= $class_list ?>" id="input-<?= $template_row['name'] ?>" name="<?= $template_row['name'] ?>" placeholder="" <?= $required ?> <?= $readonly ?> value="<?= $value != '' ? date('d-m-Y', strtotime($value)) : '' ?>" <?= $attributes ?> <?= $min_date_attr ?> <?= $max_date_attr ?>>
+					<input type="text" class="form-control date-widget <?= $class_list ?>" id="input-<?= $template_row['name'] ?>" name="<?= $template_row['name'] ?>" <?= $required ?> <?= $readonly ?> value="<?= $value != '' ? date(input_date, strtotime($value)) : '' ?>" <?= $attributes ?> <?= $min_date_attr ?> <?= $max_date_attr ?>>
 					<div class="input-group-append">
 						<label for="input-<?= $template_row['name'] ?>" class="input-group-text m-0">
 							<i class="fa fa-calendar"></i>
@@ -271,9 +268,10 @@ foreach ($template as $template_row) {
 				<div class="form-check form-check-inline p-0 mr-0">
 					<?php
 					foreach ($template_row['options'] as $to => $option) {
+						$radio_checked = $value == $to ? 'checked' : '';
 					?>
 						<div class="custom-control custom-radio">
-							<input type="radio" id="radio-<?= $template_row['name'] ?>-<?= $to ?>" name="<?= $template_row['name'] ?>" class="custom-control-input" value="<?= $to ?>">
+							<input type="radio" id="radio-<?= $template_row['name'] ?>-<?= $to ?>" name="<?= $template_row['name'] ?>" class="custom-control-input" value="<?= $to ?>" <?= $radio_checked ?>>
 							<label class="custom-control-label" for="radio-<?= $template_row['name'] ?>-<?= $to ?>"><?= $option ?></label>
 						</div>
 					<?php
@@ -293,42 +291,38 @@ foreach ($template as $template_row) {
 			<?= get_label($template_row) ?>
 			<div class="<?= $col_class ?>">
 				<input type="file" class="form-control p-2 h-auto <?= $class_list ?>" id="input-<?= $template_row['name'] ?>" name="<?= $template_row['name'] . ($multiple ? '[]' : '') ?>" <?= $required ?> <?= $attributes ?>>
-				<?php
-				if (isset($template_row['download'])) {
-					echo anchor(base_url($template_row['download']['path'] . $value), $template_row['download']['label'], ['target' => '_blank']);
-				}
-				?>
 				<?= form_error($template_row['name']) ?>
 			</div>
+			<?php
+			if ($value != "") {
+			?>
+				<div class="col">
+					<a href="<?= base_url($template_row['path'] . $value) ?>" target="_blank" class="btn btn-secondary">View Uploaded File</a>
+				</div>
+			<?php
+			}
+			?>
 		</div>
 	<?php
 	}
 
 	if ($template_row['type'] == 'list') {
+		$multiple = (isset($template_row['multiple']) && $template_row['multiple'] == true) ? 'multiple' : '';
 	?>
 		<div class="form-group row">
 			<?= get_label($template_row) ?>
 			<div class="<?= $col_class ?>">
 				<div class="input-list-container">
 					<div class="input-group-list" id="input-list-<?= $template_row['name'] ?>">
-						<?php
-						$input_row = 0;
-						do {
-							$field_value = $edit[$template_row['name']][$input_row] ?? "";
-						?>
-							<div class="input-group input-group-list-item mb-1">
-								<div class="input-group-prepend">
-									<span class="input-group-text"><?= $template_row['prepend_text'] ?><span class="input-list-serial"><?= $input_row + 1 ?></span></span>
-								</div>
-								<input type="text" class="form-control <?= $class_list ?>" name="<?= $template_row['name'] ?>[]" <?= $required ?> <?= $attributes ?> value="<?= $field_value ?>">
-								<div class="input-group-append">
-									<button class="btn btn-outline-danger btn-sm input-list-remove" type="button"><i class="fa fa-times"></i></button>
-								</div>
+						<div class="input-group input-group-list-item mb-1">
+							<div class="input-group-prepend">
+								<span class="input-group-text"><?= $template_row['prepend_text'] ?><span class="input-list-serial">1</span></span>
 							</div>
-						<?php
-							$input_row += 1;
-						} while (isset($edit[$template_row['name']][$input_row]));
-						?>
+							<input type="text" class="form-control <?= $class_list ?>" name="<?= $template_row['name'] ?>[]" <?= $required ?> <?= $attributes ?>>
+							<div class="input-group-append">
+								<button class="btn btn-outline-danger btn-sm input-list-remove" type="button"><i class="fa fa-times"></i></button>
+							</div>
+						</div>
 					</div>
 					<button class="btn btn-info btn-sm input-list-add" type="button"><i class="fa fa-plus"></i> Add Row</button>
 				</div>
@@ -363,7 +357,7 @@ foreach ($template as $template_row) {
 		<div class="form-group row">
 			<?= get_label($template_row) ?>
 			<div class="col-md-9 table-responsive">
-				<table class="input-list-container table table-bordered table-sm m-0">
+				<table class="input-list-container table table-sm m-0">
 					<thead>
 						<tr>
 							<th>Sl. No</th>
@@ -424,17 +418,17 @@ foreach ($template as $template_row) {
 	}
 
 	if ($template_row['type'] == 'input-table') {
-		$fields = $this->TemplateModel->{$template_row['fields']}();
+		$fields = $this->TemplateModel->{$template_row['fields']}($edit_id);
 		$table_inline = $template_row['table-inline'] ?? false;
 		$table_col = $table_inline ? "col-md-9" : "col-md-12";
 	?>
 		<div class="form-group row">
 			<?= get_label($template_row) ?>
 			<div class="<?= $table_col ?> table-responsive">
-				<table class="table table-sm table-bordered input-list-container" id="input-table-<?= $template_row['name'] ?>">
+				<table class="table table-sm input-list-container" id="input-table-<?= $template_row['name'] ?>">
 					<thead>
 						<tr>
-							<th width="50px">Sl. No</th>
+							<th width="65px">Sl. No</th>
 							<?php
 							foreach ($fields as $field) {
 							?>
@@ -466,6 +460,7 @@ foreach ($template as $template_row) {
 												if (is_array($field['options'])) {
 													$field_options = $field['options'];
 												} elseif (is_string($field['options'])) {
+													$field_options = $field['edit_options'] ?? [];
 													$row_attributes['data-ajax-options'] = $field['options'];
 												}
 											}
@@ -475,17 +470,26 @@ foreach ($template as $template_row) {
 											</div>
 										<?php
 										} elseif ($field['type'] == 'checkbox') {
+											$class_list .= " input-list-serial-index";
+											$field['attributes'] = ($field['attributes'] ?? []) + ['data-serial-index-name' => $field['name']];
+											$field_checked = $field_value == '1';
 										?>
-											<div class="custom-control custom-checkbox">
-												<?= form_checkbox($field['name'] . "[]", '', false, ['class' => "custom-control-input $class_list", 'id' => "check-list-" . $field['name'] . $input_row] + ($field['attributes'] ?? [])); ?>
-												<label class="custom-control-label" for="<?= "check-list-" . $field['name'] . $input_row ?>">1</label>
+											<div class="selectgroup selectgroup-pills">
+												<label class="selectgroup-item">
+													<?= form_checkbox($field['name'] . "[$input_row]", '1', $field_checked, ['class' => "selectgroup-input $class_list",] + ($field['attributes'] ?? [])); ?>
+													<span class="selectgroup-button"><?= $field['label'] ?></span>
+												</label>
 											</div>
 										<?php
 										} elseif ($field['type'] == 'radio') {
+											$class_list .= " input-list-serial-index";
+											$field['attributes'] = ($field['attributes'] ?? []) + ['data-serial-index-name' => $field['name']];
 										?>
-											<div class="custom-control custom-checkbox">
-												<?= form_radio($field['name'], '', false, ['class' => "custom-control-input $class_list", 'id' => "check-list-" . $field['name'] . $input_row] + ($field['attributes'] ?? [])); ?>
-												<label class="custom-control-label" for="<?= "check-list-" . $field['name'] . $input_row ?>">1</label>
+											<div class="selectgroup selectgroup-pills">
+												<label class="selectgroup-item" for="<?= "check-list-" . $field['name'] . $input_row ?>">
+													<?= form_radio($field['name'], '', false, ['class' => "selectgroup-input $class_list",] + ($field['attributes'] ?? [])); ?>
+													<span class="selectgroup-button"><?= $field['label'] ?></span>
+												</label>
 											</div>
 										<?php
 										} elseif ($field['type'] == 'textarea') {
@@ -499,6 +503,7 @@ foreach ($template as $template_row) {
 								}
 								?>
 								<td class="text-center">
+									<input type="hidden" name="sort_order[]" value="<?= $input_row ?>" class="input-list-serial-value">
 									<button class="btn btn-outline-danger btn-sm input-list-remove" type="button"><i class="fa fa-times"></i></button>
 								</td>
 							</tr>
@@ -530,7 +535,7 @@ foreach ($template as $template_row) {
 			<?= get_label($template_row) ?>
 			<div class="<?= $col_class ?>">
 				<div class="tags-control form-control form-control-sm <?= $class_list ?>">
-					<input type="text" id="input-<?= $template_row['name'] ?>" name="<?= $template_row['name'] ?>" placeholder="" <?= $required ?> <?= $readonly ?> value="<?= $value ?>" <?= $attributes ?> data-role="tagsinput">
+					<input type="text" id="input-<?= $template_row['name'] ?>" name="<?= $template_row['name'] ?>" <?= $required ?> <?= $readonly ?> value="<?= $value ?>" <?= $attributes ?> data-role="tagsinput">
 				</div>
 				<?= form_error($template_row['name']) ?>
 			</div>
