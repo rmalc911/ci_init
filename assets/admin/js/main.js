@@ -109,10 +109,10 @@ $(function () {
 								icon: "error",
 							});
 						}
-					},,
+					},
 				});
 				return false;
-			},,
+			},
 		});
 	} else {
 		const validator = $(".validate-form").validate({
@@ -162,8 +162,8 @@ $(function () {
 					var divContent = div.html();
 					document.execCommand("insertHtml", false, divContent);
 				}, 30);
-			},,
-		},,
+			},
+		},
 	});
 
 	var href = window.location.origin + window.location.pathname;
@@ -174,12 +174,12 @@ $(function () {
 	if (activeLi[0]) {
 		activeLi[0].scrollIntoView({
 			behavior: "instant",
-			block: "center",,
+			block: "center",
 		});
 		setTimeout(() => {
 			activeLi[0].scrollIntoView({
 				behavior: "instant",
-				block: "center",,
+				block: "center",
 			});
 		}, 200);
 	}
@@ -276,12 +276,12 @@ $(function () {
 			html: " ",
 			showConfirmButton: showBtn,
 			customClass: {
-				popup: modalSize,,
+				popup: modalSize,
 			},
 			showCloseButton: true,
 			didOpen: () => {
 				Swal.showLoading();;
-			},,
+			},
 		});;
 		$.post({
 			url: ADMIN_PATH + "ajax/" + url,
@@ -301,7 +301,7 @@ $(function () {
 				if (res.reload) {
 					dtable.ajax.reload();
 				}
-			},,
+			},
 		});
 	});
 
@@ -369,7 +369,7 @@ $(function () {
 					}
 					Swal.fire("Could not update!", error_message, "error");
 				}
-			},,
+			},
 		});
 	});;
 
@@ -447,7 +447,7 @@ $(function () {
 				},
 				success: fnCallback,
 			});
-		},,
+		},
 	});
 
 	// Input File Image
@@ -593,7 +593,7 @@ $(function () {
 							}
 						});
 				}
-			},,
+			},
 		});
 	});
 
@@ -656,5 +656,5 @@ const Processing = Swal.mixin({
 	icon: "info",
 	didOpen: (processing) => {
 		Processing.showLoading();
-	},,
+	},
 });
