@@ -1,18 +1,17 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class Home extends CI_Controller {
+class Home extends MY_Controller {
 	public function __construct() {
 		parent::__construct();
+		$this->data['message'] = $this->session->flashdata('message');
 	}
 
 	public function index() {
-		$this->data['message'] = $this->session->flashdata('message');
 		$this->load->template('home', $this->data);
 	}
 
 	public function email_config() {
-		$this->data['message'] = $this->session->flashdata('message');
 		$this->TemplateModel->verify_access('email_config', 'view_data');
 		$this->form_validation->set_rules('sendmail_mode', 'Sendmail Mode', 'required');
 		$config_items = [
@@ -49,7 +48,6 @@ class Home extends CI_Controller {
 	}
 
 	public function change_password() {
-		$this->data['message'] = $this->session->flashdata('message');
 		$this->data['form_template'] = $this->TemplateModel->change_pw_form();
 		$this->data['view_template'] = $this->TemplateModel->change_pw_view();
 		$this->TemplateModel->set_validation($this->data['form_template']);
@@ -60,7 +58,6 @@ class Home extends CI_Controller {
 	}
 
 	public function payment_config() {
-		$this->data['message'] = $this->session->flashdata('message');
 		$this->TemplateModel->verify_access('payment_config', 'view_data');
 		$this->form_validation->set_rules('payment_gateway', 'Payment Gateway', 'required');
 		$this->form_validation->set_rules('payment_key_state', 'Active Payment Keys', 'required');

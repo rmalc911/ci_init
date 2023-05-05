@@ -3,6 +3,11 @@
 		<div class="card-head-row">
 			<h4 class="card-title"><?= $view_template['head'] ?></h4>
 			<div class="card-tools">
+				<?php
+				if ((($view_template['export'] ?? "") != "") && !array_key_exists('export', $view_template['links'])) {
+					$view_template['links']['export'] = $view_template['export'];
+				}
+				?>
 				<?= $this->load->view(ADMIN_VIEWS_PATH . 'templates/links_template', ['links' => $view_template['links'], 'filter' => $view_template['filter'] ?? ''], true) ?>
 			</div>
 		</div>

@@ -96,13 +96,21 @@ class TemplateModel extends MY_Model {
 		];
 	}
 
-	// Website / Career Applications
-	public function career_application_view() {
+
+	// Enquiries / Career Applications
+	public function career_application_view($queries = true) {
+		$career_options = $queries ? $this->career_config->get_options() : [];
 		return [
 			'head' => 'Career Applications',
 			'links' => [
 				'view' => 'website/view_career_applications',
 			],
+			'filter' => [
+				['type' => 'select', 'label' => 'Career', 'name' => 'career_id', 'filter_options' => $career_options],
+				['type' => 'date', 'name' => 'date-1', 'label' => 'From Date', 'date_type' => '>='],
+				['type' => 'date', 'name' => 'date-2', 'label' => 'To Date', 'date_type' => '<='],
+			],
+			'export' => 'enquiries/export_career_applications',
 		];
 	}
 
@@ -111,7 +119,7 @@ class TemplateModel extends MY_Model {
 			'heads' => ['Sl. no', 'Career', 'First Name', 'Last Name', 'Email', 'Phone', 'About', 'Resume', 'Date'],
 			'src' => 'ajax',
 			'data' => 'ajaxtables/career_applications',
-			'text_fields' => ['applicant_fname', 'applicant_lname', 'applicant_email', 'applicant_phone', 'applicant_resume', 'DATETIME' => 'date'],
+			'text_fields' => ['applicant_fname', 'applicant_lname', 'applicant_email', 'applicant_phone', 'applicant_resume', 'date' => 'DATETIME'],
 			'joins' => [
 				[
 					'table' => 'careers',
@@ -122,6 +130,21 @@ class TemplateModel extends MY_Model {
 		];
 	}
 
+	public function get_career_application_export($filter) {
+		$config = $this->career_application_config;
+		$table_heads = [
+			'career_name' => 'Career',
+			'applicant_fname' => 'First Name',
+			'applicant_lname' => 'Last Name',
+			'applicant_email' => 'Email',
+			'applicant_phone' => 'Phone',
+			'applicant_about' => 'Message',
+			'applicant_resume' => 'Resume',
+			'date' => 'Date',
+		];
+		return $this->get_export($config, $table_heads, $filter);
+	}
+
 	// Website / Contact Us
 	public function contact_us_view() {
 		return [
@@ -129,6 +152,11 @@ class TemplateModel extends MY_Model {
 			'links' => [
 				'view' => 'website/view_contact_us',
 			],
+			'filter' => [
+				['type' => 'date', 'name' => 'contact_date-1', 'label' => 'From Date', 'date_type' => '>='],
+				['type' => 'date', 'name' => 'contact_date-2', 'label' => 'To Date', 'date_type' => '<='],
+			],
+			'export' => 'enquiries/export_contact_us',
 		];
 	}
 
@@ -137,7 +165,19 @@ class TemplateModel extends MY_Model {
 			'heads' => ['Sl. no', 'Name', 'Email', 'Message', 'Date'],
 			'src' => 'ajax',
 			'data' => 'ajaxtables/contact_us',
-			'text_fields' => ['contact_name', 'contact_email', 'contact_message', 'DATETIME' => 'contact_date'],
+			'text_fields' => ['contact_name', 'contact_email', 'contact_message', 'contact_date' => 'DATETIME'],
 		];
+	}
+
+	public function get_contact_us_export($filter) {
+		$config = $this->contact_us_config;
+		$table_heads = [
+			'contact_name' => 'Name',
+			// 'submit_page' => 'Submit Page',
+			'contact_email' => 'Email',
+			'contact_message' => 'Message',
+			'contact_date' => 'Date',
+		];
+		return $this->get_export($config, $table_heads, $filter);
 	}
 }

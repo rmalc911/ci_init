@@ -114,6 +114,7 @@ define('date_time_format', 'Y-m-d H:i:s');
 define('user_date', 'jS M Y');
 define('user_date_time', 'jS M Y, g:i A');
 define('input_date', 'd-m-Y');
+define('input_date_time', 'd-m-Y g:i A');
 define('db_user_date', '%D %b %Y');
 define('db_user_date_time', '%D %b %Y - %l:%i %p');
 

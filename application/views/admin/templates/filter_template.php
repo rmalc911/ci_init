@@ -1,4 +1,4 @@
-<form action="" method="post">
+<form action="<?= ad_base_url($export ?? '') ?>" method="post">
 	<div class="row">
 		<?php
 		foreach ($filter_columns as $fi => $filter_col) {
@@ -108,11 +108,11 @@
 		foreach ($filter_columns as $fi => $filter_col) {
 			if ($filter_col['type'] == "radio") {
 		?>
-				filter.<?= $filter_col['name'] ?> = $("[name='<?= $filter_col['name'] ?>']:checked").val();
+				filter['<?= $filter_col['name'] ?>'] = $("[name='<?= $filter_col['name'] ?>']:checked").val();
 			<?php
 			} else {
 			?>
-				filter.<?= $filter_col['name'] ?> = $("#filter-<?= $filter_col['name'] ?>").val();
+				filter['<?= $filter_col['name'] ?>'] = $("#filter-<?= $filter_col['name'] ?>").val();
 		<?php
 			}
 		}

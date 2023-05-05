@@ -130,6 +130,33 @@ foreach ($template as $template_row) {
 	<?php
 	}
 
+	if ($template_row['type'] == 'datetime-widget') {
+		$min_date_attr = '';
+		$max_date_attr = '';
+		if (isset($template_row['add-min-date'])) {
+			$min_date_attr = 'data-date-min-date="' . $template_row['add-min-date'] . '"';
+		}
+		if (isset($template_row['add-max-date'])) {
+			$max_date_attr = 'data-date-max-date="' . $template_row['add-max-date'] . '"';
+		}
+	?>
+		<div class="form-group row">
+			<?= get_label($template_row) ?>
+			<div class="<?= $col_class ?>">
+				<div class="input-group">
+					<input type="text" class="form-control datetime-widget <?= $class_list ?>" id="input-<?= $template_row['name'] ?>" name="<?= $template_row['name'] ?>" <?= $required ?> <?= $readonly ?> value="<?= $value != '' ? date(input_date_time, strtotime($value)) : '' ?>" <?= $attributes ?> <?= $min_date_attr ?> <?= $max_date_attr ?>>
+					<div class="input-group-append">
+						<label for="input-<?= $template_row['name'] ?>" class="input-group-text m-0">
+							<i class="fa fa-calendar-alt"></i>
+						</label>
+					</div>
+					<?= form_error($template_row['name']) ?>
+				</div>
+			</div>
+		</div>
+	<?php
+	}
+
 	if ($template_row['type'] == 'select-widget') {
 		// echo json_encode($template_row, JSON_PRETTY_PRINT);
 		$multiple = (isset($template_row['multiple']) && $template_row['multiple'] == true) ? 'multiple' : '';
@@ -179,6 +206,14 @@ foreach ($template as $template_row) {
 					</div>
 				</div>
 				<?= form_error($template_row['name']) ?>
+			</div>
+			<div class="col">
+				<?php
+				if (isset($template_row['custom_html'])) {
+					$params = ['edit_id' => $edit_id, 'name' => $template_row['name']];
+					echo $this->load->view(ADMIN_VIEWS_PATH . $template_row['custom_html'], $params, true);
+				}
+				?>
 			</div>
 		</div>
 	<?php
@@ -425,7 +460,7 @@ foreach ($template as $template_row) {
 		<div class="form-group row">
 			<?= get_label($template_row) ?>
 			<div class="<?= $table_col ?> table-responsive">
-				<table class="table table-sm input-list-container" id="input-table-<?= $template_row['name'] ?>">
+				<table class="table table-sm table-bordered input-list-container" id="input-table-<?= $template_row['name'] ?>">
 					<thead>
 						<tr>
 							<th width="65px">Sl. No</th>
@@ -490,6 +525,44 @@ foreach ($template as $template_row) {
 													<?= form_radio($field['name'], '', false, ['class' => "selectgroup-input $class_list",] + ($field['attributes'] ?? [])); ?>
 													<span class="selectgroup-button"><?= $field['label'] ?></span>
 												</label>
+											</div>
+										<?php
+										} elseif ($field['type'] == 'image') {
+											$size = null;
+											$accept_type = 'image/*';
+											$accept_types = '';
+											$max_file_size = '4 MB';
+											if (isset($field['size'])) {
+												$size = $field['size'];
+											}
+											if (isset($field['accept'])) {
+												$accept_types = join(' / ', $field['accept']);
+												$accept = [];
+												foreach ($field['accept'] as $accept_type) {
+													$accept[] = 'image/' . $accept_type;
+												}
+												$accept_type = join(', ', $accept);
+											}
+											$placeholder_img = ad_base_url('ajax/placeholder_img?size=') . ($size ? join('x', $size) : '150') . '&text=' . ($size ? join('x', $size) : '');
+											$old_img = $field_value ?? false;
+											$src = $old_img ? base_url($field['path'] . $old_img) : $placeholder_img;
+											$row_attributes = $field['attributes'] ?? [];
+										?>
+											<div class="input-file-image">
+												<div class="mb-2">
+													<img class="img-upload-preview" height="120" src="<?= $src ?>" alt="preview">
+												</div>
+												<label class="input-file">
+													<input type="file" class="form-control form-control-file" name="<?= $field['name'] ?>[]" accept="<?= $accept_type ?>;capture=camera" <?= join(' ', $row_attributes) ?>>
+													<span class="label-input-file btn btn-default btn-round">
+														<span class="btn-label">
+															<i class="fa fa-file-image"></i>
+														</span>
+														Upload a Image
+													</span>
+												</label>
+												<input type="hidden" class="reset-src" value="<?= $placeholder_img ?>">
+												<input type="hidden" name="old_img[]" value="<?= $old_img ?>">
 											</div>
 										<?php
 										} elseif ($field['type'] == 'textarea') {

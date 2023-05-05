@@ -260,3 +260,9 @@ body.swal2-shown > .select2-container--bootstrap {
 	background-color: currentColor;
 	opacity: 0.25;
 }
+
+.input-file.input-file-image img.img-upload-preview {
+	max-width: 50%;
+	max-height: 150px;
+	height: auto;
+}

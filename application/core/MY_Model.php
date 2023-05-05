@@ -304,6 +304,9 @@ class MY_Model extends CI_Model {
 			if ($field['type'] == 'date-widget') {
 				$field_data = date(date_format, strtotime($post_data[$field_name]));
 			}
+			if ($field['type'] == 'datetime-widget') {
+				$field_data = date(date_time_format, strtotime($post_data[$field_name]));
+			}
 			if (isset($field['allow_null']) && $field['allow_null'] == true && $post_data[$field_name] == '') {
 				$field_data = null;
 			}
@@ -642,6 +645,45 @@ class MY_Model extends CI_Model {
 			$status = $this->db->replace('admin_config', $set_config);
 		}
 		return $status;
+	}
+
+	/**
+	 * get_export
+	 *
+	 * @param TemplateConfig $config
+	 * @param array $table_heads
+	 *
+	 * @return array
+	 */
+	public function get_export($config, $table_heads, $filter_data) {
+		$joins = $this->TemplateModel->{$config->table_template}()['joins'] ?? [];
+		$table_alias = $this->TemplateModel->{$config->table_template}()['table_alias'] ?? "a";
+		$view_filters = $this->TemplateModel->{$config->view_template}()['filter'];
+		foreach ($view_filters as $filter) {
+			$filter_name = $filter['name'];
+			$filter_value = $filter_data[$filter_name] ?? "";
+			if ($filter_value == '') continue;
+			if ($filter['type'] == 'date') {
+				$filter_value = date(date_format, strtotime($filter_value));
+				$filter_date_type = $filter['date_type'];
+				$filter_name = explode("-", $filter_name)[0];
+				$filter_name = "DATE({$filter_name}) {$filter_date_type}";
+			}
+			$this->db->where($filter_name, $filter_value);
+		}
+		$this->db
+			->select(array_keys($table_heads))
+			->from("{$config->table} {$table_alias}");
+
+		foreach ($joins as $join) {
+			$join_table = $join['table'];
+			$join_alias = $join['alias'];
+			$join_condition = $join['condition'];
+			$join_type = $join['type'] ?? "";
+			$this->db->join("$join_table $join_alias", $join_condition, $join_type);
+		}
+		$results = $this->db->get()->result_array();
+		return [$table_heads, $results];
 	}
 }
 

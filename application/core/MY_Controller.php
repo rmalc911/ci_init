@@ -11,6 +11,8 @@ class MY_Controller extends CI_Controller {
 		$this->load->helper('inflector');
 		$this->load->helper('text');
 		$this->load->helper('common');
+		// $this->load->helper('access');
+		$this->load->library('Excel_export');
 		$this->popover_btn = '<button class="btn btn-$3 btn-border btn-sm btn-rounded json-format txn-id-btn" type="button" data-toggle="popover" data-content=\'$2\' data-label="$1" data-original-title="$1 <span class=\'close \'>&times;</span">$1</button>';
 	}
 
@@ -26,7 +28,7 @@ class MY_Controller extends CI_Controller {
 		$this->data['message'] = $this->session->flashdata('message');
 		$this->data['form_template'] = $this->TemplateModel->{$options->form_template}();
 		$this->data['view_template'] = $this->TemplateModel->{$options->view_template}();
-		$this->data['edit'] = $this->TemplateModel->get_edit_row($options->table, '', $options->id);
+		$this->data['edit'] = $this->TemplateModel->get_edit_row($options->table);
 		if ($this->data['edit']) {
 			if ($edit_map) {
 				$this->data['edit'] = $edit_map($this->data['edit']);
@@ -176,6 +178,23 @@ class MY_Controller extends CI_Controller {
 		}
 	}
 
+	public function export_wildcard($path, $option) {
+		if (method_exists($path, "export_{$option}")) {
+			$this->{"export_{$option}"}();
+		} else {
+			$option = singular($option);
+			/** @var TemplateConfig */
+			$options = $this->TemplateModel->{"{$option}_config"};
+			$this->TemplateModel->verify_access($options->access, 'view_data');
+			$filter = $this->input->post();
+			list($table_heads, $table_data) = $this->TemplateModel->{"get_{$option}_export"}($filter);
+			$view_template = $this->TemplateModel->{$options->view_template}();
+			$name = $view_template['head'];
+			$file_name = "Download-" . url_title($name) . "-" . date(date_format);
+			return @Excel_export::exportExcelTable($table_data, $table_heads, $file_name);
+		}
+	}
+
 	protected function add_action_col($cols) {
 		$action_col = '<div class="text-center"><div class="btn-group" role="group" aria-label="Button group">';
 		foreach ($cols as $col_name => $col_value) {
@@ -213,7 +232,8 @@ class MY_Controller extends CI_Controller {
 	}
 
 	protected function _ajaxtable_template(TemplateConfig $options, array $searchable_columns, string $select_fields = "") {
-		$template = $this->TemplateModel->{$options->view_template}();
+		$template = $this->TemplateModel->{$options->view_template}(false);
+		$view_filters = $template['filter'] ?? [];
 		$text_fields = $this->TemplateModel->{$options->table_template}()['text_fields'] ?? [];
 		$img_fields = $this->TemplateModel->{$options->table_template}()['img_fields'] ?? [];
 		$table_alias = $this->TemplateModel->{$options->table_template}()['table_alias'] ?? "a";
@@ -222,7 +242,7 @@ class MY_Controller extends CI_Controller {
 		$table = $options->table;
 
 		$status_field = "";
-		if ($this->action_field) {
+		if ($this->action_field && $options->status_field) {
 			$status_field = ", " . $table_alias . "." . $options->status_field;
 		}
 
@@ -234,13 +254,14 @@ class MY_Controller extends CI_Controller {
 
 		$text_fields_select = (count($text_fields) > 0) ? join(', ', array_map(function ($key, $val) use ($table_alias) {
 			$select = $table_alias . "." . $val;
-			if ($key === "DATETIME") {
-				$select = 'DATE_FORMAT(' . $val . ', "' . db_user_date_time . '")';
+			if ($val === "DATETIME") {
+				$select = 'DATE_FORMAT(' . $key . ', "' . db_user_date_time . '")';
 			}
-			if ($key === "DATE") {
-				$select = 'DATE_FORMAT(' . $val . ', "' . db_user_date . '")';
+			if ($val === "DATE") {
+				$select = 'DATE_FORMAT(' . $key . ', "' . db_user_date . '")';
 			}
-			return $select . " AS " . $val;
+			if (is_int($key)) $key = $val;
+			return $select . " AS " . $key;
 		}, array_keys($text_fields), $text_fields)) . "," : "";
 
 		// [Image column name => Image file path]
@@ -276,6 +297,20 @@ class MY_Controller extends CI_Controller {
 			$join_condition = $join['condition'];
 			$join_type = $join['type'] ?? "";
 			$this->datatables->join("$join_table $join_alias", $join_condition, $join_type);
+		}
+
+		$filter_data = $this->input->post('filter') ?? [];
+		foreach ($view_filters as $filter) {
+			$filter_name = $filter['name'];
+			$filter_value = $filter_data[$filter_name] ?? "";
+			if ($filter_value == '') continue;
+			if ($filter['type'] == 'date') {
+				$filter_value = date(date_format, strtotime($filter_value));
+				$filter_date_type = $filter['date_type'];
+				$filter_name = explode("-", $filter_name)[0];
+				$filter_name = "DATE({$filter_name}) {$filter_date_type}";
+			}
+			$this->datatables->filter($filter_name, $filter_value);
 		}
 
 		$this->setSearchableColumns($searchable_columns);

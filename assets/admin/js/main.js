@@ -5,7 +5,12 @@ let select2Config = {
 	allowClear: true,
 	templateResult: formatIcon,
 	templateSelection: formatIcon,
-}
+	language: {
+		searching: function () {
+			return "Searching...";
+		},
+	},
+};
 function formatIcon(state) {
 	let img = $(state.element).data('img-path')
 	if (img) {
@@ -36,35 +41,12 @@ var select2AjaxConfig = {
 		cache: true,
 	},
 };
-var select2AjaxConfig = {
-	ajax: {
-		url: function (params) {
-			return ADMIN_PATH + "ajax/" + $(this).data("ajax-options");
-		},
-		processResults: function (data, params) {
-			params.page = params.page || 1;
-			return {
-				results: data.map((option) => {
-					return {
-						id: option.option_value,
-						text: option.option_name,
-					};
-				}),
-				pagination: {
-					more: params.page * 30 < data.total_count,
-				},
-			};
-		},
-		delay: 250,
-		cache: true,
-	},
-};
 
 let validatorConfig = {
 	ignore: ":hidden, [contenteditable='true']:not([name])",
 	errorPlacement: function (error, element) {
 		let appendAfter = element;
-		let toggleBtnParent = element.parents(".btn-group-toggle");;
+		let toggleBtnParent = element.parents(".btn-group-toggle");
 		if (toggleBtnParent.length > 0) {
 			let errorContainer = $("<div class='btn-toggle-error' />");
 			errorContainer.append(error);
@@ -132,6 +114,10 @@ $(function () {
 	});
 	$(".time-widget").datetimepicker({
 		format: "hh:mm A",
+	});
+	$(".datetime-widget").datetimepicker({
+		format: "DD-MM-YYYY hh:mm A",
+		sideBySide: true,
 	});
 	if ($(".datepicker").length > 0) {
 		$(".datepicker").datetimepicker({
@@ -280,9 +266,9 @@ $(function () {
 			},
 			showCloseButton: true,
 			didOpen: () => {
-				Swal.showLoading();;
+				Swal.showLoading();
 			},
-		});;
+		});
 		$.post({
 			url: ADMIN_PATH + "ajax/" + url,
 			data: {
@@ -327,7 +313,7 @@ $(function () {
 					},
 					dataType: "JSON",
 					success: function (res) {
-						dtable.ajax.reload();;
+						dtable.ajax.reload();
 						if (res.success) {
 							Swal.fire("Deleted!", "", "success");
 						} else if (res.map_view) {
@@ -361,7 +347,7 @@ $(function () {
 			},
 			dataType: "JSON",
 			success: function (res) {
-				dtable.ajax.reload();;
+				dtable.ajax.reload();
 				if (!res.success) {
 					var error_message = res.error_message;
 					if (!error_message) {
@@ -371,7 +357,7 @@ $(function () {
 				}
 			},
 		});
-	});;
+	});
 
 	var pagingType = "full_numbers";
 	if (window.innerWidth < 761) {
@@ -384,7 +370,7 @@ $(function () {
 	var processingStatusClass = "btn-border btn-primary";
 	var disabledStatusIcon = '<i class="fa fa-fw fa-ban"></i>';
 	var enabledStatusIcon = '<i class="fa fa-fw fa-check"></i>';
-	var processingStatusIcon = '<i class="loader loader-sm table-btn-spinner"></i>';;
+	var processingStatusIcon = '<i class="loader loader-sm table-btn-spinner"></i>';
 	dtable = $("[data-ajax-url]").DataTable({
 		bProcessing: true,
 		bServerSide: true,
@@ -412,7 +398,7 @@ $(function () {
 			if (currentStatus == "0") {
 				$(statusBtn).removeClass(enabledStatusClass).addClass(disabledStatusClass).html(disabledStatusIcon);
 			} else {
-				$(statusBtn).removeClass(disabledStatusClass).addClass(enabledStatusClass).html(enabledStatusIcon);;
+				$(statusBtn).removeClass(disabledStatusClass).addClass(enabledStatusClass).html(enabledStatusIcon);
 			}
 		},
 		fnServerData: function (sSource, aoData, fnCallback) {
@@ -597,29 +583,38 @@ $(function () {
 		});
 	});
 
-	$("body").on('click', ".input-list-add", function () {
+	$(document).on("input", "[data-search-rows]", function () {
+		let searchTable = $(this).data("search-rows");
+		let query = $(this).val();
+		$(searchTable + " [data-search-row]").show();
+		$(searchTable + " [data-search-row]").each(function (ix, ie) {
+			let searchField = $("[data-search-field]", ie).map(function () {
+				return $(this).text();
+			}).toArray().join(" ");
+			if (!searchField.toLowerCase().includes(query.toLowerCase())) {
+				$(ie).hide();
+			}
+		})
+	});
+
+	$("body").on("click", ".input-list-add", function () {
 		var inputListContainer = $(this).parents(".input-list-container");
 		var inputList = $(".input-group-list", inputListContainer);
-		$(".select-widget", inputListContainer).select2('destroy');
-		$(".select-widget", inputListContainer)
-			.removeAttr('data-live-search')
-			.removeAttr('data-select2-id')
-			.removeAttr('aria-hidden')
-			.removeAttr('tabindex');
+		$(".select-widget", inputListContainer).select2("destroy");
+		$(".select-widget", inputListContainer).removeAttr("data-live-search").removeAttr("data-select2-id").removeAttr("aria-hidden").removeAttr("tabindex");
+		$("[data-select2-id]", inputListContainer).removeAttr("data-select2-id");
 		var inputListItem = $(".input-group-list-item:first-child", inputList).clone();
 		var resetSrc = $(".reset-src", inputListItem).val();
-		$(".form-control", inputListItem).val('');
-		$(".img-upload-preview", inputListItem).attr('src', resetSrc);
+		$(".form-control", inputListItem).val("");
+		$("[type=radio], [type=checkbox]", inputListItem).prop("checked", false);
+		$(".img-upload-preview", inputListItem).attr("src", resetSrc);
 		inputList.append(inputListItem);
 		$(".select-widget", inputListContainer).select2(select2Config);
-		$(".input-group-list-item", inputListContainer).each(function (ix, ie) {
-			$(".input-list-serial", ie).text(ix + 1);
-			$(".input-list-serial-value", ie).val(ix);
+		$(".select-widget[data-ajax-options]").select2({
+			...select2Config,
+			...select2AjaxConfig,
 		});
-		$(".input-group-list-item", inputListContainer).each(function (ix, ie) {
-			$(".input-list-serial", ie).text(ix + 1);
-			$(".input-list-serial-value", ie).val(ix);
-		});
+		updateInputListIndex(inputListContainer);
 	});
 
 	$("body").on("click", ".input-list-remove", function () {
@@ -629,11 +624,19 @@ $(function () {
 		if (inputListLength > 1) {
 			$(this).parents(".input-group-list-item").remove();
 		}
+		updateInputListIndex(inputListContainer);
+	});
+
+	function updateInputListIndex(inputListContainer) {
 		$(".input-group-list-item", inputListContainer).each(function (ix, ie) {
 			$(".input-list-serial", ie).text(ix + 1);
 			$(".input-list-serial-value", ie).val(ix);
+			$(".input-list-serial-index", ie).each(function (sx, se) {
+				let attr = $(se).data("serial-index-name");
+				$(se).attr("name", attr + "[" + ix + "]");
+			});
 		});
-	});
+	}
 });
 
 const Toast = Swal.mixin({
