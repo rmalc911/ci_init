@@ -157,6 +157,25 @@ foreach ($template as $template_row) {
 	<?php
 	}
 
+	if ($template_row['type'] == 'password') {
+	?>
+		<div class="form-group row">
+			<?= get_label($template_row) ?>
+			<div class="<?= $col_class ?>">
+				<div class="input-group">
+					<input type="password" class="form-control <?= $class_list ?>" id="input-<?= $template_row['name'] ?>" name="<?= $template_row['name'] ?>" placeholder="" <?= $required ?> <?= $readonly ?> value="<?= $value ?>" <?= $attributes ?>>
+					<div class="input-group-append">
+						<label for="input-<?= $template_row['name'] ?>" class="input-group-text m-0">
+							<i class="fa fa-lock"></i>
+						</label>
+					</div>
+					<?= form_error($template_row['name']) ?>
+				</div>
+			</div>
+		</div>
+	<?php
+	}
+
 	if ($template_row['type'] == 'select-widget') {
 		// echo json_encode($template_row, JSON_PRETTY_PRINT);
 		$multiple = (isset($template_row['multiple']) && $template_row['multiple'] == true) ? 'multiple' : '';

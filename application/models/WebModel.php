@@ -162,7 +162,7 @@ class WebModel extends CI_Model {
 			];
 		} else {
 			$email_recipients = [];
-			$to_user_list = explode("\n", $to_user_id);
+			$to_user_list = explode("\r\n", $to_user_id);
 			// Clean empty strings
 			$to_user_list = array_filter($to_user_list);
 			foreach ($to_user_list as $to_user_line) {

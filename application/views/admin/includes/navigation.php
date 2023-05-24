@@ -103,6 +103,12 @@
 			</ul>
 			<ul class="nav">
 				<li class="nav-item resp-visible">
+					<a href="<?= ad_base_url('home/change_password') ?>">
+						<i class="fas fa-key"></i>
+						<p>Change Password</p>
+					</a>
+				</li>
+				<li class="nav-item resp-visible">
 					<a href="<?= ad_base_url('login/logout') ?>">
 						<i class="fas fa-sign-out-alt"></i>
 						<p>Logout</p>

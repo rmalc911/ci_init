@@ -10,7 +10,7 @@ if (isset($view_template['form_action'])) {
 		<div class="card-head-row">
 			<h4 class="card-title"><?= $view_template['head'] ?></h4>
 			<div class="card-tools">
-				<?= $this->load->view(ADMIN_VIEWS_PATH . 'templates/links_template', ['links' => $view_template['links'], 'filter' => $view_template['filter'] ?? ''], true) ?>
+				<?= $this->load->view(ADMIN_VIEWS_PATH . 'templates/links_template', ['links' => $view_template['links']], true) ?>
 			</div>
 		</div>
 	</div>

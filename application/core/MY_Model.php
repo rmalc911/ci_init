@@ -72,6 +72,26 @@ class MY_Model extends CI_Model {
 		return $page_access;
 	}
 
+	public function change_pw_form() {
+		return [
+			['type' => 'hidden', 'label' => '', 'name' => 'username'],
+			['type' => 'password', 'label' => 'Old Password', 'name' => 'old_password', 'required' => true, 'attributes' => ['autocomplete' => 'off']],
+			['type' => 'password', 'label' => 'New Password', 'name' => 'new_password', 'required' => true, 'attributes' => ['autocomplete' => 'new-password']],
+			['type' => 'password', 'label' => 'Confirm Password', 'name' => 'confirm_password', 'required' => true, 'attributes' => ['autocomplete' => 'confirm-password'], 'rules' => ['matches[new_password]']],
+		];
+	}
+
+	public function change_pw_view() {
+		return [
+			'head' => 'Change Password',
+			'links' => [],
+		];
+	}
+
+	public function change_password($login_id, $new_password) {
+		return $this->db->update('users', ['login_password' => $new_password], ['id' => $login_id]);
+	}
+
 	// Example
 	private function example_view() {
 		return [
@@ -154,7 +174,7 @@ class MY_Model extends CI_Model {
 
 	public function set_validation($data) {
 		foreach ($data  as $field) {
-			$rules = [];
+			$rules = $field['rules'] ?? [];
 			$field_name = $field['name'];
 			if (isset($field['required']) && $field['required'] == true && $field['type'] != 'image') {
 				$rules[] = 'required';

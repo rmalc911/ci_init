@@ -48,12 +48,29 @@ class Home extends MY_Controller {
 	}
 
 	public function change_password() {
+		$this->data['message'] = $this->session->flashdata('message');
 		$this->data['form_template'] = $this->TemplateModel->change_pw_form();
 		$this->data['view_template'] = $this->TemplateModel->change_pw_view();
 		$this->TemplateModel->set_validation($this->data['form_template']);
+		$post_data = $this->input->post();
 		if ($this->form_validation->run()) {
-			$post_data = $this->input->post();
+			$this->load->library('encription_utility');
+			$login_id = $this->session->userdata('user')['id'];
+			$enc_old_password = $this->encription_utility->getSaltPassword($post_data['old_password']);
+			$user = $this->db->get_where('users', ['id' => $login_id, 'login_password' => $enc_old_password, 'user_status' => '1'], 1)->row_array();
+			$old_password_valid = $user ? true : false;
+			if (!$old_password_valid) {
+				$this->session->set_flashdata('message', $this->TemplateModel->show_alert('err', 'Invalid Old Password'));
+			} else {
+				$login_password = $this->encription_utility->getSaltPassword($post_data['new_password']);
+				$status = $this->TemplateModel->change_password($login_id, $login_password);
+				$alert = $status ? $this->TemplateModel->show_alert('suc', 'Successfully updated') : $this->TemplateModel->show_alert('err', 'Failed to update');
+				$this->session->set_flashdata('message', $alert);
+			}
+			redirect(ad_base_url('home/change_password'));
 		}
+		$this->data['edit'] = $post_data;
+		$this->data['edit']['username'] = $this->session->userdata('user')['user_mobile'];
 		$this->load->template('templates/add_template', $this->data);
 	}
 
