@@ -479,10 +479,40 @@ foreach ($template as $template_row) {
 		<div class="form-group row">
 			<?= get_label($template_row) ?>
 			<div class="<?= $table_col ?> table-responsive">
+				<?php
+				foreach ($fields as $field) {
+					if ($field['type'] != 'image') {
+						continue;
+					}
+					$size = [100, 100];
+					$accept_type = 'image/*';
+					$accept_types = '';
+					$max_file_size = '4 MB';
+					if (isset($field['size'])) {
+						$size = $field['size'];
+					}
+					if (isset($field['accept'])) {
+						$accept_types = join(' / ', $field['accept']);
+						$accept = [];
+						foreach ($field['accept'] as $accept_type) {
+							$accept[] = 'image/' . $accept_type;
+						}
+						$accept_type = join(', ', $accept);
+					}
+					$placeholder_img = ad_base_url('ajax/placeholder_img?size=') . ($size ? join('x', $size) : '150') . '&text=' . ($size ? join('x', $size) : '');
+				?>
+					<div class="alert alert-info mt-2">
+						<h4><?= $field['label'] ?></h4>
+						<?= $size ? ('<p class="text-muted mb-0">Dimensions: ' . $size[0] . 'px &times; ' . $size[1] . 'px</p>') : '' ?>
+						<?= ($accept_types != '') ? ('<p class="text-muted mb-0">Format: ' . $accept_types . '</p>') : '' ?>
+					</div>
+				<?php
+				}
+				?>
 				<table class="table table-sm table-bordered input-list-container" id="input-table-<?= $template_row['name'] ?>">
 					<thead>
 						<tr>
-							<th width="65px">Sl. No</th>
+							<th width="50px">Sl. No</th>
 							<?php
 							foreach ($fields as $field) {
 							?>
@@ -504,11 +534,11 @@ foreach ($template as $template_row) {
 								foreach ($fields as $field) {
 									$field_value = $edit[$template_row['name']][$input_row][$field['name']] ?? "";
 									$class_list = $field['class_list'] ?? "";
+									$row_attributes = $field['attributes'] ?? [];
 								?>
 									<td style="position: relative;">
 										<?php
 										if ($field['type'] == 'select-widget') {
-											$row_attributes = $field['attributes'] ?? [];
 											$field_options = [];
 											if (isset($field['options'])) {
 												if (is_array($field['options'])) {
@@ -547,31 +577,14 @@ foreach ($template as $template_row) {
 											</div>
 										<?php
 										} elseif ($field['type'] == 'image') {
-											$size = null;
-											$accept_type = 'image/*';
-											$accept_types = '';
-											$max_file_size = '4 MB';
-											if (isset($field['size'])) {
-												$size = $field['size'];
-											}
-											if (isset($field['accept'])) {
-												$accept_types = join(' / ', $field['accept']);
-												$accept = [];
-												foreach ($field['accept'] as $accept_type) {
-													$accept[] = 'image/' . $accept_type;
-												}
-												$accept_type = join(', ', $accept);
-											}
-											$placeholder_img = ad_base_url('ajax/placeholder_img?size=') . ($size ? join('x', $size) : '150') . '&text=' . ($size ? join('x', $size) : '');
 											$old_img = $field_value ?? false;
 											$src = $old_img ? base_url($field['path'] . $old_img) : $placeholder_img;
-											$row_attributes = $field['attributes'] ?? [];
 										?>
-											<div class="input-file-image">
-												<div class="mb-2">
-													<img class="img-upload-preview" height="120" src="<?= $src ?>" alt="preview">
+											<div class="input-file-image d-flex flex-wrap">
+												<div class="mb-2 mr-2 flex-shrink-0">
+													<img class="img-upload-preview" height="<?= min($size[0], 120) ?>" src="<?= $src ?>" alt="preview">
 												</div>
-												<label class="input-file">
+												<label class="input-file mb-0">
 													<input type="file" class="form-control form-control-file" name="<?= $field['name'] ?>[]" accept="<?= $accept_type ?>;capture=camera" <?= join(' ', $row_attributes) ?>>
 													<span class="label-input-file btn btn-default btn-round">
 														<span class="btn-label">
@@ -585,9 +598,9 @@ foreach ($template as $template_row) {
 											</div>
 										<?php
 										} elseif ($field['type'] == 'textarea') {
-											echo form_textarea(['name' => $field['name'] . "[]"] + ($field['attributes'] ?? []), $field_value, ['class' => "form-control $class_list"]);
+											echo form_textarea(['name' => $field['name'] . "[]"] + ($row_attributes), $field_value, ['class' => "form-control $class_list"]);
 										} else {
-											echo form_input($field['name'] . "[]", $field_value, ['class' => "form-control $class_list"] + ($field['attributes'] ?? []));
+											echo form_input($field['name'] . "[]", $field_value, ['class' => "form-control $class_list"] + ($row_attributes));
 										}
 										?>
 									</td>
