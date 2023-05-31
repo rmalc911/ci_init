@@ -51,6 +51,9 @@ class Alerts {
 	}
 
 	public function send_mail($subject, $message, $touser, $cc = [], $bcc = []) {
+		if (ENVIRONMENT == "development") {
+			return true;
+		}
 		if ($this->sendmail_mode == 'local') {
 			return $this->send_mail_local($subject, $message, $touser, $cc, $bcc);
 		} elseif ($this->sendmail_mode == 'sendinblue') {
@@ -185,7 +188,9 @@ class Alerts {
 	}
 
 	function send_sms($mobile, $sms) {
-		return true;
+		if (ENVIRONMENT == "development") {
+			return true;
+		}
 		$sms = urlencode($sms);
 
 		$url = "";

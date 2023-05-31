@@ -1,7 +1,7 @@
 <?php
 $action = '';
-if (isset($view_template['form_action'])) {
-	$action = $view_template['form_action'];
+if (isset($view_template['sort_submit'])) {
+	$action = $view_template['sort_submit'];
 }
 ?>
 
@@ -16,7 +16,7 @@ if (isset($view_template['form_action'])) {
 	</div>
 	<form method="post" action="<?= $action ?>">
 		<div class="row justify-content-center">
-			<div class="col-md-6">
+			<div class="col-md-8 col-lg-7">
 				<div class="kanban-board w-100 mt-4">
 					<main class="kanban-drag" id="sortable">
 						<?php
@@ -45,7 +45,7 @@ if (isset($view_template['form_action'])) {
 </div>
 
 <!-- Sortable-->
-<script src="<?= base_url() ?>assets/js/plugin/sortable/sortable.min.js"></script>
+<script src="<?= base_url("assets/plugins/sortable/sortable.min.js") ?>"></script>
 
 <script>
 	var config = {
