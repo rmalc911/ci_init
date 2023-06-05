@@ -11,6 +11,12 @@ let select2Config = {
 		},
 	},
 };
+
+function auto_grow(element) {
+	element.style.height = (element.scrollHeight - parseFloat($(element).css('line-height'))) + "px";
+	element.style.height = (element.scrollHeight + 2) + "px";
+}
+
 function formatIcon(state) {
 	let img = $(state.element).data('img-path')
 	if (img) {
@@ -150,6 +156,12 @@ $(function () {
 				}, 30);
 			},
 		},
+	});
+	$(document).on('input', '.auto-grow', function() {
+		auto_grow(this);
+	});
+	$('.auto-grow').each(function() {
+		auto_grow(this);
 	});
 
 	var href = window.location.origin + window.location.pathname;

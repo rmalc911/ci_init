@@ -193,7 +193,7 @@ class MY_Controller extends CI_Controller {
 			$table_template = $this->TemplateModel->{$options->table_template}();
 			$text_fields = $table_template['text_fields'];
 			$select_fields = $table_template['select_fields'] ?? "";
-			$search_fields = range(1, count($text_fields));
+			$search_fields = range(1, count($text_fields) + count(explode(',', $select_fields)));
 			$this->_ajaxtable_template($options, $search_fields, $select_fields);
 		}
 	}
