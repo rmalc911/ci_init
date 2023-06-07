@@ -27,7 +27,22 @@ function formatIcon(state) {
 var select2AjaxConfig = {
 	ajax: {
 		url: function (params) {
-			return ADMIN_PATH + "ajax/" + $(this).data("ajax-options");
+			let customParams = $(this).data("params").split(",");
+			let fieldInTableRow = $(this).parents(".input-group-list-item");
+			let container = null;
+			let fieldSuffix = "";
+			if (fieldInTableRow.length > 0) {
+				container = fieldInTableRow;
+				fieldSuffix = "[]";
+			} else {
+				container = $(this).parents(".validate-form");
+			}
+			let urlParams = customParams.map(function (param) {
+				let paramField = $("[name='" + param + fieldSuffix + "']", container);
+				let paramValue = paramField.val();
+				return param + "=" + paramValue;
+			}).join("&");
+			return ADMIN_PATH + "ajax/" + $(this).data("ajax-options") + "?" + urlParams;
 		},
 		processResults: function (data, params) {
 			params.page = params.page || 1;
@@ -157,10 +172,10 @@ $(function () {
 			},
 		},
 	});
-	$(document).on('input', '.auto-grow', function() {
+	$(document).on("input", ".auto-grow", function () {
 		auto_grow(this);
 	});
-	$('.auto-grow').each(function() {
+	$(".auto-grow").each(function () {
 		auto_grow(this);
 	});
 
@@ -216,6 +231,14 @@ $(function () {
 
 		e.target.value = input;
 	});
+
+	$("body").on("input", "textarea[maxlength]", function (e) {
+		let id = $(this).attr("id");
+		let counter = $("[data-count='" + id + "']");
+		counter.text(e.target.value.length);
+	});
+
+	$("textarea[maxlength]").trigger("input");
 
 	$(document).on("change", "[data-update]", function () {
 		var dataUpdate = $(this).attr("data-update");
@@ -563,6 +586,19 @@ $(function () {
 									...select2Config,
 									dropdownParent: $("#swal2-html-container"),
 								});
+								$('#swal2-html-container .date-widget').datetimepicker({
+									format: 'DD-MM-YYYY',
+								});
+								if (res.script) {
+									var head = document.getElementsByTagName('head')[0];
+									var js = document.createElement("script");
+									head.appendChild(js);
+									js.onload = function () {
+										console.log("custom script loaded")
+									};
+									js.id = "swal2-html-container-script";
+									js.src = res.script;
+								}
 							},
 						})
 						.then(function (result) {

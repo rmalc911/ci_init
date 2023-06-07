@@ -101,6 +101,13 @@ foreach ($template as $template_row) {
 			<?= get_label($template_row) ?>
 			<div class="<?= $col_class ?>">
 				<textarea name="<?= $template_row['name'] ?>" id="input-<?= $template_row['name'] ?>" class="form-control auto-grow <?= $class_list ?>" rows="<?= $textarea_rows ?>" <?= $required ?> <?= $readonly ?> <?= $attributes ?>><?= $value ?></textarea>
+				<?php
+				if (intval($template_row['attributes']['maxlength'] ?? "")) {
+				?>
+					<p class="text-muted text-right"><span data-count="input-<?= $template_row['name'] ?>" class="char-count"></span> of <?= intval($template_row['attributes']['maxlength']) ?> characters</p>
+				<?php
+				}
+				?>
 				<?= form_error($template_row['name']) ?>
 			</div>
 		</div>
