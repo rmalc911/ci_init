@@ -10,7 +10,7 @@ class Ajaxtables extends MY_Controller {
 	public function career_applications() {
 		$this->action_field = false;
 		/**
-		 * $options 
+		 * $options
 		 * @var TemplateConfig
 		 */
 		$options = $this->TemplateModel->career_application_config;
@@ -39,7 +39,7 @@ class Ajaxtables extends MY_Controller {
 	public function contact_us() {
 		$this->action_field = false;
 		/**
-		 * $options 
+		 * $options
 		 * @var TemplateConfig
 		 */
 		$options = $this->TemplateModel->contact_us_config;
@@ -53,7 +53,7 @@ class Ajaxtables extends MY_Controller {
 	}
 
 	function __destruct() {
-		$response = $this->datatables->generate();
+		$response = @$this->datatables->generate();
 		echo $response;
 	}
 }

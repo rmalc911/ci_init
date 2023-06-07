@@ -16,3 +16,4 @@
 - [ ] Template config generator
 - [ ] DB create table query generator
 - [ ] Theme Switcher
+- [ ] Make installable

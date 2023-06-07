@@ -28,6 +28,10 @@
 	height: calc(1.7em + 0.5rem + 2px);
 }
 
+.form-control.auto-grow {
+	min-height: 6rem;
+}
+
 .form-group label.error {
 	margin-bottom: 0;
 }

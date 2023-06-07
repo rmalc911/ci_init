@@ -100,7 +100,7 @@ foreach ($template as $template_row) {
 		<div class="form-group row">
 			<?= get_label($template_row) ?>
 			<div class="<?= $col_class ?>">
-				<textarea name="<?= $template_row['name'] ?>" id="input-<?= $template_row['name'] ?>" class="form-control" rows="<?= $textarea_rows ?>" <?= $required ?> <?= $readonly ?> <?= $attributes ?>><?= $value ?></textarea>
+				<textarea name="<?= $template_row['name'] ?>" id="input-<?= $template_row['name'] ?>" class="form-control auto-grow <?= $class_list ?>" rows="<?= $textarea_rows ?>" <?= $required ?> <?= $readonly ?> <?= $attributes ?>><?= $value ?></textarea>
 				<?= form_error($template_row['name']) ?>
 			</div>
 		</div>
@@ -371,15 +371,24 @@ foreach ($template as $template_row) {
 			<div class="<?= $col_class ?>">
 				<div class="input-list-container">
 					<div class="input-group-list" id="input-list-<?= $template_row['name'] ?>">
-						<div class="input-group input-group-list-item mb-1">
-							<div class="input-group-prepend">
-								<span class="input-group-text"><?= $template_row['prepend_text'] ?><span class="input-list-serial">1</span></span>
+						<?php
+						$input_row = 0;
+						do {
+							$field_value = $edit[$template_row['name']][$input_row] ?? "";
+						?>
+							<div class="input-group input-group-list-item mb-1">
+								<div class="input-group-prepend">
+									<span class="input-group-text"><?= $template_row['prepend_text'] ?><span class="input-list-serial"><?= $input_row + 1 ?></span></span>
+								</div>
+								<input type="text" class="form-control <?= $class_list ?>" name="<?= $template_row['name'] ?>[]" <?= $required ?> <?= $attributes ?> value="<?= $field_value ?>">
+								<div class="input-group-append">
+									<button class="btn btn-outline-danger btn-sm input-list-remove" type="button"><i class="fa fa-times"></i></button>
+								</div>
 							</div>
-							<input type="text" class="form-control <?= $class_list ?>" name="<?= $template_row['name'] ?>[]" <?= $required ?> <?= $attributes ?>>
-							<div class="input-group-append">
-								<button class="btn btn-outline-danger btn-sm input-list-remove" type="button"><i class="fa fa-times"></i></button>
-							</div>
-						</div>
+						<?php
+							$input_row += 1;
+						} while (isset($edit[$template_row['name']][$input_row]));
+						?>
 					</div>
 					<button class="btn btn-info btn-sm input-list-add" type="button"><i class="fa fa-plus"></i> Add Row</button>
 				</div>
@@ -603,7 +612,7 @@ foreach ($template as $template_row) {
 											</div>
 										<?php
 										} elseif ($field['type'] == 'textarea') {
-											echo form_textarea(['name' => $field['name'] . "[]"] + ($row_attributes), $field_value, ['class' => "form-control $class_list"]);
+											echo form_textarea(['name' => $field['name'] . "[]"] + ($row_attributes), $field_value, ['class' => "form-control auto-grow $class_list"]);
 										} elseif ($field['type'] == 'custom') {
 											$field['input_row'] = $input_row;
 											echo $this->load->view(ADMIN_VIEWS_PATH . $field['view'], $field, true);
