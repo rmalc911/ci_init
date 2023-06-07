@@ -22,6 +22,110 @@ class TemplateModel extends MY_Model {
 		$this->contact_us_config = new TemplateConfig('contact_us', null, 'contact_us_table', 'contact_us_view', 'contact_us', 'id', 'contact_name', null);
 	}
 
+	// Users / Users
+	public function user_view() {
+		return [
+			'head' => 'Users',
+			'links' => [
+				// 'sort' => 'users/sort_users',
+				'add' => 'users/add_user',
+				'view' => 'users/view_users',
+			],
+			'form_action' => ad_base_url('users/submit_user'),
+			// 'sort_submit' => ad_base_url('users/submit_sort_users'),
+			'form_ajax' => true,
+		];
+	}
+
+	public function user_table() {
+		return [
+			'heads' => ['Sl. no', 'Name', 'Mobile', 'Password', 'Action'],
+			'src' => 'ajax',
+			'data' => 'ajaxtables/users',
+			'text_fields' => ['display_name', 'user_mobile'],
+		];
+	}
+
+	public function user_add() {
+		$config = $this->user_config;
+		$user_access_navs = $this->get_user_access_navs();
+		return  [
+			['type' => 'input', 'label' => 'Name', 'name' => 'display_name', 'required' => true, 'unique' => ['table' => $config->table, 'key' => $config->id]],
+			['type' => 'input', 'label' => 'Mobile No.', 'name' => 'user_mobile', 'required' => true, 'unique' => ['table' => $config->table, 'key' => $config->id], 'help_text' => 'Login User ID'],
+			['type' => 'input', 'label' => 'Email', 'name' => 'user_email', 'required' => false],
+			['type' => 'custom', 'name' => 'user_access', 'validation' => false, 'view' => 'users/map-rights', 'params' => ['navs' => $user_access_navs]],
+			['type' => 'hidden', 'label' => 'ID', 'name' => 'login_password'],
+			['type' => 'hidden', 'label' => 'ID', 'name' => 'user_name'],
+			['type' => 'key', 'label' => 'ID', 'name' => 'id'],
+		];
+	}
+
+	public function get_user_access_navs() {
+		return  [
+			'Masters' => [
+				['label' => 'States', 'name' => 'state', 'options' => ['v', 'a', 'e', 'b', 'd'], 'url' => 'location/view_states'],
+				['label' => 'Cities', 'name' => 'city', 'options' => ['v', 'a', 'e', 'b', 'd'], 'url' => 'location/view_cities'],
+				['label' => 'Users', 'name' => 'user', 'options' => ['v', 'a', 'e', 'b', 'd'], 'url' => 'users/view_users'],
+			],
+			'Website' => [
+				['label' => 'Banners', 'name' => 'banner', 'options' => ['v', 'a', 'e', 'b', 'd'], 'url' => 'website/view_banners'],
+				['label' => 'About Us', 'name' => 'about_us', 'options' => ['v', 'e'], 'url' => 'website/about_us_config'],
+				['label' => 'Videos', 'name' => 'videos', 'options' => ['v', 'a', 'e', 'b', 'd'], 'url' => 'website/view_videos'],
+				['label' => 'Page Banners', 'name' => 'page_banners', 'options' => ['v', 'e'], 'url' => 'website/page_banners'],
+				['label' => 'Industries', 'name' => 'industries', 'options' => ['v', 'a', 'e', 'b', 'd'], 'url' => 'website/view_industries'],
+				['label' => 'Projects', 'name' => 'projects', 'options' => ['v', 'a', 'e', 'b', 'd'], 'url' => 'website/view_projects'],
+				// ['label' => 'Service Categories', 'name' => 'service_categories', 'options' => ['v', 'a', 'e', 'b', 'd'], 'url' => 'website/view_service_categories'],
+				['label' => 'Services', 'name' => 'services', 'options' => ['v', 'a', 'e', 'b', 'd'], 'url' => 'website/view_services'],
+				['label' => 'Production Facilities', 'name' => 'production_facilities', 'options' => ['v', 'a', 'e', 'b', 'd'], 'url' => 'website/view_production_facilities'],
+				['label' => 'Testimonials', 'name' => 'testimonials', 'options' => ['v', 'a', 'e', 'b', 'd'], 'url' => 'website/view_testimonials'],
+				['label' => 'Awards', 'name' => 'awards', 'options' => ['v', 'a', 'e', 'b', 'd'], 'url' => 'website/view_awards'],
+				['label' => 'Blogs', 'name' => 'blogs', 'options' => ['v', 'a', 'e', 'b', 'd'], 'url' => 'website/view_blogs'],
+				['label' => 'Careers', 'name' => 'careers', 'options' => ['v', 'a', 'e', 'b', 'd'], 'url' => 'website/view_careers'],
+			],
+			'Page Content' => [
+				['label' => 'About Us (Overview)', 'name' => 'about_us_overview', 'options' => ['v', 'e'], 'url' => 'website/about_us_content'],
+				['label' => 'Our Team', 'name' => 'team_members', 'options' => ['v', 'a', 'e', 'b', 'd'], 'url' => 'website/view_team_members'],
+				['label' => 'About Us (Mission & Vision)', 'name' => 'about_mission_vision', 'options' => ['v', 'e'], 'url' => 'website/about_us_mission_vision'],
+				['label' => 'Clientele', 'name' => 'clientele', 'options' => ['v', 'a', 'e', 'b', 'd'], 'url' => 'website/view_clientele'],
+			],
+			'Enquiries' => [
+				['label' => 'Career Applications', 'name' => 'career_applications', 'options' => ['v'], 'url' => 'website/view_career_applications'],
+				['label' => 'Contact Us', 'name' => 'contact_us', 'options' => ['v'], 'url' => 'website/view_contact_us'],
+			],
+			'Config' => [
+				['label' => 'Email', 'name' => 'email_config', 'options' => ['v', 'e'], 'url' => 'home/email_config'],
+				['label' => 'Contact Details', 'name' => 'contact_details', 'options' => ['v', 'e'], 'url' => 'home/contact_details'],
+				['label' => 'Static Pages SEO', 'name' => 'seo_static_pages', 'options' => ['v', 'e'], 'url' => 'home/seo_config/static'],
+				['label' => 'Dynamic Pages SEO', 'name' => 'seo_dynamic_pages', 'options' => ['v', 'e'], 'url' => 'home/seo_config/dynamic'],
+			],
+		];
+	}
+
+	public function save_user_access_map($user_id, $post, $login_user_id = null) {
+		$navs = $this->get_user_access_navs();
+		foreach ($navs as $pages) {
+			foreach ($pages as $page) {
+				$page_access = $this->db->get_where('user_access_map', ['user' => $user_id, 'page' => $page['name']], 1)->row_array();
+				$page_update = [
+					'user' => $user_id,
+					'page' => $page['name'],
+					'view_data' => isset($post[$page['name'] . '~v']) ? '1' : '0',
+					'add_data' => isset($post[$page['name'] . '~a']) ? '1' : '0',
+					'edit_data' => isset($post[$page['name'] . '~e']) ? '1' : '0',
+					'block_data' => isset($post[$page['name'] . '~b']) ? '1' : '0',
+					'delete_data' => isset($post[$page['name'] . '~d']) ? '1' : '0',
+					'updated_date' => date(date_time_format),
+					'updated_by' => $login_user_id,
+				];
+				if ($page_access) {
+					$this->db->update('user_access_map', $page_update, ['id' => $page_access['id']]);
+				} else {
+					$this->db->insert('user_access_map', $page_update);
+				}
+			}
+		}
+	}
+
 	// Banners
 	public function web_banner_view() {
 		return [
