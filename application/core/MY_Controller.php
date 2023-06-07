@@ -67,7 +67,9 @@ class MY_Controller extends CI_Controller {
 			array_push($update, [$id => $sort_val, 'sort_order' => $i]);
 		}
 
-		$this->db->update_batch($table, $update, $id);
+		$status = $this->db->update_batch($table, $update, $id);
+		$alert = $status ? $this->TemplateModel->show_alert('suc', 'Successfully updated') : $this->TemplateModel->show_alert('err', 'Failed to update');
+		$this->session->set_flashdata('message', $alert);
 		redirect($return_url);
 	}
 
@@ -163,6 +165,24 @@ class MY_Controller extends CI_Controller {
 		}
 	}
 
+	public function sort_wildcard($path, $option) {
+		if (method_exists($path, "sort_{$option}")) {
+			$this->{"sort_{$option}"}();
+		} else {
+			$option = singular($option);
+			$this->_sort_template($this->TemplateModel->{"{$option}_config"});
+		}
+	}
+
+	public function submit_sort_wildcard($path, $option) {
+		if (method_exists($path, "submit_sort_{$option}")) {
+			$this->{"submit_sort_{$option}"}();
+		} else {
+			$option = singular($option);
+			$this->_submit_sort($this->TemplateModel->{"{$option}_config"});
+		}
+	}
+
 	public function dt_wildcard($path, $option) {
 		$option = singular($option);
 		if (method_exists($path, "dt_{$option}")) {
@@ -237,9 +257,13 @@ class MY_Controller extends CI_Controller {
 		$text_fields = $this->TemplateModel->{$options->table_template}()['text_fields'] ?? [];
 		$img_fields = $this->TemplateModel->{$options->table_template}()['img_fields'] ?? [];
 		$table_alias = $this->TemplateModel->{$options->table_template}()['table_alias'] ?? "a";
-		$sort_order = $this->TemplateModel->{$options->table_template}()['sort_order'] ?? "{$options->id} DESC";
+		$sort_order = $this->TemplateModel->{$options->table_template}()['sort_order'] ?? "$table_alias.{$options->id} DESC";
 		$joins = $this->TemplateModel->{$options->table_template}()['joins'] ?? [];
 		$table = $options->table;
+
+		if (!$options->form_template) {
+			$this->action_field = false;
+		}
 
 		$status_field = "";
 		if ($this->action_field && $options->status_field) {
@@ -253,6 +277,7 @@ class MY_Controller extends CI_Controller {
 		}
 
 		$text_fields_select = (count($text_fields) > 0) ? join(', ', array_map(function ($key, $val) use ($table_alias) {
+			if (substr_count($val, '.')) return $val;
 			$select = $table_alias . "." . $val;
 			if ($val === "DATETIME") {
 				$select = 'DATE_FORMAT(' . $key . ', "' . db_user_date_time . '")';

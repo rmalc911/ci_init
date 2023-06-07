@@ -27,7 +27,7 @@ class TemplateModel extends MY_Model {
 		return [
 			'head' => 'Website Banners',
 			'links' => [
-				// 'sort' => 'website/sort_banners',
+				'sort' => 'website/sort_banners',
 				'add' => 'website/add_banner',
 				'view' => 'website/view_banners',
 			],
@@ -44,6 +44,7 @@ class TemplateModel extends MY_Model {
 			'data' => 'ajaxtables/dt_banners',
 			'text_fields' => ['banner_name'],
 			'img_fields' => ['banner_img' => BANNER_UPLOAD_PATH],
+			'sort_order' => 'sort_order',
 		];
 	}
 

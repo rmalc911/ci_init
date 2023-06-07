@@ -20,6 +20,9 @@ foreach ($template as $template_row) {
 	$required = (isset($template_row['required']) && $template_row['required'] == true) ? 'required' : '';
 	$class_list = (isset($template_row['class_list'])) ? $template_row['class_list'] : '';
 	$value = (isset($edit[$template_row['name']])) ? $edit[$template_row['name']] : '';
+	if (!is_array($value)) {
+		$value = htmlspecialchars($value);
+	}
 	$value_ids = (isset($edit[$template_row['name']])) ? $edit[$template_row['name']] : [];
 	$post_fill = false;
 	$edit_block = false;
@@ -92,11 +95,12 @@ foreach ($template as $template_row) {
 	}
 
 	if ($template_row['type'] == 'textarea') {
+		$textarea_rows = ($template_row['attributes']['rows'] ?? 3);
 	?>
 		<div class="form-group row">
 			<?= get_label($template_row) ?>
 			<div class="<?= $col_class ?>">
-				<textarea name="<?= $template_row['name'] ?>" id="input-<?= $template_row['name'] ?>" class="form-control" rows="3" <?= $required ?> <?= $readonly ?> <?= $attributes ?>><?= $value ?></textarea>
+				<textarea name="<?= $template_row['name'] ?>" id="input-<?= $template_row['name'] ?>" class="form-control" rows="<?= $textarea_rows ?>" <?= $required ?> <?= $readonly ?> <?= $attributes ?>><?= $value ?></textarea>
 				<?= form_error($template_row['name']) ?>
 			</div>
 		</div>
@@ -361,7 +365,6 @@ foreach ($template as $template_row) {
 	}
 
 	if ($template_row['type'] == 'list') {
-		$multiple = (isset($template_row['multiple']) && $template_row['multiple'] == true) ? 'multiple' : '';
 	?>
 		<div class="form-group row">
 			<?= get_label($template_row) ?>
@@ -484,7 +487,7 @@ foreach ($template as $template_row) {
 					if ($field['type'] != 'image') {
 						continue;
 					}
-					$size = [100, 100];
+					$size = $field['size'] ?? [100, 100];
 					$accept_type = 'image/*';
 					$accept_types = '';
 					$max_file_size = '4 MB';
@@ -499,7 +502,8 @@ foreach ($template as $template_row) {
 						}
 						$accept_type = join(', ', $accept);
 					}
-					$placeholder_img = ad_base_url('ajax/placeholder_img?size=') . ($size ? join('x', $size) : '150') . '&text=' . ($size ? join('x', $size) : '');
+					$cap_height = min($size[0], 120);
+					$placeholder_img = ad_base_url('ajax/placeholder_img?size=') . ($size ? join('x', $size) : '150') . '&text=' . ($size ? join('x', $size) : '') . '&height=' . $cap_height;
 				?>
 					<div class="alert alert-info mt-2">
 						<h4><?= $field['label'] ?></h4>
@@ -560,6 +564,7 @@ foreach ($template as $template_row) {
 										?>
 											<div class="selectgroup selectgroup-pills">
 												<label class="selectgroup-item">
+													<input type="hidden" name="<?= $field['name'] . "[$input_row]" ?>" value="0" class="<?= $class_list ?>" data-serial-index-name="<?= $field['name'] ?>">
 													<?= form_checkbox($field['name'] . "[$input_row]", '1', $field_checked, ['class' => "selectgroup-input $class_list",] + ($field['attributes'] ?? [])); ?>
 													<span class="selectgroup-button"><?= $field['label'] ?></span>
 												</label>
@@ -582,7 +587,7 @@ foreach ($template as $template_row) {
 										?>
 											<div class="input-file-image d-flex flex-wrap">
 												<div class="mb-2 mr-2 flex-shrink-0">
-													<img class="img-upload-preview" height="<?= min($size[0], 120) ?>" src="<?= $src ?>" alt="preview">
+													<img class="img-upload-preview" height="<?= $cap_height ?>" src="<?= $src ?>" alt="preview">
 												</div>
 												<label class="input-file mb-0">
 													<input type="file" class="form-control form-control-file" name="<?= $field['name'] ?>[]" accept="<?= $accept_type ?>;capture=camera" <?= join(' ', $row_attributes) ?>>
@@ -594,11 +599,14 @@ foreach ($template as $template_row) {
 													</span>
 												</label>
 												<input type="hidden" class="reset-src" value="<?= $placeholder_img ?>">
-												<input type="hidden" name="old_img[]" value="<?= $old_img ?>">
+												<input type="hidden" name="old_img[]" value="<?= $old_img ?>" class="form-control">
 											</div>
 										<?php
 										} elseif ($field['type'] == 'textarea') {
 											echo form_textarea(['name' => $field['name'] . "[]"] + ($row_attributes), $field_value, ['class' => "form-control $class_list"]);
+										} elseif ($field['type'] == 'custom') {
+											$field['input_row'] = $input_row;
+											echo $this->load->view(ADMIN_VIEWS_PATH . $field['view'], $field, true);
 										} else {
 											echo form_input($field['name'] . "[]", $field_value, ['class' => "form-control $class_list"] + ($row_attributes));
 										}
@@ -608,7 +616,7 @@ foreach ($template as $template_row) {
 								}
 								?>
 								<td class="text-center">
-									<input type="hidden" name="sort_order[]" value="<?= $input_row ?>" class="input-list-serial-value">
+									<input type="hidden" name="sort_order[<?= $template_row['name'] ?>][]" value="<?= $input_row ?>" class="input-list-serial-value">
 									<button class="btn btn-outline-danger btn-sm input-list-remove" type="button"><i class="fa fa-times"></i></button>
 								</td>
 							</tr>
@@ -667,7 +675,7 @@ foreach ($template as $template_row) {
 	}
 
 	if ($template_row['type'] == 'custom') {
-		echo $this->load->view(ADMIN_VIEWS_PATH . $template_row['view'], null, true);
+		echo $this->load->view(ADMIN_VIEWS_PATH . $template_row['view'], $template_row, true);
 	}
 }
 ?>

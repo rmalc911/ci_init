@@ -466,7 +466,7 @@ class MY_Model extends CI_Model {
 			if ($upload_status) {
 				$upload_image = ['status' => true, 'image' => $data['file_name']];
 			} else {
-				if ($preserve_index && $old_images[$key] != null) {
+				if ($preserve_index && ($old_images[$key] ?? null) != null) {
 					$upload_image = ['status' => true, 'image' => $old_images[$key]];
 				} else {
 					$unlink_image = $db_images[$key] ?? null;
@@ -490,7 +490,7 @@ class MY_Model extends CI_Model {
 		return $images;
 	}
 
-	public function save_table_map($table, $foreign_key, $foreign_value, $fields, $formatting = null) {
+	public function save_table_map($table, $foreign_key, $foreign_value, $fields, $formatting = null, $extras = []) {
 		if (!$this->db_setup) {
 			return [];
 		}
@@ -503,7 +503,15 @@ class MY_Model extends CI_Model {
 				];
 			}
 			foreach ($fields as $fi => $field_name) {
-				$post_row[$field_name] = $this->input->post($field_name)[$ii];
+				if ($field_name == "sort_order") {
+					$sort_order_key = $extras['sort_key'] ?? "";
+					if ($sort_order_key == "") {
+						continue;
+					}
+					$post_row[$field_name] = $this->input->post($field_name)[$sort_order_key][$ii];
+				} else {
+					$post_row[$field_name] = $this->input->post($field_name)[$ii];
+				}
 				if (isset($formatting[$fi]) && $formatting[$fi] != "") {
 					$post_row[$field_name] = call_user_func($formatting[$fi], $post_row[$field_name]);
 				}
@@ -679,6 +687,7 @@ class MY_Model extends CI_Model {
 		$joins = $this->TemplateModel->{$config->table_template}()['joins'] ?? [];
 		$table_alias = $this->TemplateModel->{$config->table_template}()['table_alias'] ?? "a";
 		$view_filters = $this->TemplateModel->{$config->view_template}()['filter'];
+		$sort_order = $this->TemplateModel->{$config->table_template}()['sort_order'] ?? "$table_alias.{$config->id} DESC";
 		foreach ($view_filters as $filter) {
 			$filter_name = $filter['name'];
 			$filter_value = $filter_data[$filter_name] ?? "";
@@ -691,6 +700,7 @@ class MY_Model extends CI_Model {
 			}
 			$this->db->where($filter_name, $filter_value);
 		}
+		$this->db->order_by($sort_order);
 		$this->db
 			->select(array_keys($table_heads))
 			->from("{$config->table} {$table_alias}");
