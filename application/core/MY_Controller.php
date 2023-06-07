@@ -28,7 +28,7 @@ class MY_Controller extends CI_Controller {
 		$this->data['message'] = $this->session->flashdata('message');
 		$this->data['form_template'] = $this->TemplateModel->{$options->form_template}();
 		$this->data['view_template'] = $this->TemplateModel->{$options->view_template}();
-		$this->data['edit'] = $this->TemplateModel->get_edit_row($options->table);
+		$this->data['edit'] = $this->TemplateModel->get_edit_row($options->table, '', $options->id);
 		if ($this->data['edit']) {
 			if ($edit_map) {
 				$this->data['edit'] = $edit_map($this->data['edit']);
