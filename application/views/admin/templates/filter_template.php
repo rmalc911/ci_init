@@ -1,4 +1,4 @@
-<form action="<?= ad_base_url($export ?? '') ?>" method="post">
+<form action="" method="post">
 	<div class="row">
 		<?php
 		foreach ($filter_columns as $fi => $filter_col) {
@@ -8,7 +8,7 @@
 			?>
 				<div class="col-md-4">
 					<div class="form-group">
-						<label for="select-filter-company" class="control-label"><?= $filter_col['label'] ?></label>
+						<label for="filter-<?= $filter_col['name'] ?>" class="control-label"><?= $filter_col['label'] ?></label>
 						<?= form_dropdown(['name' => $filter_col['name']], array_column($filter_col['filter_options'], 'option_name', 'option_value'), [], ['id' => "filter-" . $filter_col['name'], 'class' => "form-control select-widget"]); ?>
 					</div>
 				</div>
@@ -18,7 +18,7 @@
 			?>
 				<div class="col">
 					<div class="form-group">
-						<label for="select-filter-company" class="control-label"><?= $filter_col['label'] ?></label>
+						<label for="" class="control-label"><?= $filter_col['label'] ?></label>
 						<div class="form-check form-check-inline px-0 w-100 flex-wrap">
 							<?php
 							foreach ($filter_col['filter_options'] as $radio_option) {
@@ -39,7 +39,7 @@
 			?>
 				<div class="col-md-4">
 					<div class="form-group">
-						<label for="select-filter-company" class="control-label"><?= $filter_col['label'] ?></label>
+						<label for="filter-<?= $filter_col['name'] ?>" class="control-label"><?= $filter_col['label'] ?></label>
 						<div class="input-group">
 							<input class="form-control date-widget" type="text" name="<?= $filter_col['name'] ?>" id="filter-<?= $filter_col['name'] ?>">
 							<div class="input-group-append">
