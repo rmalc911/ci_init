@@ -10,6 +10,7 @@
 - [ ] Template for Sorting with images
 - [ ] Template for navigation
 - [x] Change password
+- [ ] Fix form template labels for select fields 
 
 ## Future
 

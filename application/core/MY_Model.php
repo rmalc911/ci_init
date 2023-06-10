@@ -346,7 +346,11 @@ class MY_Model extends CI_Model {
 			$post['created_date'] = date(date_time_format);
 			$save = $this->db->insert($table, $post);
 			if ($save) {
-				return $this->db->insert_id();
+				$insert_id = $this->db->insert_id();
+				if ($insert_id) {
+					return $insert_id;
+				}
+				return $post[$key];
 			} else {
 				return false;
 			}

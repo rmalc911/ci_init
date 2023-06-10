@@ -13,21 +13,21 @@ let select2Config = {
 };
 
 function auto_grow(element) {
-	element.style.height = (element.scrollHeight - parseFloat($(element).css('line-height'))) + "px";
-	element.style.height = (element.scrollHeight + 2) + "px";
+	element.style.height = element.scrollHeight - parseFloat($(element).css("line-height")) + "px";
+	element.style.height = element.scrollHeight + 2 + "px";
 }
 
 function formatIcon(state) {
-	let img = $(state.element).data('img-path')
+	let img = $(state.element).data("img-path");
 	if (img) {
-		return $('<span class="select2-icon"><img src="' + img + '" height="20" class="img-responsive mr-2" />' + state.text + '</span>');
+		return $('<span class="select2-icon"><img src="' + img + '" height="20" class="img-responsive mr-2" />' + state.text + "</span>");
 	}
 	return state.text;
 }
 var select2AjaxConfig = {
 	ajax: {
 		url: function (params) {
-			let customParams = $(this).data("params").split(",");
+			let customParams = $(this).data("params")?.split(",") || [];
 			let fieldInTableRow = $(this).parents(".input-group-list-item");
 			let container = null;
 			let fieldSuffix = "";
@@ -37,11 +37,13 @@ var select2AjaxConfig = {
 			} else {
 				container = $(this).parents(".validate-form");
 			}
-			let urlParams = customParams.map(function (param) {
-				let paramField = $("[name='" + param + fieldSuffix + "']", container);
-				let paramValue = paramField.val();
-				return param + "=" + paramValue;
-			}).join("&");
+			let urlParams = customParams
+				.map(function (param) {
+					let paramField = $("[name='" + param + fieldSuffix + "']", container);
+					let paramValue = paramField.val();
+					return param + "=" + paramValue;
+				})
+				.join("&");
 			return ADMIN_PATH + "ajax/" + $(this).data("ajax-options") + "?" + urlParams;
 		},
 		processResults: function (data, params) {
@@ -586,15 +588,15 @@ $(function () {
 									...select2Config,
 									dropdownParent: $("#swal2-html-container"),
 								});
-								$('#swal2-html-container .date-widget').datetimepicker({
-									format: 'DD-MM-YYYY',
+								$("#swal2-html-container .date-widget").datetimepicker({
+									format: "DD-MM-YYYY",
 								});
 								if (res.script) {
-									var head = document.getElementsByTagName('head')[0];
+									var head = document.getElementsByTagName("head")[0];
 									var js = document.createElement("script");
 									head.appendChild(js);
 									js.onload = function () {
-										console.log("custom script loaded")
+										console.log("custom script loaded");
 									};
 									js.id = "swal2-html-container-script";
 									js.src = res.script;
@@ -636,13 +638,16 @@ $(function () {
 		let query = $(this).val();
 		$(searchTable + " [data-search-row]").show();
 		$(searchTable + " [data-search-row]").each(function (ix, ie) {
-			let searchField = $("[data-search-field]", ie).map(function () {
-				return $(this).text();
-			}).toArray().join(" ");
+			let searchField = $("[data-search-field]", ie)
+				.map(function () {
+					return $(this).text();
+				})
+				.toArray()
+				.join(" ");
 			if (!searchField.toLowerCase().includes(query.toLowerCase())) {
 				$(ie).hide();
 			}
-		})
+		});
 	});
 
 	$("body").on("click", ".input-list-add", function () {
