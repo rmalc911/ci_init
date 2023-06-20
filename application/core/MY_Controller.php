@@ -26,9 +26,9 @@ class MY_Controller extends CI_Controller {
 
 	protected function _add_template(TemplateConfig $options, callable $edit_map = null) {
 		$this->data['message'] = $this->session->flashdata('message');
-		$this->data['form_template'] = $this->TemplateModel->{$options->form_template}();
-		$this->data['view_template'] = $this->TemplateModel->{$options->view_template}();
 		$this->data['edit'] = $this->TemplateModel->get_edit_row($options->table, '', $options->id);
+		$this->data['form_template'] = $this->TemplateModel->{$options->form_template}($this->data['edit'][$options->id] ?? "");
+		$this->data['view_template'] = $this->TemplateModel->{$options->view_template}();
 		if ($this->data['edit']) {
 			if ($edit_map) {
 				$this->data['edit'] = $edit_map($this->data['edit']);
@@ -97,19 +97,19 @@ class MY_Controller extends CI_Controller {
 	}
 
 	public function view_wildcard($path, $option) {
-		$option = singular($option);
 		if (method_exists($path, "view_{$option}")) {
 			$this->{"view_{$option}"}();
 		} else {
+			$option = singular($option);
 			$this->_view_template($this->TemplateModel->{"{$option}_config"});
 		}
 	}
 
 	public function add_wildcard($path, $option) {
-		$option = singular($option);
 		if (method_exists($path, "add_{$option}")) {
 			$this->{"add_{$option}"}();
 		} else {
+			$option = singular($option);
 			/** @var TemplateConfig */
 			$config = $this->TemplateModel->{"{$option}_config"};
 			$this->_add_template($config, function ($edit) use ($option, $config) {
@@ -133,10 +133,10 @@ class MY_Controller extends CI_Controller {
 	}
 
 	public function submit_wildcard($path, $option) {
-		$option = singular($option);
 		if (method_exists($path, "submit_{$option}")) {
 			$this->{"submit_{$option}"}();
 		} else {
+			$option = singular($option);
 			$this->_submit_template($this->TemplateModel->{"{$option}_config"}, function ($post_data) use ($option) {
 				if (method_exists("TemplateModel", "{$option}_img_config")) {
 					$img_configs = $this->TemplateModel->{"{$option}_img_config"}();

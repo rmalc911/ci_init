@@ -421,10 +421,11 @@ foreach ($template as $template_row) {
 			}
 			$accept_type = join(', ', $accept);
 		}
-		$placeholder_img = ad_base_url('ajax/placeholder_img?size=') . ($size ? join('x', $size) : '150') . '&text=' . ($size ? join('x', $size) : '');
+		$cap_height = min($size[0], 120);
+		$placeholder_img = ad_base_url('ajax/placeholder_img?size=') . ($size ? join('x', $size) : '150') . '&text=' . ($size ? join('x', $size) : '') . '&height=' . $cap_height;
 		$image_rows = [];
 		if ($value) {
-			$image_rows = explode(IMG_SPLIT, $value);
+			$image_rows = is_array($value) ? $value : explode(IMG_SPLIT, $value);
 		}
 	?>
 		<div class="form-group row">
