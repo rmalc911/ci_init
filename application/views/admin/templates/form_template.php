@@ -452,12 +452,12 @@ foreach ($template as $template_row) {
 									<span class=""><span class="input-list-serial"><?= $img_row_index + 1 ?></span></span>
 								</td>
 								<td>
-									<img class="img-upload-preview" height="100" src="<?= $src ?>" alt="preview">
+									<img class="img-upload-preview" height="<?= $cap_height ?>" src="<?= $src ?>" alt="preview">
 								</td>
 								<td>
 									<label class="input-file">
-										<input type="file" class="form-control form-control-file" id="select-<?= $template_row['name'] ?>-<?= $img_row_index ?>" name="<?= $template_row['name'] ?>[]" accept="<?= $accept_type ?>;capture=camera" <?= $required ?> <?= $readonly ?> <?= $attributes ?>>
-										<span for="select-<?= $template_row['name'] ?>-<?= $img_row_index ?>" class="label-input-file btn btn-default btn-round">
+										<input type="file" class="form-control form-control-file" name="<?= $template_row['name'] ?>[]" accept="capture=camera,<?= $accept_type ?>" <?= $required ?> <?= $readonly ?> <?= $attributes ?>>
+										<span class="label-input-file btn btn-default btn-round">
 											<span class="btn-label">
 												<i class="fa fa-file-image"></i>
 											</span>
@@ -607,7 +607,7 @@ foreach ($template as $template_row) {
 													<img class="img-upload-preview" height="<?= $cap_height ?>" src="<?= $src ?>" alt="preview">
 												</div>
 												<label class="input-file mb-0">
-													<input type="file" class="form-control form-control-file" name="<?= $field['name'] ?>[]" accept="<?= $accept_type ?>;capture=camera" <?= join(' ', $row_attributes) ?>>
+													<input type="file" class="form-control form-control-file" name="<?= $field['name'] ?>[]" accept="capture=camera,<?= $accept_type ?>" <?= join(' ', $row_attributes) ?>>
 													<span class="label-input-file btn btn-default btn-round">
 														<span class="btn-label">
 															<i class="fa fa-file-image"></i>
