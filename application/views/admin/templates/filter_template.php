@@ -1,4 +1,4 @@
-<form action="" method="post">
+<form action="<?= ad_base_url($export ?? '') ?>" method="post">
 	<div class="row">
 		<?php
 		foreach ($filter_columns as $fi => $filter_col) {
