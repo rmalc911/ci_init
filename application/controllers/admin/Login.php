@@ -3,7 +3,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class Login extends CI_Controller {
 	private $login_redirect = ADMIN_LOGIN_REDIRECT;
-
 	public function index() {
 		$data['message'] = $this->session->flashdata('login');
 		$init = $this->db->get_where('users', ['user_mobile' => 'admin'])->num_rows();
@@ -25,6 +24,7 @@ class Login extends CI_Controller {
 			];
 			$this->db->insert('users', $post);
 		}
+		$data['config'] = $this->TemplateModel->get_config();
 		$this->load->view(ADMIN_VIEWS_PATH . 'pages/login', $data);
 	}
 
@@ -68,7 +68,7 @@ class Login extends CI_Controller {
 	public function logout() {
 		$this->session->unset_userdata('user');
 		$this->session->unset_userdata('company_login');
-		redirect(ad_base_url('login'));
+		redirect_base(ADMIN_PATH);
 	}
 
 	public function admin_access_update() {

@@ -14,6 +14,7 @@ class MY_Controller extends CI_Controller {
 		// $this->load->helper('access');
 		$this->load->library('Excel_export');
 		$this->popover_btn = '<button class="btn btn-$3 btn-border btn-sm btn-rounded json-format txn-id-btn" type="button" data-toggle="popover" data-content=\'$2\' data-label="$1" data-original-title="$1 <span class=\'close \'>&times;</span">$1</button>';
+		$this->data['config'] = $this->TemplateModel->get_config();
 	}
 
 	protected function _view_template(TemplateConfig $options) {
@@ -43,12 +44,23 @@ class MY_Controller extends CI_Controller {
 	protected function _sort_template(TemplateConfig $options) {
 		$this->data['message'] = $this->session->flashdata('message');
 		$this->data['view_template'] = $this->TemplateModel->{$options->view_template}();
+		$default_sort_order = "ASC";
+		$table_sort = $this->TemplateModel->{$options->table_template}()['sort_order'] ?? [$options->id, $default_sort_order];
+		if (is_array($table_sort)) {
+			$sort_order = $table_sort[0];
+			$sort_direction = $default_sort_order;
+		} else {
+			$table_sort = explode(" ", $table_sort);
+			$sort_order = $table_sort[0];
+			$sort_direction = $default_sort_order;
+		}
+		$table_alias = $options->table;
 		$this->TemplateModel->verify_access($options->access, 'edit_data');
 		$filter = [];
 		if ($options->parent_field !== null) {
 			$filter[$options->parent_field] = null;
 		}
-		$this->data['sort_list'] = $options->get_options($filter, false, 'sort_order');
+		$this->data['sort_list'] = $options->get_options($filter, false, "ISNULL($table_alias.$sort_order) $sort_direction, $table_alias.$sort_order $sort_direction, $table_alias.{$options->id} $sort_direction");
 		$this->load->template('templates/sort_template', $this->data);
 	}
 
@@ -60,6 +72,8 @@ class MY_Controller extends CI_Controller {
 		$sort_data = json_decode($sort);
 		$update = [];
 		if ($sort == '') {
+			$alert = $this->TemplateModel->show_alert('', 'No Change');
+			$this->session->set_flashdata('message', $alert);
 			redirect($return_url);
 		}
 		$id = $options->id;
@@ -68,7 +82,7 @@ class MY_Controller extends CI_Controller {
 		}
 
 		$status = $this->db->update_batch($table, $update, $id);
-		$alert = $status ? $this->TemplateModel->show_alert('suc', 'Successfully updated') : $this->TemplateModel->show_alert('err', 'Failed to update');
+		$alert = $status >= 1 ? $this->TemplateModel->show_alert('suc', 'Successfully updated') : $this->TemplateModel->show_alert('err', 'Failed to update');
 		$this->session->set_flashdata('message', $alert);
 		redirect($return_url);
 	}
@@ -257,7 +271,16 @@ class MY_Controller extends CI_Controller {
 		$text_fields = $this->TemplateModel->{$options->table_template}()['text_fields'] ?? [];
 		$img_fields = $this->TemplateModel->{$options->table_template}()['img_fields'] ?? [];
 		$table_alias = $this->TemplateModel->{$options->table_template}()['table_alias'] ?? "a";
-		$sort_order = $this->TemplateModel->{$options->table_template}()['sort_order'] ?? "$table_alias.{$options->id} DESC";
+		$default_sort_order = "ASC";
+		$table_sort = $this->TemplateModel->{$options->table_template}()['sort_order'] ?? [$options->id, $default_sort_order];
+		if (is_array($table_sort)) {
+			$sort_order = $table_sort[0];
+			$sort_direction = $table_sort[1] ?? $default_sort_order;
+		} else {
+			$table_sort = explode(" ", $table_sort);
+			$sort_order = $table_sort[0];
+			$sort_direction = $table_sort[1] ?? $default_sort_order;
+		}
 		$joins = $this->TemplateModel->{$options->table_template}()['joins'] ?? [];
 		$table = $options->table;
 
@@ -295,7 +318,7 @@ class MY_Controller extends CI_Controller {
 			return $table_alias . "." . $key . " AS " . $key;
 		}, array_keys($img_fields))) . "," : "";
 
-		$this->db->order_by($sort_order);
+		$this->db->order_by("ISNULL($table_alias.$sort_order) $sort_direction, $table_alias.$sort_order $sort_direction, $table_alias.{$options->id} $sort_direction");
 		$this->datatables
 			->from($table . " $table_alias")
 			->select("1 as sl, $select_fields $text_fields_select $img_fields_select $table_alias.$id_field $status_field")
