@@ -113,12 +113,12 @@ class MY_Model extends CI_Model {
 		];
 	}
 
-	private function example_add($path) {
+	private function example_add() {
 		$common_properties = [
 			['type', 'required'],
 			['name', 'required'],
 			['label', 'required'],
-			['unique' => ['table' => 'table name', 'key' => 'primary/unique key'], 'optional'],
+			['unique' => ['table' => 'table name', 'key' => 'primary/unique key', 'composite' => 'parent id (optional)'], 'optional'],
 			['help_text', 'optional'],
 			['readonly', 'optional'],
 			['required', 'optional'],
@@ -142,7 +142,7 @@ class MY_Model extends CI_Model {
 			// Custom props: [multiple => bool, update => field name, change => ajax fn, options => select_options array, add_options => [master, label]]
 			['type' => 'select-widget', 'label' => 'Select Widget', 'name' => 'select'],
 			// Custom props: [size => [x, y], accept => [...filetypes], path => upload dir]
-			['type' => 'image', 'label' => 'Image', 'name' => 'img', 'path' => $path, 'required' => true, 'size' => [1600, 700], 'accept' => ['png', 'jpeg', 'webp']],
+			['type' => 'image', 'label' => 'Image', 'name' => 'img', 'path' => 'path', 'required' => true, 'size' => [1600, 700], 'accept' => ['png', 'jpeg', 'webp']],
 			['type' => 'wysiwyg', 'label' => 'WYSIWYG - Styled Textarea Widget', 'name' => ''],
 			// Custom props: [on_state, off_state]
 			['type' => 'checkbox', 'label' => 'Bootstrap Switch Checkbox', 'name' => ''],
@@ -152,7 +152,7 @@ class MY_Model extends CI_Model {
 			['type' => 'file', 'label' => 'File Input', 'name' => ''],
 			// Custom props: [multiple, prepend_text]
 			['type' => 'list', 'label' => 'List Input', 'name' => ''],
-			// Custom props: [footer => view file]
+			// Custom props: [footer => view file, table-inline => bool]
 			['type' => 'input-table', 'label' => 'Input Table', 'name' => '', 'fields' => 'input_template_fn'],
 			// Custom props: []
 			['type' => 'tags', 'label' => 'Tags Input', 'name' => ''],
@@ -166,6 +166,14 @@ class MY_Model extends CI_Model {
 			['type' => 'select-widget', 'label' => 'Table Select', 'name' => 'table_select', 'options' => []],
 			['type' => 'form_input type: text/number/email/textarea', 'label' => 'Table Input', 'name' => 'table_input', 'attributes' => ['size' => 5]],
 		];
+	}
+
+	private function example_config_add() {
+		$city_options_config = [
+			'parent' => $this->state_config,
+			'options' => $this->city_config,
+		];
+		$city_options = $this->select_parent_options($city_options_config, true);
 	}
 
 	//======================================================================
@@ -183,7 +191,11 @@ class MY_Model extends CI_Model {
 				$unique = $field['unique'];
 				$table = $unique['table'];
 				$key = $unique['key'];
-				$edit = $this->input->post($key);
+				$composite = $unique['composite'] ?? "";
+				$edit = $this->input->post($key) ?? "";
+				if ($composite != "") {
+					$key = "$composite>>$key";
+				}
 				$rules[] = "edit_unique[$table.$field_name.$key.$edit]";
 			}
 			if (isset($field['multiple']) && $field['multiple'] == true) {
@@ -255,6 +267,42 @@ class MY_Model extends CI_Model {
 			->get()
 			->result_array();
 
+		if ($select) {
+			array_unshift($result, [
+				'option_name' => 'Select',
+				'option_value' => '',
+			]);
+		}
+		return $result;
+	}
+
+	/**
+	 * select_parent_options
+	 *
+	 * @param array $relation
+	 * $relation = [
+	 * 	'options'	=> 	TemplateConfig,
+	 * 	'parent'	=> 	TemplateConfig
+	 * ]
+	 * @param bool $select
+	 *
+	 * @return array
+	 */
+	public function select_parent_options($relation, $select = true) {
+		$table = $relation['options']->table;
+		$field_name = $relation['options']->display_name;
+		$field_id = $relation['options']->id;
+		$parent_key = $relation['options']->parent_field;
+		$parent_table = $relation['parent']->table;
+		$parent_name = $relation['parent']->display_name;
+		$parent_id = $relation['parent']->id;
+		$result = $this->db
+			->select("CONCAT_WS(' > ', t2.{$parent_name}, t1.{$field_name}) as option_name, t1.{$field_id} as option_value")
+			->from("{$table} t1")
+			->join("{$parent_table} t2", "t2.{$parent_id} = t1.{$parent_key}", 'LEFT')
+			->order_by('option_name', 'ASC')
+			->get()
+			->result_array();
 		if ($select) {
 			array_unshift($result, [
 				'option_name' => 'Select',

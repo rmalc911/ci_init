@@ -39,7 +39,7 @@ class Login extends CI_Controller {
 			redirect(ad_base_url());
 		}
 		$this->session->set_userdata('user', $user);
-		$this->db->update('users', ['last_login' => date('Y-m-d H:i:s')], ['user_mobile' => $post_data['username']]);
+		$this->db->update('users', ['last_login' => date(date_time_format)], ['user_mobile' => $post_data['username']]);
 		if ($user['user_mobile'] != 'admin') {
 			$view_access = $this->db->get_where('user_access_map', ['user' => $user['id'], 'view_data' => '1'], 1)->row_array();
 			if (!$view_access) {
