@@ -431,6 +431,11 @@ foreach ($template as $template_row) {
 		<div class="form-group row">
 			<?= get_label($template_row) ?>
 			<div class="col-md-9 table-responsive">
+				<div class="alert alert-info mt-2">
+					<?= $size ? ('<p class="text-muted mb-0">Dimensions: ' . $size[0] . 'px &times; ' . $size[1] . 'px</p>') : '' ?>
+					<?= ($accept_types != '') ? ('<p class="text-muted mb-0">Format: ' . $accept_types . '</p>') : '' ?>
+					<p class="text-muted mb-0">Max size: <?= $max_file_size ?></p>
+				</div>
 				<table class="input-list-container table table-bordered table-sm m-0">
 					<thead>
 						<tr>
@@ -467,7 +472,8 @@ foreach ($template as $template_row) {
 								</td>
 								<td class="">
 									<input type="hidden" class="reset-src" value="<?= $placeholder_img ?>">
-									<input type="hidden" name="old_img[]" value="<?= $old_img ?>">
+									<input type="hidden" name="old_img[<?= $template_row['name'] ?>][]" value="<?= $old_img ?>">
+									<input type="hidden" name="sort_order[<?= $template_row['name'] ?>][]" value="<?= $img_row_index ?>" class="input-list-serial-value">
 									<button class="btn btn-outline-danger btn-sm input-list-remove" type="button"><i class="fa fa-times"></i></button>
 								</td>
 							</tr>
