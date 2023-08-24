@@ -16,3 +16,52 @@ function wysiwyg_to_preview_text($html, $length) {
 	}
 	return ellipsize(html_string_add_new_lines($html), $length);
 }
+
+// function date_format($time_string) {
+// 	if (!$time_string) {
+// 		return '';
+// 	}
+// 	return date(date_format, strtotime($time_string));
+// }
+
+function time_format($time_string) {
+	if (!$time_string) {
+		return '';
+	}
+	return date(time_format, strtotime($time_string));
+}
+
+function date_time_format($time_string) {
+	if (!$time_string) {
+		return '';
+	}
+	return date(date_time_format, strtotime($time_string));
+}
+
+function user_date($time_string) {
+	if (!$time_string) {
+		return '';
+	}
+	return date(user_date, strtotime($time_string));
+}
+
+function user_time($time_string) {
+	if (!$time_string) {
+		return '';
+	}
+	return date(user_time, strtotime($time_string));
+}
+
+function user_date_time($time_string) {
+	if (!$time_string) {
+		return '';
+	}
+	return date(user_date_time, strtotime($time_string));
+}
+
+function db_user_time($time_string) {
+	if (!$time_string) {
+		return '';
+	}
+	return date(db_user_time, strtotime($time_string));
+}

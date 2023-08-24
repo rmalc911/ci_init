@@ -96,6 +96,9 @@ define('BANNER_UPLOAD_PATH', 'assets/uploads/banners/');
 define('GALLERY_UPLOAD_PATH', 'assets/uploads/gallery/');
 define('PRODUCT_IMG_UPLOAD_PATH', 'assets/uploads/products/');
 define('RESUME_UPLOAD_PATH', 'assets/uploads/resume/');
+define('PROFILE_LOGO_UPLOAD_PATH', 'assets/uploads/logo/');
+
+define('PROFILE_LOGO_FIELD', 'profile_logo');
 
 define('CLIENT_NAME', '');
 define('CLIENT_NAME_SHORT', '');
@@ -108,14 +111,18 @@ define('LOGO_IMG', 'assets/images/logo.png');
 define('LOGO_IMG_MIN', 'assets/images/logo-min.png');
 define('LOGO26', 'assets/images/26_footer_dark.png');
 define('LOGO26_LIGHT', 'assets/images/26_footer.png');
+define('LOGO26_URL', 'https://steed26.com/');
 
 define('date_format', 'Y-m-d');
+define('time_format', 'H:i:s');
 define('date_time_format', 'Y-m-d H:i:s');
 define('user_date', 'jS M Y');
+define('user_time', 'g:i A');
 define('user_date_time', 'jS M Y, g:i A');
 define('input_date', 'd-m-Y');
 define('input_date_time', 'd-m-Y g:i A');
 define('db_user_date', '%D %b %Y');
+define('db_user_time', '%l:%i %p');
 define('db_user_date_time', '%D %b %Y - %l:%i %p');
 
 define('CATEGORY_VIEW_DEPTH', 3);

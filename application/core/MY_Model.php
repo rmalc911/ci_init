@@ -33,6 +33,11 @@ class MY_Model extends CI_Model {
 				$access['page_access'] = array_column($this->get_user_access_map($this->session->userdata('user')), null, 'page');
 			}
 			$login = true;
+		} else {
+			$access = [
+				'user_name' => 'admin',
+				'user_id' => 0,
+			];
 		}
 		if (!$login) {
 			redirect_base(ADMIN_LOGIN_PATH);
@@ -41,6 +46,12 @@ class MY_Model extends CI_Model {
 	}
 
 	public function verify_access($access_page, $access_type, $redirect = true) {
+		if (!$this->db_setup) {
+			return true;
+		}
+		if (!$this->session->userdata('user')) {
+			return false;
+		}
 		$username = $this->session->userdata('user')['user_mobile'];
 		if ($username == 'admin') {
 			return true;
@@ -221,7 +232,11 @@ class MY_Model extends CI_Model {
 			'option_value' => '',
 		];
 		if (!$this->db_setup) {
-			return [$select_0];
+			$result = [];
+			if ($select) {
+				array_unshift($result, $select_0);
+			}
+			return $result;
 		}
 		if ($option_name == '') {
 			$option_name = $option_value;
@@ -375,6 +390,9 @@ class MY_Model extends CI_Model {
 			if ($field['type'] == 'datetime-widget') {
 				$field_data = date(date_time_format, strtotime($post_data[$field_name]));
 			}
+			if ($field['type'] == 'time') {
+				$field_data = date(time_format, strtotime($post_data[$field_name]));
+			}
 			if (isset($field['allow_null']) && $field['allow_null'] == true && $post_data[$field_name] == '') {
 				$field_data = null;
 			}
@@ -406,6 +424,16 @@ class MY_Model extends CI_Model {
 				return false;
 			}
 		}
+	}
+
+	public function get_array_options($array_options, $select = true) {
+		$options = array_map(function ($key, $value) {
+			return ['option_value' => $key, 'option_name' => $value];
+		}, array_keys($array_options), $array_options);
+		if ($select) {
+			array_unshift($options, ['option_value' => '', 'option_name' => 'Select']);
+		}
+		return $options;
 	}
 
 	/**
@@ -706,6 +734,9 @@ class MY_Model extends CI_Model {
 	}
 
 	public function get_config($config_key = null) {
+		if (!$this->db_setup) {
+			return [];
+		}
 		if ($config_key) {
 			$this->db->where_in('config_key', $config_key);
 		}
@@ -769,6 +800,15 @@ class MY_Model extends CI_Model {
 		}
 		$results = $this->db->get()->result_array();
 		return [$table_heads, $results];
+	}
+
+	public function get_array_case_select($options, $field) {
+		$select = "CASE $field";
+		foreach ($options as $key => $value) {
+			$select .= " WHEN '$key' THEN '$value'";
+		}
+		$select .= "ELSE $field END AS {$field}_case";
+		return $select;
 	}
 }
 
