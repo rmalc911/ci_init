@@ -2,4 +2,4 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/9.2.0/swiper-bundle.min.js" integrity="sha512-KBCt3sdFOcFtYTgEfE3uJckVpvPr1w8HPugyPgHFE/4iJOwhwj6eSaF27bDJTHRX2jyAFOgV3Ve9vOD97rbjrg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="<?= base_url('assets/plugins/jquery-3.6.3.min.js') ?>"></script>
 <script src="<?= base_url('assets/plugins/jquery.validate/jquery.validate.min.js') ?>"></script>
-<script src="<?= base_url('assets/js/main.js') ?>"></script>
+<script src="<?= base_url('assets/js/main.js?v=' . js_version()) ?>"></script>
