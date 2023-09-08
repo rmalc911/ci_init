@@ -2,17 +2,10 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 
 class TemplateModel extends MY_Model {
-	/** @var TemplateConfig */
-	public $banner_config;
-
-	/** @var TemplateConfig */
-	public $career_config;
-
-	/** @var TemplateConfig */
-	public $career_application_config;
-
-	/** @var TemplateConfig */
-	public $contact_us_config;
+	/** @var TemplateConfig */ public $banner_config;
+	/** @var TemplateConfig */ public $career_config;
+	/** @var TemplateConfig */ public $career_application_config;
+	/** @var TemplateConfig */ public $contact_us_config;
 
 	public function __construct() {
 		parent::__construct();
@@ -147,7 +140,7 @@ class TemplateModel extends MY_Model {
 			'src' => 'ajax',
 			'data' => 'ajaxtables/dt_banners',
 			'text_fields' => ['banner_name'],
-			'img_fields' => ['banner_img' => BANNER_UPLOAD_PATH],
+			'img_fields' => $this->banner_img_config(),
 			'sort_order' => 'sort_order',
 		];
 	}

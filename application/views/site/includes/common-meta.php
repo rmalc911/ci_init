@@ -4,6 +4,10 @@
 <link rel="shortcut icon" href="<?= base_url(LOGO_IMG_MIN) ?>" type="image/x-icon">
 <title><?= CLIENT_NAME ?></title>
 
+<meta name="msapplication-TileColor" content="">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="black">
+
 <!-- Libs -->
 <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/9.2.0/swiper-bundle.min.css" integrity="sha512-Ja1oxinMmERBeokXx+nbQVVXeNX771tnUSWWOK4mGIbDAvMrWcRsiteRyTP2rgdmF8bwjLdEJADIwdMXQA5ccg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 

@@ -664,6 +664,15 @@ class MY_Model extends CI_Model {
 			case 'err':
 				$alert_class = 'alert-danger';
 				break;
+			case 'warn':
+				$alert_class = 'alert-warning';
+				break;
+			case 'info':
+				$alert_class = 'alert-info';
+				break;
+			default:
+				$alert_class = 'alert-primary';
+				break;
 		}
 
 		$alert = '<div data-notify="container" class="float-alert alert ' . $alert_class . '" role="alert"><button type="button" aria-hidden="true" class="close" data-notify="dismiss">×</button><span data-notify="title"></span><span data-notify="message">' . $message . '</span></div>';

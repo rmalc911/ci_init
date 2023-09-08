@@ -1,9 +1,10 @@
 <?php
 $current_url = base_url(uri_string());
 foreach ($links as $type => $link) {
-	$url = base_url(ADMIN_PATH . $link);
 	if ($type == 'other') {
 		$url = base_url(ADMIN_PATH . $link['url']);
+	} else {
+		$url = base_url(ADMIN_PATH . $link);
 	}
 	$url_match = $url == $current_url;
 	if ($type == 'add') {

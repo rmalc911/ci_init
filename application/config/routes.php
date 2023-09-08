@@ -1,5 +1,5 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
 $route['default_controller'] = 'home';
 $route['404_override'] = '';
@@ -14,6 +14,7 @@ $route['admin/(:any)/(submit_([a-zA-Z0-9_]+))'] = 'admin/$1/submit_wildcard/$1/$
 $route['admin/(:any)/(sort_([a-zA-Z0-9_]+))'] = 'admin/$1/sort_wildcard/$1/$3';
 $route['admin/(:any)/(dt_([a-zA-Z0-9_]+))'] = 'admin/$1/dt_wildcard/$1/$3';
 $route['admin/(:any)/(export_([a-zA-Z0-9_]+))'] = 'admin/$1/export_wildcard/$1/$3';
+$route['admin/(:any)/(:any)'] = 'admin/$1/$2';
 
 $route['webhooks/(:any)'] = 'webhooks/$1';
 $route['user/(:any)'] = 'home/user_$1';
