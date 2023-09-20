@@ -160,7 +160,11 @@ $(function () {
 		height: 250,
 		callbacks: {
 			onPaste: function (e) {
-				var bufferText = ((e.originalEvent || e).clipboardData || window.clipboardData).getData("text/html");
+				var clipboardData = ((e.originalEvent || e).clipboardData || window.clipboardData)
+				var bufferText = clipboardData.getData("text/html");
+				if (bufferText == "") {
+					bufferText = clipboardData.getData("text").split("\n").join("<br>");
+				}
 				e.preventDefault();
 				var div = $("<div />");
 				div.append(bufferText);

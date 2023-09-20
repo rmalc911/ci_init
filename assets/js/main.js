@@ -38,11 +38,20 @@ $(function (e) {
 			}
 		});
 	});
+
+	window.addEventListener("scroll", scrollCheck);
+
+	setTimeout(() => {
+		scrollCheck();
+	}, 200);
+
+	$(".scroll-link").on("click", function (e) {
+		$("html").removeClass("menu-active");
+	});
 });
 
-window.addEventListener("scroll", function () {
+function scrollCheck() {
 	let scrollPos = window.scrollY;
-	if (scrollPos < 10)
-		$("html").removeClass("scroll-down");
+	if (scrollPos < 10) $("html").removeClass("scroll-down");
 	else $("html").addClass("scroll-down");
-});
+}

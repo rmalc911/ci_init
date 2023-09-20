@@ -192,6 +192,7 @@ class Home extends MY_Controller {
 			$null = "NOT NULL";
 			$maxlength = 250;
 			$type = "VARCHAR($maxlength)";
+			$comment = "";
 			if (($template['allow_null'] ?? false) == true) {
 				$null = "NULL DEFAULT NULL";
 			}
@@ -201,12 +202,25 @@ class Home extends MY_Controller {
 			if ($template['type'] == 'select-widget') {
 				if ((($template['multiple']) ?? false) == false) {
 					$type = 'INT(11)';
-					$option_value = $template['options'][1]['option_value'];
-					if (is_numeric($option_value)) {
-						$type = 'INT(11)';
+					if (($template['fixed_options'] ?? false) == true) {
+						$options = array_column($template['options'], 'option_name', 'option_value');
+						$options = array_filter($options, function ($val, $key) {
+							return $key;
+						}, ARRAY_FILTER_USE_BOTH);
+						$type = "ENUM('" . implode("', '", array_keys($options)) . "')";
+						$comment = " COMMENT '";
+						foreach ($options as $option_key => $option) {
+							$comment .= $option_key . " - " . $option . ", ";
+						}
+						$comment = substr($comment, 0, -2) . "'";
 					} else {
-						$type_length = ceil((strlen($option_value) + 5) / 10) * 10;
-						$type = "VARCHAR($type_length)";
+						$option_value = ($template['options'][1]['option_value'] ?? null);
+						if (is_numeric($option_value)) {
+							$type = 'INT(11)';
+						} else {
+							$type_length = ceil((strlen($option_value) + 5) / 10) * 10;
+							$type = "VARCHAR($type_length)";
+						}
 					}
 				} else {
 					$map_key_name = singular($table_name);
@@ -224,6 +238,9 @@ class Home extends MY_Controller {
 			// if (($template['validation'] ?? true) == false) continue;
 			if ($template['type'] == 'textarea') {
 				$type = 'VARCHAR(1000)';
+			}
+			if ($template['type'] == 'wysiwyg') {
+				$type = 'TEXT';
 			}
 			if ($template['type'] == 'time') {
 				$type = 'TIME';
@@ -262,7 +279,7 @@ class Home extends MY_Controller {
 			if (($template['attributes']['maxlength']) ?? false) {
 				$type = "VARCHAR({$template['attributes']['maxlength']})";
 			}
-			$create_table_fields[] = "`{$key}` $type $null";
+			$create_table_fields[] = "`{$key}` $type $null$comment";
 		}
 
 		foreach ($unique_keys as $unique_key) {
