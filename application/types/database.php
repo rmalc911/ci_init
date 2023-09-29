@@ -1,10 +1,10 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-abstract class string_types extends string {
+abstract class string_types implements Stringable {
 }
 
-abstract class num_types extends float {
+abstract class num_types implements Stringable {
 }
 
 abstract class datetime extends string_types {

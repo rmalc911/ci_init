@@ -160,7 +160,7 @@ $(function () {
 		height: 250,
 		callbacks: {
 			onPaste: function (e) {
-				var clipboardData = ((e.originalEvent || e).clipboardData || window.clipboardData)
+				var clipboardData = (e.originalEvent || e).clipboardData || window.clipboardData;
 				var bufferText = clipboardData.getData("text/html");
 				if (bufferText == "") {
 					bufferText = clipboardData.getData("text").split("\n").join("<br>");
@@ -292,9 +292,41 @@ $(function () {
 		var popup = $(this).parents(".swal2-popup");
 		if (popup) {
 			$(".swal-form-input", popup).each(function (ix, ie) {
-				formExtras[ie.name] = $(ie).val();
-				if (ie.type == "checkbox") {
-					formExtras[ie.name] = ie.checked ? "1" : "0";
+				// if parent fieldset is disabled return
+				let fieldset = $(ie).parents("fieldset");
+				if (fieldset && fieldset.is(":disabled")) {
+					return;
+				}
+				if (ie.name.indexOf("[") > 0) {
+					ie.name = ie.name.substring(0, ie.name.indexOf("["));
+					let val = $(ie).val();
+					if (ie.type == "checkbox") {
+						val = ie.checked ? "1" : "0";
+						let valAttr = $(ie).attr("value");
+						if (valAttr) {
+							if (val == "0") {
+								return;
+							}
+							val = valAttr;
+						}
+					}
+					if (formExtras[ie.name]) {
+						formExtras[ie.name].push(val);
+					} else {
+						formExtras[ie.name] = [val];
+					}
+				} else {
+					if (ie.type == "checkbox") {
+						formExtras[ie.name] = ie.checked ? "1" : "0";
+					}
+					if (ie.type == "radio") {
+						if (!ie.checked) {
+							return;
+						}
+						formExtras[ie.name] = $(ie).val();
+						return;
+					}
+					formExtras[ie.name] = $(ie).val();
 				}
 			});
 		}
@@ -665,11 +697,24 @@ $(function () {
 		$(".form-control", inputListItem).val("");
 		$("[type=radio], [type=checkbox]", inputListItem).prop("checked", false);
 		$(".img-upload-preview", inputListItem).attr("src", resetSrc);
+		$(".date-widget", inputListContainer).datetimepicker("destroy");
+		$(".time-widget", inputListContainer).datetimepicker("destroy");
+		$(".datetime-widget", inputListContainer).datetimepicker("destroy");
 		inputList.append(inputListItem);
 		$(".select-widget", inputListContainer).select2(select2Config);
 		$(".select-widget[data-ajax-options]").select2({
 			...select2Config,
 			...select2AjaxConfig,
+		});
+		$(".date-widget", inputListContainer).datetimepicker({
+			format: "DD-MM-YYYY",
+		});
+		$(".time-widget", inputListContainer).datetimepicker({
+			format: "hh:mm A",
+		});
+		$(".datetime-widget", inputListContainer).datetimepicker({
+			format: "DD-MM-YYYY hh:mm A",
+			sideBySide: true,
 		});
 		updateInputListIndex(inputListContainer);
 	});
