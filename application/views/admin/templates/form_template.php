@@ -679,6 +679,22 @@ foreach ($template as $template_row) {
 	<?php
 	}
 
+	if ($template_row['type'] == 'color') {
+	?>
+		<div class="form-group row">
+			<?= get_label($template_row) ?>
+			<div class="<?= $col_class ?>">
+				<input type="hidden" name="<?= $template_row['name'] ?>" id="pickr-<?= $template_row['name'] ?>" value="<?= $value ?? "" ?>">
+				<div class="pickr-container">
+					<div class="pickr pickr-wrapper">
+						<button type="button" id="pickr-btn-<?= $template_row['name'] ?>" data-target="#pickr-<?= $template_row['name'] ?>" class="color-picker color-picker-btn"></button>
+					</div>
+				</div>
+			</div>
+		</div>
+	<?php
+	}
+
 	if ($template_row['type'] == 'key' || $template_row['type'] == 'hidden') {
 	?>
 		<input type="hidden" name="<?= $template_row['name'] ?>" value="<?= $value ?>">

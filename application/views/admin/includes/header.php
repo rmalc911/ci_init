@@ -32,6 +32,7 @@ $login_username = $login['user_name'];
 	<link rel="stylesheet" href="<?= as_base_url('plugins/bootstrap/css/bootstrap.min.css') ?>">
 	<link rel="stylesheet" href="<?= as_base_url('plugins/sweetalert/sweetalert2.min.css') ?>">
 	<link rel="stylesheet" href="<?= aa_base_url('theme/css/azzara.min.css') ?>">
+	<link rel="stylesheet" href="<?= as_base_url('plugins/pickr/nano.min.css'); ?>">
 	<link rel="stylesheet" href="<?= aa_base_url('css/main.css?v=') . css_version() ?>">
 	<!--   Core JS Files   -->
 	<script src="<?= as_base_url('plugins/jquery-3.6.3.min.js') ?>"></script>

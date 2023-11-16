@@ -12,6 +12,28 @@ let select2Config = {
 	},
 };
 
+let pickrConfig = {
+	theme: "nano",
+	// inline: true,
+	// showAlways: true,
+
+	components: {
+		palette: true,
+
+		// Main components
+		preview: true,
+		opacity: true,
+		hue: true,
+
+		// Input / output Options
+		interaction: {
+			input: true,
+			// save: true,
+			// cancel: true,
+		},
+	},
+};
+
 function auto_grow(element) {
 	element.style.height = element.scrollHeight - parseFloat($(element).css("line-height")) + "px";
 	element.style.height = element.scrollHeight + 2 + "px";
@@ -739,6 +761,26 @@ $(function () {
 			});
 		});
 	}
+
+	var pickrList = [];
+	$(".color-picker-btn").each(function (ix, ie) {
+		var target = $(ie).attr("data-target");
+		pickrConfig.el = ie;
+		pickrConfig.default = $(target).val();
+		var newPickr = Pickr.create(pickrConfig);
+		pickrList.push(newPickr);
+		newPickr.on("save", function (color, pickr) {
+			var hex = color.toHEXA().toString(0);
+			$(target).val(hex);
+		});
+		newPickr.on('change', function(color, e, pickr) {
+			var hex = color.toHEXA().toString(0);
+			$(target).val(hex);
+		});
+		newPickr.on('hide', function(pickr) {
+			pickr.applyColor();
+		});
+	});
 });
 
 const Toast = Swal.mixin({

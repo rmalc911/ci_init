@@ -270,3 +270,9 @@ body.swal2-shown > .select2-container--bootstrap {
 	max-height: 150px;
 	height: auto;
 }
+
+.pickr .pcr-button {
+	border: 1px solid #dadada;
+	width: 35px;
+	height: 35px;
+}

@@ -38,6 +38,9 @@
 <!-- Azzara JS -->
 <script src="<?= aa_base_url('theme/js/ready.js?v=') . js_version() ?>"></script>
 
+<!-- Pickr -->
+<script src="<?= as_base_url('plugins/pickr/pickr.min.js'); ?>" type="text/javascript"></script>
+
 <!-- Admin -->
 <script src="<?= aa_base_url('js/main.js?v=') . js_version() ?>"></script>
 </body>

@@ -167,6 +167,8 @@ class MY_Model extends CI_Model {
 			['type' => 'input-table', 'label' => 'Input Table', 'name' => '', 'fields' => 'input_template_fn'],
 			// Custom props: []
 			['type' => 'tags', 'label' => 'Tags Input', 'name' => ''],
+			// Custom props: []
+			['type' => 'color', 'label' => 'Color', 'name' => 'color'],
 			// Key field is required
 			['type' => 'key', 'label' => 'ID', 'name' => 'id'],
 		];
