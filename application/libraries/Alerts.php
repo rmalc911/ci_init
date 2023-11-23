@@ -29,7 +29,6 @@ class Alerts {
 			'sendinblue_api_key',
 		];
 		$CI = &get_instance();
-		$CI->load->model('AdminModel');
 		$config = $CI->AdminModel->get_config($config_items);
 		if ($config == null) {
 			return;

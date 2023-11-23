@@ -103,6 +103,22 @@ class MY_Model extends CI_Model {
 		return $this->db->update('users', ['login_password' => $new_password], ['id' => $login_id]);
 	}
 
+	public function save_user_account($user_data) {
+		$user = $this->db->get_where('users', ['user_id' => $user_data['user_id'], 'user_type' => $user_data['user_type']])->row_array();
+		$save_user = false;
+		if ($user) {
+			$user_data['updated_date'] = date(date_time_format);
+			$save_user = $this->db->update('users', $user_data, ['id' => $user['id']]);
+		} else {
+			$this->load->library('encription_utility');
+			$pw = $this->encription_utility->getSaltPassword('password');
+			$user_data['login_password'] = $pw;
+			$user_data['created_date'] = date(date_time_format);
+			$save_user = $this->db->insert('users', $user_data);
+		}
+		return $save_user;
+	}
+
 	// Example
 	private function example_view() {
 		return [
@@ -234,11 +250,7 @@ class MY_Model extends CI_Model {
 			'option_value' => '',
 		];
 		if (!$this->db_setup) {
-			$result = [];
-			if ($select) {
-				array_unshift($result, $select_0);
-			}
-			return $result;
+			return [$select_0];
 		}
 		if ($option_name == '') {
 			$option_name = $option_value;
@@ -508,8 +520,8 @@ class MY_Model extends CI_Model {
 				return $image;
 			} else {
 				// $data['message'] = $this->generals_func->show_alert('err', 'Error!' . $this->upload->display_errors());
-				echo $field;
-				echo json_encode($this->upload->display_errors('', ''));
+				// echo $field;
+				// echo json_encode($this->upload->display_errors('', ''));
 			}
 		}
 		// echo json_encode($_FILES[$field]['name']);

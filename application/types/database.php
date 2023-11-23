@@ -1,10 +1,22 @@
 <?php
+
+namespace db;
+
 defined('BASEPATH') or exit('No direct script access allowed');
 
-abstract class string_types implements Stringable {
+interface Stringable {
+	#region Functions
+
+	/**
+	 * Gets a string representation of the object
+	 * @return string Returns the `string` representation of the object.
+	 */
+	function __toString();
+
+	#endregion
 }
 
-abstract class num_types implements Stringable {
+abstract class string_types implements Stringable {
 }
 
 abstract class datetime extends string_types {
@@ -22,8 +34,8 @@ abstract class text extends string_types {
 abstract class enum extends string_types {
 }
 
-abstract class decimal extends num_types {
-}
-
-abstract class table {
+abstract class table implements Stringable {
+	function __toString() {
+		return __CLASS__;
+	}
 }

@@ -5,12 +5,12 @@ class MY_Controller extends CI_Controller {
 	public $data = [];
 	public $popover_btn = "";
 	public $action_field = true;
+	public $init_dtable = true;
 
 	public function __construct() {
 		parent::__construct();
 		$this->load->helper('inflector');
 		$this->load->helper('text');
-		$this->load->helper('common');
 		// $this->load->helper('access');
 		$this->load->library('Excel_export');
 		$this->popover_btn = '<button class="btn btn-$3 btn-border btn-sm btn-rounded json-format txn-id-btn" type="button" data-toggle="popover" data-content=\'$2\' data-label="$1" data-original-title="$1 <span class=\'close \'>&times;</span">$1</button>';
@@ -22,14 +22,17 @@ class MY_Controller extends CI_Controller {
 		$this->TemplateModel->verify_access($options->access, 'view_data');
 		$this->data['table_template'] = $this->TemplateModel->{$options->table_template}();
 		$this->data['view_template'] = $this->TemplateModel->{$options->view_template}();
-		$this->load->template('templates/view_template', $this->data);
+		$this->template('templates/view_template', $this->data);
 	}
 
-	protected function _add_template(TemplateConfig $options, callable $edit_map = null) {
+	protected function _add_template(TemplateConfig $options, callable $edit_map = null, callable $edit_prefill = null) {
 		$this->data['message'] = $this->session->flashdata('message');
 		$this->data['edit'] = $this->TemplateModel->get_edit_row($options->table, '', $options->id);
 		$this->data['form_template'] = $this->TemplateModel->{$options->form_template}($this->data['edit'][$options->id] ?? "");
 		$this->data['view_template'] = $this->TemplateModel->{$options->view_template}();
+		if ($edit_prefill) {
+			$this->data['edit'] = $edit_prefill($this->data['edit']);
+		}
 		if ($this->data['edit']) {
 			if ($edit_map) {
 				$this->data['edit'] = $edit_map($this->data['edit']);
@@ -38,7 +41,7 @@ class MY_Controller extends CI_Controller {
 		} else {
 			$this->TemplateModel->verify_access($options->access, 'add_data');
 		}
-		$this->load->template('templates/add_template', $this->data);
+		$this->template('templates/add_template', $this->data);
 	}
 
 	protected function _sort_template(TemplateConfig $options) {
@@ -61,7 +64,7 @@ class MY_Controller extends CI_Controller {
 			$filter[$options->parent_field] = null;
 		}
 		$this->data['sort_list'] = $options->get_options($filter, false, "ISNULL($table_alias.$sort_order) $sort_direction, $table_alias.$sort_order $sort_direction, $table_alias.{$options->id} $sort_direction");
-		$this->load->template('templates/sort_template', $this->data);
+		$this->template('templates/sort_template', $this->data);
 	}
 
 	protected function _submit_sort(TemplateConfig $options) {
@@ -100,11 +103,14 @@ class MY_Controller extends CI_Controller {
 			}
 			$update = $this->TemplateModel->save_table_data($options->table, $post_data, $this->data['form_template'], $options->id);
 			if ($after_submit) {
-				$after_submit($post_data, $update);
+				$update = $after_submit($post_data, $update);
 			}
-			$this->db->trans_complete();
+			$error_data = $this->db->error()['message'];
+			if ($update == true) {
+				$this->db->trans_complete();
+			}
 			$return_url = ad_base_url($this->data['view_template']['links']['view']);
-			echo json_encode(['save_id' => $update, 'status' => $update !== false, 'return_url' => $return_url, 'errors' => $this->form_validation->error_array()]);
+			echo json_encode(['save_id' => $update, 'status' => $update !== false, 'return_url' => $return_url, 'errors' => $this->form_validation->error_array(), 'error_data' => $error_data]);
 		} else {
 			echo json_encode(['status' => false, 'errors' => $this->form_validation->error_array()]);
 		}
@@ -142,6 +148,11 @@ class MY_Controller extends CI_Controller {
 					$edit = $this->{"{$option}_edit_map"}($edit);
 				}
 				return $edit;
+			}, function ($edit) use ($option) {
+				if (method_exists($this, "{$option}_edit_prefill")) {
+					$edit = $this->{"{$option}_edit_prefill"}($edit);
+				}
+				return $edit;
 			});
 		}
 	}
@@ -173,8 +184,9 @@ class MY_Controller extends CI_Controller {
 				return $post_data;
 			}, function ($post_data, $update) use ($option) {
 				if (method_exists($this, "{$option}_after_submit")) {
-					$this->{"{$option}_after_submit"}($post_data, $update);
+					return $this->{"{$option}_after_submit"}($post_data, $update);
 				}
+				return true;
 			});
 		}
 	}
@@ -202,6 +214,9 @@ class MY_Controller extends CI_Controller {
 		if (method_exists($path, "dt_{$option}")) {
 			$this->{"dt_{$option}"}();
 		} else {
+			if (method_exists($this, "{$option}_table")) {
+				$this->{"{$option}_table"}();
+			}
 			/** @var TemplateConfig */
 			$options = $this->TemplateModel->{"{$option}_config"};
 			$table_template = $this->TemplateModel->{$options->table_template}();
@@ -301,15 +316,29 @@ class MY_Controller extends CI_Controller {
 
 		$text_fields_select = (count($text_fields) > 0) ? join(', ', array_map(function ($key, $val) use ($table_alias) {
 			if (substr_count($val, '.')) return $val;
-			$select = $table_alias . "." . $val;
+			$column_alias = $table_alias;
+			if (substr_count($key, '.')) {
+				$key = explode(".", $key);
+				$column_alias = $key[0];
+				$key = $key[1];
+			}
+			$select = $column_alias . "." . $val;
 			if ($val === "DATETIME") {
-				$select = 'DATE_FORMAT(' . $key . ', "' . db_user_date_time . '")';
+				$select = 'DATE_FORMAT(' . $column_alias . "." . $key . ', "' . db_user_date_time . '")';
 			}
 			if ($val === "DATE") {
-				$select = 'DATE_FORMAT(' . $key . ', "' . db_user_date . '")';
+				$select = 'DATE_FORMAT(' . $column_alias . "." . $key . ', "' . db_user_date . '")';
+			}
+			if ($val === "TIME") {
+				$select = 'DATE_FORMAT(' . $column_alias . "." . $key . ', "' . db_user_time . '")';
+			}
+			if ($val === "CASE") {
+				$select = $key;
+				$key = "";
 			}
 			if (is_int($key)) $key = $val;
-			return $select . " AS " . $key;
+			if (is_string($key) && $key != "") $key = " AS " . $key;
+			return $select . $key;
 		}, array_keys($text_fields), $text_fields)) . "," : "";
 
 		// [Image column name => Image file path]
@@ -362,5 +391,23 @@ class MY_Controller extends CI_Controller {
 		}
 
 		$this->setSearchableColumns($searchable_columns);
+	}
+
+	protected function template($template_name, $vars = array(), $return = FALSE) {
+		$view = $this->load->view(ADMIN_VIEWS_PATH . 'includes/header', $vars, true);
+
+		if (is_array($template_name)) {
+			foreach ($template_name as $file_to_load) {
+				$view .= $this->load->view(ADMIN_VIEWS_PATH . $file_to_load, $vars, true);
+			}
+		} else {
+			$view .= $this->load->view(ADMIN_VIEWS_PATH . $template_name, $vars, true);
+		}
+
+		$view .= $this->load->view(ADMIN_VIEWS_PATH . 'includes/footer', $vars, true);
+		if ($return) {
+			return $view;
+		}
+		echo $view;
 	}
 }

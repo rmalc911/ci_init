@@ -2,6 +2,8 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 
 class TemplateModel extends MY_Model {
+	/** @var TemplateConfig */ public $testimonial_config;
+	/** @var TemplateConfig */ public $blog_config;
 	/** @var TemplateConfig */ public $banner_config;
 	/** @var TemplateConfig */ public $career_config;
 	/** @var TemplateConfig */ public $career_application_config;
@@ -9,6 +11,8 @@ class TemplateModel extends MY_Model {
 
 	public function __construct() {
 		parent::__construct();
+		$this->testimonial_config = new TemplateConfig('testimonials', 'testimonial_add', 'testimonial_table', 'testimonial_view', 'testimonials', 'id', 'testimonial_title', 'testimonial_status',);
+		$this->blog_config = new TemplateConfig('blogs', 'blog_add', 'blog_table', 'blog_view', 'blogs', 'id', 'blog_title', 'blog_status',);
 		$this->banner_config = new TemplateConfig('web_banners', 'web_banner_add', 'web_banner_table', 'web_banner_view', 'web_banners', 'id', 'banner_name', 'status');
 		$this->career_config = new TemplateConfig('careers', 'career_add', 'career_table', 'career_view', 'careers', 'id', 'career_name', 'career_status');
 		$this->career_application_config = new TemplateConfig('career_applications', null, 'career_application_table', 'career_application_view', 'career_applications', 'id', 'applicant_fname');
@@ -55,41 +59,26 @@ class TemplateModel extends MY_Model {
 
 	public function get_user_access_navs() {
 		return  [
+			'Locations' => [
+				// states
+				['options' => ['v', 'a', 'e', 'b', 'd'], 'config' => $this->state_config, 'icon' => 'fas fa-globe-asia'],
+				// ciites
+				['options' => ['v', 'a', 'e', 'b', 'd'], 'config' => $this->city_config, 'icon' => 'fas fa-map-marked'],
+			],
 			'Masters' => [
-				['label' => 'States', 'name' => 'state', 'options' => ['v', 'a', 'e', 'b', 'd'], 'url' => 'location/view_states'],
-				['label' => 'Cities', 'name' => 'city', 'options' => ['v', 'a', 'e', 'b', 'd'], 'url' => 'location/view_cities'],
-				['label' => 'Users', 'name' => 'user', 'options' => ['v', 'a', 'e', 'b', 'd'], 'url' => 'users/view_users'],
-			],
-			'Website' => [
-				['label' => 'Banners', 'name' => 'banner', 'options' => ['v', 'a', 'e', 'b', 'd'], 'url' => 'website/view_banners'],
-				['label' => 'About Us', 'name' => 'about_us', 'options' => ['v', 'e'], 'url' => 'website/about_us_config'],
-				['label' => 'Videos', 'name' => 'videos', 'options' => ['v', 'a', 'e', 'b', 'd'], 'url' => 'website/view_videos'],
-				['label' => 'Page Banners', 'name' => 'page_banners', 'options' => ['v', 'e'], 'url' => 'website/page_banners'],
-				['label' => 'Industries', 'name' => 'industries', 'options' => ['v', 'a', 'e', 'b', 'd'], 'url' => 'website/view_industries'],
-				['label' => 'Projects', 'name' => 'projects', 'options' => ['v', 'a', 'e', 'b', 'd'], 'url' => 'website/view_projects'],
-				// ['label' => 'Service Categories', 'name' => 'service_categories', 'options' => ['v', 'a', 'e', 'b', 'd'], 'url' => 'website/view_service_categories'],
-				['label' => 'Services', 'name' => 'services', 'options' => ['v', 'a', 'e', 'b', 'd'], 'url' => 'website/view_services'],
-				['label' => 'Production Facilities', 'name' => 'production_facilities', 'options' => ['v', 'a', 'e', 'b', 'd'], 'url' => 'website/view_production_facilities'],
-				['label' => 'Testimonials', 'name' => 'testimonials', 'options' => ['v', 'a', 'e', 'b', 'd'], 'url' => 'website/view_testimonials'],
-				['label' => 'Awards', 'name' => 'awards', 'options' => ['v', 'a', 'e', 'b', 'd'], 'url' => 'website/view_awards'],
-				['label' => 'Blogs', 'name' => 'blogs', 'options' => ['v', 'a', 'e', 'b', 'd'], 'url' => 'website/view_blogs'],
-				['label' => 'Careers', 'name' => 'careers', 'options' => ['v', 'a', 'e', 'b', 'd'], 'url' => 'website/view_careers'],
-			],
-			'Page Content' => [
-				['label' => 'About Us (Overview)', 'name' => 'about_us_overview', 'options' => ['v', 'e'], 'url' => 'website/about_us_content'],
-				['label' => 'Our Team', 'name' => 'team_members', 'options' => ['v', 'a', 'e', 'b', 'd'], 'url' => 'website/view_team_members'],
-				['label' => 'About Us (Mission & Vision)', 'name' => 'about_mission_vision', 'options' => ['v', 'e'], 'url' => 'website/about_us_mission_vision'],
-				['label' => 'Clientele', 'name' => 'clientele', 'options' => ['v', 'a', 'e', 'b', 'd'], 'url' => 'website/view_clientele'],
+				// profile
+				['options' => ['v', 'e'], 'config' => $this->profile_config, 'icon' => 'fas fa-user'],
+				// brands
+				['options' => ['v', 'a', 'e', 'b', 'd'], 'config' => $this->brand_config, 'icon' => 'fas fa-tags'],
 			],
 			'Enquiries' => [
-				['label' => 'Career Applications', 'name' => 'career_applications', 'options' => ['v'], 'url' => 'website/view_career_applications'],
-				['label' => 'Contact Us', 'name' => 'contact_us', 'options' => ['v'], 'url' => 'website/view_contact_us'],
+				// contact us
+				['options' => ['v'], 'config' => $this->contact_us_config, 'icon' => 'fas fa-phone'],
+				// exhibitor enquiry
+				['options' => ['v'], 'config' => $this->exhibitor_enquiry_config, 'icon' => 'fas fa-user-plus'],
 			],
 			'Config' => [
-				['label' => 'Email', 'name' => 'email_config', 'options' => ['v', 'e'], 'url' => 'home/email_config'],
-				['label' => 'Contact Details', 'name' => 'contact_details', 'options' => ['v', 'e'], 'url' => 'home/contact_details'],
-				['label' => 'Static Pages SEO', 'name' => 'seo_static_pages', 'options' => ['v', 'e'], 'url' => 'home/seo_config/static'],
-				['label' => 'Dynamic Pages SEO', 'name' => 'seo_dynamic_pages', 'options' => ['v', 'e'], 'url' => 'home/seo_config/dynamic'],
+				['options' => ['v', 'e'], 'config' => $this->email_config, 'icon' => 'fas fa-envelope'],
 			],
 		];
 	}
@@ -98,20 +87,23 @@ class TemplateModel extends MY_Model {
 		$navs = $this->get_user_access_navs();
 		foreach ($navs as $pages) {
 			foreach ($pages as $page) {
-				$page_access = $this->db->get_where('user_access_map', ['user' => $user_id, 'page' => $page['name']], 1)->row_array();
+				/** @var TemplateConfig $page_config */
+				$page_config = $page['config'];
+				$page_name = $page_config->access;
+				$page_access = $this->db->get_where('user_access_map', ['user' => $user_id, 'page' => $page_name], 1)->row_array();
 				$page_update = [
 					'user' => $user_id,
-					'page' => $page['name'],
-					'view_data' => isset($post[$page['name'] . '~v']) ? '1' : '0',
-					'add_data' => isset($post[$page['name'] . '~a']) ? '1' : '0',
-					'edit_data' => isset($post[$page['name'] . '~e']) ? '1' : '0',
-					'block_data' => isset($post[$page['name'] . '~b']) ? '1' : '0',
-					'delete_data' => isset($post[$page['name'] . '~d']) ? '1' : '0',
+					'page' => $page_name,
+					'view_data' => isset($post[$page_name . '~v']) ? '1' : '0',
+					'add_data' => isset($post[$page_name . '~a']) ? '1' : '0',
+					'edit_data' => isset($post[$page_name . '~e']) ? '1' : '0',
+					'block_data' => isset($post[$page_name . '~b']) ? '1' : '0',
+					'delete_data' => isset($post[$page_name . '~d']) ? '1' : '0',
 					'updated_date' => date(date_time_format),
 					'updated_by' => $login_user_id,
 				];
 				if ($page_access) {
-					$this->db->update('user_access_map', $page_update, ['id' => $page_access['id']]);
+					$this->db->update('user_access_map', $page_update, ['id' => $user_id, 'page' => $page_name,]);
 				} else {
 					$this->db->insert('user_access_map', $page_update);
 				}
@@ -160,6 +152,88 @@ class TemplateModel extends MY_Model {
 			'banner_img' => BANNER_UPLOAD_PATH,
 		];
 	}
+
+	#region Website / Testimonials
+	public function testimonial_view() {
+		return [
+			'head' => 'Testimonials',
+			'links' => [
+				'sort' => 'website/sort_testimonials',
+				'add' => 'website/add_testimonial',
+				'view' => 'website/view_testimonials',
+			],
+			'form_action' => ad_base_url('website/submit_testimonial'),
+			// 'sort_submit' => ad_base_url('website/submit_sort_testimonials'),
+			'form_ajax' => true,
+		];
+	}
+
+	public function testimonial_table() {
+		return [
+			'heads' => ['Sl. no', 'Name', 'Designation', 'Action'],
+			'src' => 'ajax',
+			'data' => 'ajaxtables/dt_testimonials',
+			'text_fields' => ['testimonials_name', 'testimonials_designation'],
+			'sort_order' => 'sort_order',
+		];
+	}
+
+	public function testimonial_add() {
+		$testimonial_config = $this->testimonial_config;
+		return [
+			['type' => 'input', 'label' => 'Name', 'name' => 'testimonials_name', 'required' => true],
+			['type' => 'input', 'label' => 'Designation', 'name' => 'testimonials_designation', 'required' => true],
+			['type' => 'textarea', 'label' => 'Description', 'name' => 'testimonials_description', 'required' => true],
+			['type' => 'key', 'name' => $testimonial_config->id],
+		];
+	}
+	#endregion
+
+	#region Website / Blogs
+	public function blog_view() {
+		return [
+			'head' => 'Blogs',
+			'links' => [
+				// 'sort' => 'website/sort_blogs',
+				'add' => 'website/add_blog',
+				'view' => 'website/view_blogs',
+			],
+			'form_action' => ad_base_url('website/submit_blog'),
+			// 'sort_submit' => ad_base_url('website/submit_sort_blogs'),
+			'form_ajax' => true,
+		];
+	}
+
+	public function blog_table() {
+		return [
+			'heads' => ['Sl. no', 'Title', 'Date', 'Image', 'Action'],
+			'src' => 'ajax',
+			'data' => 'ajaxtables/dt_blogs',
+			'text_fields' => ['blog_title', 'blog_date' => 'DATE'],
+			'sort_order' => 'blog_date DESC',
+			'img_fields' => $this->blog_img_config(),
+		];
+	}
+
+	public function blog_add() {
+		$blog_config = $this->blog_config;
+		return [
+			['type' => 'input', 'label' => 'Title', 'name' => 'blog_title', 'required' => true, 'unique' => ['table' => $blog_config->table, 'key' => $blog_config->id]],
+			['type' => 'input', 'label' => 'URL', 'name' => 'blog_url_title', 'required' => false, 'readonly' => true, 'help_text' => 'Auto generated'],
+			['type' => 'date-widget', 'label' => 'Date', 'name' => 'blog_date', 'required' => true],
+			['type' => 'image', 'label' => 'Image', 'name' => 'blog_image', 'size' => [1600, 600], 'accept' => ['jpeg', 'png', 'webp'], 'path' => BLOG_IMAGE_UPLOAD_PATH],
+			['type' => 'wysiwyg', 'label' => 'Content', 'name' => 'blog_content', 'required' => true],
+			['type' => 'hidden', 'label' => 'Preview', 'name' => 'blog_content_preview'],
+			['type' => 'key', 'name' => $blog_config->id],
+		];
+	}
+
+	public function blog_img_config() {
+		return [
+			'blog_image' => BLOG_IMAGE_UPLOAD_PATH,
+		];
+	}
+	#endregion
 
 	// Website / Careers
 	public function career_view() {
@@ -218,6 +292,7 @@ class TemplateModel extends MY_Model {
 			'src' => 'ajax',
 			'data' => 'ajaxtables/career_applications',
 			'text_fields' => ['applicant_fname', 'applicant_lname', 'applicant_email', 'applicant_phone', 'applicant_resume', 'date' => 'DATETIME'],
+			'sort_order' => 'date DESC',
 			'joins' => [
 				[
 					'table' => 'careers',
@@ -264,6 +339,7 @@ class TemplateModel extends MY_Model {
 			'src' => 'ajax',
 			'data' => 'ajaxtables/contact_us',
 			'text_fields' => ['contact_name', 'contact_email', 'contact_message', 'contact_date' => 'DATETIME'],
+			'sort_order' => 'contact_date DESC',
 		];
 	}
 

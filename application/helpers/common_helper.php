@@ -17,12 +17,16 @@ function wysiwyg_to_preview_text($html, $length) {
 	return ellipsize(html_string_add_new_lines($html), $length);
 }
 
-// function date_format($time_string) {
-// 	if (!$time_string) {
-// 		return '';
-// 	}
-// 	return date(date_format, strtotime($time_string));
-// }
+function single_db_image($images, $key) {
+	return explode(IMG_SPLIT, $images)[$key] ?? '';
+}
+
+function date_format_c($time_string) {
+	if (!$time_string) {
+		return '';
+	}
+	return date(date_format, strtotime($time_string));
+}
 
 function time_format($time_string) {
 	if (!$time_string) {
