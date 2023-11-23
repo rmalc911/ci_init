@@ -4,7 +4,7 @@ CREATE TABLE `users` (
 	`display_name` VARCHAR(250) NOT NULL,
 	`user_mobile` VARCHAR(50) NOT NULL,
 	`user_email` VARCHAR(100) NULL DEFAULT NULL,
-	`user_role` VARCHAR(50) NULL DEFAULT NULL,
+	`user_type` VARCHAR(50) NULL DEFAULT NULL,
 	`user_status` ENUM('1', '0') NOT NULL DEFAULT '1',
 	`created_date` DATETIME NULL DEFAULT NULL,
 	`updated_date` DATETIME NULL DEFAULT NULL,
@@ -66,5 +66,25 @@ CREATE TABLE `contact_us` (
 	`submit_page` VARCHAR(50) NOT NULL,
 	`contact_date` DATETIME NOT NULL,
 	`contact_ip` VARCHAR(50) NOT NULL,
+	PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+CREATE TABLE `albums`(
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`album_name` VARCHAR(250) NOT NULL,
+	`url_path` VARCHAR(250) NOT NULL,
+	`album_status` ENUM('1', '0') NOT NULL DEFAULT '1',
+	`created_date` DATETIME NULL DEFAULT NULL,
+	`updated_date` DATETIME NULL DEFAULT NULL,
+	PRIMARY KEY(`id`),
+	UNIQUE `album_name`(`album_name`)
+) ENGINE = INNODB;
+CREATE TABLE `media_images` (
+	`id` int(11) NOT NULL AUTO_INCREMENT,
+	`album_id` int(11) NOT NULL,
+	`image_caption` varchar(250) NOT NULL,
+	`image_url` varchar(250) NOT NULL,
+	`image_status` enum('1', '0') NOT NULL DEFAULT '1',
+	`created_date` datetime DEFAULT NULL,
+	`updated_date` datetime DEFAULT NULL,
 	PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;

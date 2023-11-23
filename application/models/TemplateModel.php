@@ -400,6 +400,70 @@ class TemplateModel extends MY_Model {
 		return $this->get_export($config, $table_heads, $filter);
 	}
 
+	#region Website / Album
+	public function album_view() {
+		return [
+			'head' => 'Albums',
+			'links' => [
+				// 'sort' => 'website/sort_albums',
+				'add' => 'website/add_album',
+				'view' => 'website/view_albums',
+			],
+			'form_action' => ad_base_url('website/submit_album'),
+			// 'sort_submit' => ad_base_url('website/submit_sort_albums'),
+			'form_ajax' => true,
+		];
+	}
+
+	public function album_table() {
+		$config = $this->album_config;
+		return [
+			'heads' => ['Sl. no', 'Name', 'Images', 'Action'],
+			'src' => 'ajax',
+			'data' => 'ajaxtables/dt_albums',
+			'text_fields' => [$config->display_name],
+		];
+	}
+
+	public function album_add() {
+		$config = $this->album_config;
+		return  [
+			['type' => 'input', 'label' => 'Name', 'name' => $config->display_name, 'required' => true, 'unique' => ['table' => $config->table, 'key' => $config->id]],
+			['type' => 'hidden', 'name' => 'url_path'],
+			['type' => 'key', 'label' => '', 'name' => $config->id],
+		];
+	}
+
+	public function website_media_view() {
+		return [
+			'head' => 'Media Gallery',
+			'links' => [
+				'add' => 'website/add_album',
+				'view' => 'website/view_albums',
+			],
+			'form_action' => ad_base_url('website/submit_media'),
+			'sort_submit' => ad_base_url('website/submit_sort_media'),
+			'form_ajax' => true,
+		];
+	}
+
+	public function website_media_table() {
+		return [
+			'heads' => ['Sl. no', 'Name', 'Images', 'Action'],
+			'src' => 'ajax',
+			'data' => 'ajaxtables/media_albums',
+			'sort_order' => 'sort_order',
+		];
+	}
+
+	public function website_media_add() {
+		return  [
+			['type' => 'input', 'label' => 'Name', 'name' => 'album_name', 'required' => true, 'unique' => ['table' => 'media_albums', 'key' => 'id']],
+			['type' => 'key', 'label' => 'ID', 'name' => 'id'],
+		];
+	}
+	#endregion
+
 	#region Home / Email
 	public function email_view() {
 		return [

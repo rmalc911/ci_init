@@ -106,11 +106,11 @@ class Ajax extends MY_Controller {
 		if (count($files) > 0) {
 			$album_post = [];
 			foreach ($files as $fi => $file) {
-				if (is_array($file)) {
-					$errors[] = $file;
+				if ($file['status'] == false) {
+					$errors[] = $file['errors'];
 					continue;
 				}
-				$album_post[] = ['image_url' => $file, 'album_id' => $album_id];
+				$album_post[] = ['image_url' => $file['image'], 'album_id' => $album_id];
 			}
 			if (count($album_post) > 0) {
 				$this->db->insert_batch('media_images', $album_post);
