@@ -90,7 +90,7 @@ define('ADMIN_LOGIN_PATH', ADMIN_PATH . 'login/');
 define('ADMIN_VIEWS_PATH', 'admin/');
 define('ADMIN_ASSETS_PATH', 'assets/admin/');
 
-define('ADMIN_LOGIN_REDIRECT', ADMIN_PATH);
+define('ADMIN_LOGIN_REDIRECT', ADMIN_PATH . 'home/profile');
 
 define('BANNER_UPLOAD_PATH', 'assets/uploads/banners/');
 define('GALLERY_UPLOAD_PATH', 'assets/uploads/gallery/');
@@ -99,6 +99,23 @@ define('RESUME_UPLOAD_PATH', 'assets/uploads/resume/');
 define('PROFILE_LOGO_UPLOAD_PATH', 'assets/uploads/logo/');
 
 define('PROFILE_LOGO_FIELD', 'profile_logo');
+
+define('SOCIAL_MEDIA_NAMES', [
+	'' => '',
+	'facebook-f' => 'Facebook',
+	'twitter' => 'Twitter',
+	'x-twitter' => 'X (Twitter)',
+	'instagram' => 'Instagram',
+	'linkedin-in' => 'LinkedIn',
+	'youtube' => 'Youtube',
+	'whatsapp' => 'WhatsApp',
+	'pinterest' => 'Pinterest',
+	'vimeo' => 'Vimeo',
+	'flickr' => 'Flickr',
+	'dribbble' => 'Dribbble',
+	'behance' => 'Behance',
+	'github' => 'Github',
+]);
 
 define('CLIENT_NAME', '');
 define('CLIENT_NAME_SHORT', '');

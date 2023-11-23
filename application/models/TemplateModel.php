@@ -2,15 +2,18 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 
 class TemplateModel extends MY_Model {
+	/** @var TemplateConfig */ public $profile_config;
 	/** @var TemplateConfig */ public $testimonial_config;
 	/** @var TemplateConfig */ public $blog_config;
 	/** @var TemplateConfig */ public $banner_config;
 	/** @var TemplateConfig */ public $career_config;
 	/** @var TemplateConfig */ public $career_application_config;
 	/** @var TemplateConfig */ public $contact_us_config;
+	/** @var TemplateConfig */ public $email_config;
 
 	public function __construct() {
 		parent::__construct();
+		$this->profile_config = new TemplateConfig('profile', 'profile_form', null, 'profile_view', null,);
 		$this->testimonial_config = new TemplateConfig('testimonials', 'testimonial_add', 'testimonial_table', 'testimonial_view', 'testimonials', 'id', 'testimonial_title', 'testimonial_status',);
 		$this->blog_config = new TemplateConfig('blogs', 'blog_add', 'blog_table', 'blog_view', 'blogs', 'id', 'blog_title', 'blog_status',);
 		$this->banner_config = new TemplateConfig('web_banners', 'web_banner_add', 'web_banner_table', 'web_banner_view', 'web_banners', 'id', 'banner_name', 'status');
@@ -18,6 +21,48 @@ class TemplateModel extends MY_Model {
 		$this->career_application_config = new TemplateConfig('career_applications', null, 'career_application_table', 'career_application_view', 'career_applications', 'id', 'applicant_fname');
 		$this->contact_us_config = new TemplateConfig('contact_us', null, 'contact_us_table', 'contact_us_view', 'contact_us', 'id', 'contact_name', null);
 	}
+
+	#region Profile config
+	public function profile_view() {
+		return [
+			'head' => 'Profile',
+			'links' => [
+				'view' => 'home/profile',
+			],
+		];
+	}
+
+	public function profile_form() {
+		// $city_options = $this->state_city_options();
+		return [
+			['type' => 'input', 'label' => 'Company Name', 'name' => 'company_name', 'required' => true],
+			['type' => 'input', 'label' => 'Company Address', 'name' => 'company_address', 'required' => true],
+			['type' => 'input', 'label' => 'City', 'name' => 'company_city', 'required' => true],
+			['type' => 'input', 'label' => 'Contact Phone', 'name' => 'company_phone', 'required' => true],
+			['type' => 'input', 'label' => 'Contact Email', 'name' => 'company_email', 'required' => true],
+			['type' => 'input', 'label' => 'Website URL', 'name' => 'company_website', 'required' => true],
+			['type' => 'image', 'label' => 'Company Logo', 'name' => 'company_logo', 'size' => [500, 500], 'accept' => ['jpeg', 'png', 'webp'], 'path' => COMPANY_LOGO_UPLOAD_PATH],
+			['type' => 'image', 'label' => 'Site Favicon', 'name' => 'site_favicon', 'size' => [200, 200], 'accept' => ['jpeg', 'png', 'webp'], 'path' => COMPANY_LOGO_UPLOAD_PATH],
+			// ['type' => 'input-table', 'label' => 'Contact Persons', 'name' => 'company_contact_persons', 'fields' => 'company_contact_persons', 'table-inline' => true],
+			// ['type' => 'input-table', 'label' => 'Social Links', 'name' => 'contact_social_links', 'fields' => 'contact_social_links', 'table-inline' => true],
+		];
+	}
+
+	public function company_contact_persons() {
+		return [
+			['type' => 'input', 'label' => 'Name', 'name' => 'contact_name', 'required' => true],
+			['type' => 'input', 'label' => 'Phone', 'name' => 'contact_phone', 'required' => true],
+		];
+	}
+
+	public function contact_social_links() {
+		$social_media_links = SOCIAL_MEDIA_NAMES;
+		return [
+			['type' => 'select-widget', 'label' => 'Social Media', 'name' => 'social_icon_class', 'options' => $social_media_links, 'required' => true],
+			['type' => 'input', 'label' => 'Link', 'name' => 'social_icon_url', 'required' => true],
+		];
+	}
+	#endregion
 
 	// Users / Users
 	public function user_view() {
@@ -354,4 +399,25 @@ class TemplateModel extends MY_Model {
 		];
 		return $this->get_export($config, $table_heads, $filter);
 	}
+
+	#region Home / Email
+	public function email_view() {
+		return [
+			'head' => 'Email Config',
+			'links' => [
+				'view' => 'home/email_config',
+			],
+		];
+	}
+
+	public function email_form() {
+		return [
+			['type' => 'radio', 'label' => 'Sendmail Mode', 'name' => 'sendmail_mode', 'required' => true],
+			['type' => 'textarea', 'label' => 'Alert To Email ID', 'name' => 'alert_to_email_id', 'required' => true],
+			['type' => 'input', 'label' => 'Alert From Email ID', 'name' => 'alert_from_email_id', 'required' => true],
+			['type' => 'input', 'label' => 'Alert From Name', 'name' => 'alert_from_name', 'required' => true],
+			['type' => 'textarea', 'label' => 'Sendinblue API Key', 'name' => 'sendinblue_api_key', 'required' => true],
+		];
+	}
+	#endregion
 }

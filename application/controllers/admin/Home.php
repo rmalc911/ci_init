@@ -16,29 +16,42 @@ class Home extends MY_Controller {
 		$this->data['view_template'] = $this->TemplateModel->profile_view();
 		$this->TemplateModel->verify_access('profile', 'view_data');
 		$this->TemplateModel->set_validation($this->data['form_template']);
+
 		$config_items = [
-			'profile_business_name',
-			'profile_address',
-			'profile_city',
-			'profile_phone',
-			'profile_email_id',
-			'profile_website_url',
-			PROFILE_LOGO_FIELD,
-			'profile_gst',
+			'company_name',
+			// 'company_code',
+			'company_address',
+			'company_city',
+			'company_logo',
+			'site_favicon',
+			'company_phone',
+			'company_email',
 		];
+		$this->data['edit'] = $this->TemplateModel->get_config($config_items);
+		// $this->data['edit']['contact_social_links'] = $this->TemplateModel->get_edit_map('contact_social_links', null);
+		// $this->data['edit']['company_contact_persons'] = $this->TemplateModel->get_edit_map('company_contact_persons', null);
+
 		if ($this->form_validation->run()) {
 			$post_data = $this->input->post();
-			$old_application_file = $post_data[PROFILE_LOGO_FIELD . '_edit'];
-			$post_data[PROFILE_LOGO_FIELD] = $old_application_file;
-			$application_file = $this->TemplateModel->save_image(PROFILE_LOGO_FIELD, PROFILE_LOGO_UPLOAD_PATH, null, null, $old_application_file);
-			if ($application_file) $post_data[PROFILE_LOGO_FIELD] = $application_file;
-			$status = $this->TemplateModel->set_config($config_items, $post_data);
+			$post_data['company_logo'] = $this->data['edit']['company_logo'] ?? "";
+			$post_data['site_favicon'] = $this->data['edit']['site_favicon'] ?? "";
+			$company_logo = $this->TemplateModel->save_image('company_logo', COMPANY_LOGO_UPLOAD_PATH, null, null, $post_data['company_logo']);
+			$site_favicon = $this->TemplateModel->save_image('site_favicon', COMPANY_LOGO_UPLOAD_PATH, null, null, $post_data['site_favicon']);
+			if ($company_logo) {
+				$post_data['company_logo'] = $company_logo;
+			}
+			if ($site_favicon) {
+				$post_data['site_favicon'] = $site_favicon;
+			}
+			// $this->TemplateModel->save_table_map('contact_social_links', null, null, ['social_icon_class', 'social_icon_url']);
+			// $this->TemplateModel->save_table_map('company_contact_persons', null, null, ['contact_name', 'contact_phone'], null);
+			$this->TemplateModel->set_config($config_items, $post_data);
+			$status = $this->db->error()['code'] == 0;
 			$alert = $status ? $this->TemplateModel->show_alert('suc', 'Successfully updated') : $this->TemplateModel->show_alert('err', 'Failed to update');
 			$this->session->set_flashdata('message', $alert);
 			redirect(base_url(uri_string()));
 		}
-		$this->data['edit'] = $this->TemplateModel->get_config($config_items);
-		$this->load->template('templates/add_template', $this->data);
+		$this->template('templates/add_template', $this->data);
 	}
 
 	public function email_config() {

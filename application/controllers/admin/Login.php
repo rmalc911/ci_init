@@ -15,9 +15,9 @@ class Login extends CI_Controller {
 				'display_name' => 'admin',
 				'user_mobile' => 'admin',
 				'user_email' => NULL,
-				'user_role' => NULL,
+				'user_type' => 'admin',
 				'user_status' => '1',
-				'created_date' => NULL,
+				'created_date' => date(date_time_format),
 				'updated_date' => NULL,
 				'login_password' => $pw,
 				'last_login' => NULL,
@@ -36,16 +36,33 @@ class Login extends CI_Controller {
 		$user = $this->db->get_where('users', ['user_mobile' => $post_data['username'], 'login_password' => $enc_password, 'user_status' => '1'], 1)->row_array();
 		if (!$user) {
 			$this->session->set_flashdata('login', 'Invalid Credentials!');
-			redirect(ad_base_url());
+			redirect(ad_base_url('login'));
 		}
-		$this->session->set_userdata('user', $user);
 		$this->db->update('users', ['last_login' => date(date_time_format)], ['user_mobile' => $post_data['username']]);
-		if ($user['user_mobile'] != 'admin') {
-			$view_access = $this->db->get_where('user_access_map', ['user' => $user['id'], 'view_data' => '1'], 1)->row_array();
+		if ($user['user_type'] == 'admin') {
+			$this->session->set_userdata('user', $user);
+			redirect_base($this->login_redirect);
+			return;
+		}
+		$user_type = "user_type";
+		if ($user['user_type'] == "$user_type") {
+			$$user_type = $this->db->get_where($user_type, ['id' => $user['user_id']])->row_array();
+			if ($$user_type[$user_type . '_status'] !== "1") {
+				$this->session->unset_userdata('user');
+				$this->session->unset_userdata('login');
+				$this->session->set_flashdata('login', 'Login disabled, please contact admin.');
+				redirect(ad_base_url('login'));
+			}
+			$this->session->set_userdata('user', $user);
+			redirect_base(ADMIN_PATH . "$user_type/profile");
+			return;
+		} else {
+			$view_access = $this->db->get_where('role_access_map', ['user' => $user['id'], 'view_data' => '1'], 1)->row_array();
 			if (!$view_access) {
 				$this->session->set_flashdata('login', 'No access provided, please ask admin to update your user rights');
 				$this->logout();
 			} else {
+				$this->session->set_userdata('user', $user);
 				$navs = $this->TemplateModel->get_user_access_navs();
 				$break = 0;
 				foreach ($navs as $pages) {
