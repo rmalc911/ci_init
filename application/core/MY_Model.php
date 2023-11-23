@@ -19,8 +19,8 @@ class MY_Model extends CI_Model {
 				$navs = $this->TemplateModel->get_user_access_navs();
 				foreach ($navs as $pages) {
 					foreach ($pages as $page) {
-						$access['page_access'][$page['name']] = [
-							'page' => $page['name'],
+						$access['page_access'][$page['config']->access] = [
+							'page' => $page['config']->access,
 							'view_data' => '1',
 							'add_data' => '1',
 							'edit_data' => '1',
