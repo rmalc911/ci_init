@@ -147,7 +147,7 @@ class MY_Model extends CI_Model {
 			['type', 'required'],
 			['name', 'required'],
 			['label', 'required'],
-			['unique' => ['table' => 'table name', 'key' => 'primary/unique key', 'composite' => 'parent id (optional)'], 'optional'],
+			['unique' => ['table' => 'table name', 'key' => 'primary/unique key', 'composite' => 'parent ids (optional)'], 'optional'],
 			['help_text', 'optional'],
 			['readonly', 'optional'],
 			['required', 'optional'],
@@ -215,15 +215,15 @@ class MY_Model extends CI_Model {
 		foreach ($data  as $field) {
 			$rules = $field['rules'] ?? [];
 			$field_name = $field['name'];
-			if (isset($field['required']) && $field['required'] == true && $field['type'] != 'image') {
+			if (isset($field['required']) && $field['required'] == true && $field['type'] != 'image' && $field['type'] != 'file') {
 				$rules[] = 'required';
 			}
 			if (isset($field['unique'])) {
 				$unique = $field['unique'];
 				$table = $unique['table'];
 				$key = $unique['key'];
-				$composite = $unique['composite'] ?? "";
 				$edit = $this->input->post($key) ?? "";
+				$composite = $unique['composite'] ?? "";
 				if ($composite != "") {
 					$key = "$composite>>$key";
 				}
