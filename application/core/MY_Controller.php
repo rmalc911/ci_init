@@ -49,6 +49,7 @@ class MY_Controller extends CI_Controller {
 		$this->data['view_template'] = $this->TemplateModel->{$options->view_template}();
 		$default_sort_order = "ASC";
 		$table_sort = $this->TemplateModel->{$options->table_template}()['sort_order'] ?? [$options->id, $default_sort_order];
+		$img_fields = $this->TemplateModel->{$options->table_template}()['img_fields'] ?? [];
 		if (is_array($table_sort)) {
 			$sort_order = $table_sort[0];
 			$sort_direction = $default_sort_order;
@@ -63,6 +64,10 @@ class MY_Controller extends CI_Controller {
 		if ($options->parent_field !== null) {
 			$filter[$options->parent_field] = null;
 		}
+		if ($img_fields) {
+			$this->db->select(array_keys($img_fields));
+		}
+		$this->data['img_fields'] = $img_fields;
 		$this->data['sort_list'] = $options->get_options($filter, false, "ISNULL($table_alias.$sort_order) $sort_direction, $table_alias.$sort_order $sort_direction, $table_alias.{$options->id} $sort_direction");
 		$this->template('templates/sort_template', $this->data);
 	}
@@ -163,18 +168,33 @@ class MY_Controller extends CI_Controller {
 		} else {
 			$option = singular($option);
 			$this->_submit_template($this->TemplateModel->{"{$option}_config"}, function ($post_data) use ($option) {
+				/** @var TemplateConfig */
+				$config = $this->TemplateModel->{"{$option}_config"};
 				if (method_exists("TemplateModel", "{$option}_img_config")) {
+					$form_template = array_column($this->TemplateModel->{$config->form_template}(), null, 'name');
 					$img_configs = $this->TemplateModel->{"{$option}_img_config"}();
 					foreach ($img_configs as $img_field => $path) {
 						$edit = $this->TemplateModel->{$option . "_config"}->get_row($post_data['id']);
-						if (is_array($_FILES[$img_field]['name'])) {
-							$images = $this->TemplateModel->save_files($img_field, $path, null, null, true, explode(IMG_SPLIT, $edit[$img_field] ?? ''), $post_data['old_img']);
+						$file_field = $_FILES[$img_field]['name'];
+						$img_form_template = $form_template[$img_field];
+						$accept = $img_form_template['accept'];
+						if (in_array('jpeg', $accept)) {
+							$accept[] = 'jpg';
+							$accept[] = 'jpe';
+						}
+						$accept = join("|", $accept);
+						if (is_array($file_field)) {
+							$images = $this->TemplateModel->save_files($img_field, $path, $accept, null, true, explode(IMG_SPLIT, $edit[$img_field] ?? ''), $post_data['old_img']);
 							$image = join(IMG_SPLIT, array_column($images, 'image'));
 						} else {
-							$image = $this->TemplateModel->save_image($img_field, $path, null, null, $edit[$img_field] ?? null);
+							$image = $this->TemplateModel->save_image($img_field, $path, $accept, null, $edit[$img_field] ?? null);
 						}
 						if ($image) {
 							$post_data[$img_field] = $image;
+						}
+						if (!$image && isset($file_field) && !empty($file_field)) {
+							echo json_encode(['status' => false, 'errors' => [$img_field => $this->upload->display_errors('', '')]]);
+							die();
 						}
 					}
 				}

@@ -22,7 +22,14 @@ if (isset($view_template['sort_submit'])) {
 						<?php
 						foreach ($sort_list as $si => $sort_option) {
 						?>
-							<div class="kanban-item sort-item" data-id="<?= $sort_option['option_value'] ?>"><?= $sort_option['option_name'] ?></div>
+							<div class="kanban-item sort-item" data-id="<?= $sort_option['option_value'] ?>">
+								<?php
+								foreach ($img_fields as $img => $img_path) {
+									echo img(base_url($img_path . $sort_option[$img]), false, ['width' => 150, 'class' => 'img-thumbnail mr-2 my-n2 ml-n2']);
+								}
+								?>
+								<?= $sort_option['option_name'] ?>
+							</div>
 						<?php
 						}
 						?>
