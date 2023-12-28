@@ -3,6 +3,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class MY_Model extends CI_Model {
 	public $db_setup = true;
+	public $template_errors = [];
 	public function __construct() {
 		parent::__construct();
 		$this->form_validation->set_error_delimiters('<label class="error">', '</label>');
@@ -319,16 +320,16 @@ class MY_Model extends CI_Model {
 	 *
 	 * @return array
 	 */
-	public function select_parent_options($relation, $select = true) {
+	public function select_parent_options($relation, $select = true, $parent_name_select = null, $option_name_select = null, $option_separator = ' > ') {
 		$table = $relation['options']->table;
-		$field_name = $relation['options']->display_name;
+		$field_name = $option_name_select ?? "t1.{$relation['options']->display_name}";
 		$field_id = $relation['options']->id;
 		$parent_key = $relation['options']->parent_field;
 		$parent_table = $relation['parent']->table;
-		$parent_name = $relation['parent']->display_name;
+		$parent_name = $parent_name_select ?? "t2.{$relation['parent']->display_name}";
 		$parent_id = $relation['parent']->id;
 		$result = $this->db
-			->select("CONCAT_WS(' > ', t2.{$parent_name}, t1.{$field_name}) as option_name, t1.{$field_id} as option_value")
+			->select("CONCAT_WS('$option_separator', {$parent_name}, {$field_name}) as option_name, t1.{$field_id} as option_value")
 			->from("{$table} t1")
 			->join("{$parent_table} t2", "t2.{$parent_id} = t1.{$parent_key}", 'LEFT')
 			->order_by('option_name', 'ASC')
@@ -625,8 +626,9 @@ class MY_Model extends CI_Model {
 		$this->db->delete($table, [$foreign_key => $foreign_value]);
 
 		if (count($post_map) > 0) {
-			$this->db->insert_batch($table, $post_map);
+			return $this->db->insert_batch($table, $post_map);
 		}
+		return 0;
 	}
 
 	public function save_table_map_manual($table, $foreign_key, $foreign_value, $data) {

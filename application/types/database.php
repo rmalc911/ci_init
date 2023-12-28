@@ -16,26 +16,23 @@ interface Stringable {
 	#endregion
 }
 
-abstract class string_types implements Stringable {
+interface string_types extends Stringable {
 }
 
-abstract class datetime extends string_types {
+interface datetime extends string_types {
 }
 
-abstract class date extends string_types {
+interface date extends string_types {
 }
 
-abstract class varchar extends string_types {
+interface varchar extends string_types {
 }
 
-abstract class text extends string_types {
+interface text extends string_types {
 }
 
-abstract class enum extends string_types {
+interface enum extends string_types {
 }
 
-abstract class table implements Stringable {
-	function __toString() {
-		return __CLASS__;
-	}
+interface table extends Stringable {
 }

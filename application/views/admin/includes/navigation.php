@@ -1,114 +1,103 @@
+<?php
+$navs = [];
+$custom_user_type = "user_type";
+switch ($user_type) {
+	case 'admin':
+	case 'staff':
+		$navs = $this->TemplateModel->get_user_access_navs();
+		break;
+	case $custom_user_type:
+		$navs = $this->TemplateModel->{"get_{$custom_user_type}_access_navs"}();
+
+	default:
+		break;
+}
+?>
 <div class="sidebar">
 	<div class="sidebar-background"></div>
 	<div class="sidebar-wrapper scrollbar-inner">
 		<div class="sidebar-content">
-			<ul class="nav">
-				<li class="nav-item">
-					<a href="<?= ad_base_url() ?>">
-						<i class="fas fa-home"></i>
-						<p>Dashboard</p>
-					</a>
-				</li>
-				<li class="nav-section d-none">
-					<span class="sidebar-mini-icon">
-						<i class="fa fa-ellipsis-h"></i>
-					</span>
-					<h4 class="text-section">Masters</h4>
-				</li>
-				<li class="nav-item d-none">
-					<a href="<?= ad_base_url('masters/profile') ?>">
-						<i class="fas fa-user"></i>
-						<p>Profile</p>
-					</a>
-				</li>
+			<?php
+			foreach ($navs as $section => $nav_list) {
+				$nav_list_access = array_filter($nav_list, function ($page) use ($page_access) {
+					return $page_access[$page['config']->access]['view_data'] ?? '0' == '1';
+				});
+				if ($nav_list_access == []) continue;
+			?>
 
-				<li class="nav-item d-none">
-					<a data-toggle="collapse" href="#users-menu">
-						<i class="fas fa-users"></i>
-						<p>Users</p>
-						<span class="caret"></span>
-					</a>
-					<div class="collapse" id="users-menu">
-						<ul class="nav nav-collapse">
-							<li>
-								<a href="<?= ad_base_url('masters/users/view_roles') ?>">
-									<span class="sub-item">Role</span>
-								</a>
-								<a href="<?= ad_base_url('masters/users/add_role') ?>" class="d-none"></a>
-							</li>
-							<li>
-								<a href="<?= ad_base_url('masters/users/view') ?>">
-									<span class="sub-item">Users</span>
-								</a>
-								<a href="<?= ad_base_url('masters/users/add') ?>" class="d-none"></a>
-							</li>
-						</ul>
-					</div>
-				</li>
-				<li class="nav-section">
-					<span class="sidebar-mini-icon">
-						<i class="fa fa-ellipsis-h"></i>
-					</span>
-					<h4 class="text-section">Website</h4>
-				</li>
-				<li class="nav-item">
-					<a href="<?= ad_base_url('website/view_banners') ?>">
-						<i class="fas fa-image"></i>
-						<p>Banner</p>
-					</a>
-					<a href="<?= ad_base_url('website/add_banner') ?>" class="d-none"></a>
-				</li>
-				<!-- Careers -->
-				<li class="nav-item">
-					<a href="<?= ad_base_url('website/view_careers') ?>">
-						<i class="fas fa-briefcase"></i>
-						<p>Job Corner</p>
-					</a>
-					<a href="<?= ad_base_url('website/add_career') ?>" class="d-none"></a>
-				</li>
-				<!-- Career Applications -->
-				<li class="nav-item">
-					<a href="<?= ad_base_url('website/view_career_applications') ?>">
-						<i class="fas fa-user-tie"></i>
-						<p>Job Applications</p>
-					</a>
-				</li>
-				<!-- Contact Us -->
-				<li class="nav-item">
-					<a href="<?= ad_base_url('website/view_contact_us') ?>">
-						<i class="fas fa-phone"></i>
-						<p>Contact Us</p>
-					</a>
-				</li>
-			</ul>
+				<ul class="nav">
+					<li class="nav-section">
+						<span class="sidebar-mini-icon">
+							<i class="fa fa-ellipsis-h"></i>
+						</span>
+						<h4 class="text-section"><?= $section ?></h4>
+					</li>
+					<?php
+					foreach ($nav_list as $ni => $nav) {
+						// echo json_encode($page_access[$page['config']->access]['view_data'], JSON_PRETTY_PRINT);
+						$view_access = $page_access[$nav['config']->access]['view_data'] ?? "";
+						if ($view_access != '1') continue;
+						/** @var TemplateConfig */
+						$nav_config = $nav['config'];
+						$nav_view = $this->TemplateModel->{$nav_config->view_template}(false);
+						$nav_links = $nav_view['links'];
+						$icon = $nav['icon'];
+						// echo json_encode($page_access[$nav['name']], JSON_PRETTY_PRINT);
+					?>
+						<li class="nav-item">
+							<a href="<?= ad_base_url($nav_links['view']) ?>">
+								<i class="<?= $icon ?>"></i>
+								<p><?= $nav_view['head'] ?></p>
+							</a>
+							<?php
+							if (isset($nav_links['add'])) {
+							?>
+								<a href="<?= ad_base_url($nav_links['add']) ?>" class="d-none"></a>
+							<?php
+							}
+							if (isset($nav_links['sort'])) {
+							?>
+								<a href="<?= ad_base_url($nav_links['sort']) ?>" class="d-none"></a>
+							<?php
+							}
+							if (isset($nav_links['export'])) {
+							?>
+								<a href="<?= ad_base_url($nav_links['export']) ?>" class="d-none"></a>
+							<?php
+							}
+							?>
+							<?php
+							if (isset($nav['other_urls'])) {
+								foreach ($nav['other_urls'] as $other_url) {
+							?>
+									<a href="<?= ad_base_url($other_url) ?>" class="d-none"></a>
+							<?php
+								}
+							}
+							?>
+						</li>
+					<?php
+					}
+					?>
+				</ul>
+			<?php
+			}
+			?>
+
 			<ul class="nav">
 				<li class="nav-section">
 					<span class="sidebar-mini-icon">
 						<i class="fa fa-ellipsis-h"></i>
 					</span>
-					<h4 class="text-section">Config</h4>
+					<h4 class="text-section">Account</h4>
 				</li>
 				<li class="nav-item">
-					<a href="<?= ad_base_url('home/email_config') ?>">
-						<i class="fas fa-user-cog"></i>
-						<p>Email</p>
-					</a>
-				</li>
-				<li class="nav-item d-none">
-					<a href="<?= ad_base_url('home/payment_config') ?>">
-						<i class="fas fa-key"></i>
-						<p>Payment Gateway</p>
-					</a>
-				</li>
-			</ul>
-			<ul class="nav">
-				<li class="nav-item resp-visible">
 					<a href="<?= ad_base_url('home/change_password') ?>">
 						<i class="fas fa-key"></i>
 						<p>Change Password</p>
 					</a>
 				</li>
-				<li class="nav-item resp-visible">
+				<li class="nav-item">
 					<a href="<?= ad_base_url('login/logout') ?>">
 						<i class="fas fa-sign-out-alt"></i>
 						<p>Logout</p>

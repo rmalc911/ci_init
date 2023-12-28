@@ -27,6 +27,7 @@ $login_username = $login['user_name'];
 			}
 		});
 	</script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
 	<!-- CSS Files -->
 	<link rel="stylesheet" href="<?= as_base_url('plugins/bootstrap/css/bootstrap.min.css') ?>">
@@ -49,12 +50,12 @@ $login_username = $login['user_name'];
 		<!--
 			Tip 1: You can change the background color of the main header using: data-background-color="blue | purple | light-blue | green | orange | red"
 		-->
-		<div class="main-header" data-background-color="light-blue">
+		<div class="main-header" data-background-color="purple">
 			<!-- Logo Header -->
 			<div class="logo-header">
 
 				<a href="<?= ad_base_url() ?>" class="logo">
-					<img src="<?= base_url(LOGO_IMG) ?>" width="175" alt="<?= CLIENT_NAME ?>" class="navbar-brand">
+					<img src="<?= base_url(LOGO_IMG) ?>" height="40" alt="<?= CLIENT_NAME ?>" class="navbar-brand">
 					<!-- <h1 class="navbar-brand text-light"><?= CLIENT_NAME ?></h1> -->
 				</a>
 				<button class="navbar-toggler sidenav-toggler ml-auto" type="button" data-toggle="collapse" data-target="collapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -94,7 +95,7 @@ $login_username = $login['user_name'];
 		</div>
 
 		<!-- Sidebar -->
-		<?= $this->load->view(ADMIN_VIEWS_PATH . 'includes/navigation', [], true); ?>
+		<?= $this->load->view(ADMIN_VIEWS_PATH . 'includes/navigation', $login, true); ?>
 		<!-- End Sidebar -->
 
 		<div class="main-panel">
