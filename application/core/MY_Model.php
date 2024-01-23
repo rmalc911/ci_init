@@ -59,23 +59,34 @@ class MY_Model extends CI_Model {
 		if ($username == 'admin') {
 			return true;
 		}
-		$login_id = $this->session->userdata('user')['id'];
-		$access_data = $this->db->get_where('user_access_map', ['user' => $login_id, 'page' => $access_page], 1)->row_array();
-		$access_verified = $access_data[$access_type] ?? '0' == '1';
+		$user = $this->session->userdata('user');
+		$username = $user['user_mobile'];
+		$login_id = $user['id'];
+		$login_type = $user['user_type'];
+		$access_verified = false;
+		if ($login_type == 'admin') {
+			$access_verified = true;
+		}
+		if ($login_type == 'service_vendor') {
+			$access_verified = $this->get_service_vendor_access()[$access_page][$access_type] ?? '0';
+		}
+		if ($login_type == 'user') {
+			$access_data = $this->db->get_where('user_access_map', ['user' => $login_id, 'page' => $access_page], 1)->row_array();
+			$access_verified = $access_data[$access_type] ?? '0' == '1';
+		}
 		if ($access_verified) {
 			return true;
-		} else {
-			if (!$redirect) {
-				return false;
-			}
-			$this->session->set_flashdata('message', $this->show_alert('err', 'You do not have access to the page/action'));
-			$redirect_url = $_SERVER['HTTP_REFERER'] ?? base_url(ADMIN_PATH);
-			$current_url = current_url();
-			if ($redirect_url == $current_url) {
-				$redirect_url = base_url(ADMIN_PATH);
-			}
-			redirect($redirect_url);
 		}
+		if (!$redirect) {
+			return false;
+		}
+		$this->session->set_flashdata('message', $this->show_alert('err', 'You do not have access to the page/action'));
+		$redirect_url = $_SERVER['HTTP_REFERER'] ?? base_url(ADMIN_PATH);
+		$current_url = current_url();
+		if ($redirect_url == $current_url) {
+			$redirect_url = base_url(ADMIN_PATH);
+		}
+		redirect($redirect_url);
 	}
 
 	public function get_user_access_map($edit_data) {
@@ -354,14 +365,14 @@ class MY_Model extends CI_Model {
 		return $opt_array;
 	}
 
-	public function get_edit_row($table, $edit = '', $key = 'id') {
+	public function get_edit_row($table, $edit = '', $key = 'id', $return_type = 'array') {
 		if (!$this->db_setup) {
 			return [];
 		}
 		if ($edit == '') {
 			$edit = $this->input->get_post('edit');
 		}
-		return $this->db->where($key, $edit)->get($table)->row_array();
+		return $this->db->where($key, $edit)->get($table)->row(0, $return_type);
 	}
 
 	public function get_edit_blank($table) {
@@ -879,10 +890,10 @@ class TemplateConfig {
 		return $ci->TemplateModel->select_options($this->table, $this->id, $this->display_name, $filter, null, $select, $order);
 	}
 
-	public function get_row($row_id) {
+	public function get_row($row_id, $return_type = "array") {
 		/** @var CI */
 		$ci = &get_instance();
-		return $ci->TemplateModel->get_edit_row($this->table, $row_id, $this->id);
+		return $ci->TemplateModel->get_edit_row($this->table, $row_id, $this->id, $return_type);
 	}
 }
 

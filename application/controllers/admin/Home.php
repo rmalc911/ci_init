@@ -237,12 +237,13 @@ class Home extends MY_Controller {
 					}
 				} else {
 					$map_key_name = singular($table_name);
+					$map_join_name = singular($template['name']);
 					$mapping_tables[] = [
 						'table' => $template['name'],
 						'fields' => [
 							"`$map_key_name` INT(11) NOT NULL",
-							"`{$template['name']}` INT(11) NOT NULL",
-							"UNIQUE `{$template['name']}`(\n\t\t`{$map_key_name}`, \n\t\t`{$template['name']}`\n\t)",
+							"`{$map_join_name}` INT(11) NOT NULL",
+							"UNIQUE `{$map_key_name}_{$map_join_name}`(\n\t\t`{$map_key_name}`, \n\t\t`{$map_join_name}`\n\t)",
 						],
 					];
 					continue;

@@ -504,7 +504,7 @@ foreach ($template as $template_row) {
 	?>
 		<div class="form-group row">
 			<?= get_label($template_row) ?>
-			<div class="<?= $table_col ?> table-responsive">
+			<div class="<?= $table_col ?>">
 				<?php
 				foreach ($fields as $field) {
 					if ($field['type'] != 'image') {
@@ -695,9 +695,15 @@ foreach ($template as $template_row) {
 	<?php
 	}
 
-	if ($template_row['type'] == 'key' || $template_row['type'] == 'hidden') {
+	if ($template_row['type'] == 'key') {
 	?>
 		<input type="hidden" name="<?= $template_row['name'] ?>" value="<?= $value ?>">
+	<?php
+	}
+
+	if ($template_row['type'] == 'hidden') {
+	?>
+		<input type="hidden" class="<?= $class_list ?>" name="<?= $template_row['name'] ?>" value="<?= $value ?>" id="input-<?= $template_row['name'] ?>" <?= $attributes ?>>
 	<?php
 	}
 
@@ -709,7 +715,9 @@ foreach ($template as $template_row) {
 
 	if ($template_row['type'] == 'group-head') {
 	?>
-		<h2 class=""><?= $template_row['name'] ?></h2>
+		<div class="form-group py-0">
+			<h2 class=""><?= $template_row['name'] ?></h2>
+		</div>
 <?php
 	}
 

@@ -146,7 +146,7 @@ class MY_Controller extends CI_Controller {
 				);
 				foreach ($input_tables as $ti => $input_table) {
 					if (($input_table['table'] ?? "") != "") {
-						$edit[$input_table['name']] = $this->TemplateModel->get_edit_map($input_table['table'], $input_table['key'], $edit[$input_table['edit_key']]);
+						$edit[$input_table['name']] = $this->TemplateModel->get_edit_map($input_table['table'], $input_table['key'], ($edit[$input_table['edit_key']] ?? ""));
 					}
 				}
 				if (method_exists($this, "{$option}_edit_map")) {
@@ -374,11 +374,18 @@ class MY_Controller extends CI_Controller {
 			->unset_column($id_field);
 
 		if ($this->action_field) {
+			$action_btns = [
+				'edit' => $template['links']['add'],
+				'delete' => "$1,$table,$id_field",
+			];
+			if ($status_field != "") {
+				$action_btns['status'] = "$1,$table,$id_field,$2,$options->status_field";
+			}
 			$this->datatables
 				->unset_column($options->status_field)
 				->add_column(
 					'action',
-					$this->add_action_col(['edit' => $template['links']['add'], 'delete' => "$1,$table,$id_field", 'status' => "$1,$table,$id_field,$2,$options->status_field"]),
+					$this->add_action_col($action_btns),
 					"$id_field, $options->status_field"
 				);
 		}
