@@ -45,8 +45,9 @@ class Login extends CI_Controller {
 			return;
 		}
 		$user_type = "user_type";
+		$user_type_table = "user_types";
 		if ($user['user_type'] == "$user_type") {
-			$$user_type = $this->db->get_where($user_type, ['id' => $user['user_id']])->row_array();
+			$$user_type = $this->db->get_where($user_type_table, ['id' => $user['user_id']])->row_array();
 			if ($$user_type[$user_type . '_status'] !== "1") {
 				$this->session->unset_userdata('user');
 				$this->session->unset_userdata('login');

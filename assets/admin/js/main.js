@@ -35,14 +35,24 @@ let pickrConfig = {
 };
 
 function auto_grow(element) {
-	element.style.height = element.scrollHeight - parseFloat($(element).css("line-height")) + "px";
-	element.style.height = element.scrollHeight + 2 + "px";
+	const rows = $(element).attr("rows") || 3;
+	const borderWidth = parseInt($(element).css("border-top-width")) + parseInt($(element).css("border-bottom-width"));
+	element.style.height = rows + "lh";
+	element.style.height = element.scrollHeight + borderWidth + "px";
 }
 
 function formatIcon(state) {
 	let img = $(state.element).data("img-path");
 	if (img) {
 		return $('<span class="select2-icon"><img src="' + img + '" height="20" class="img-responsive mr-2" />' + state.text + "</span>");
+	}
+	if (state.element) {
+		const select = $(state.element).parents("select");
+		const iconClass = select.data("icon-class");
+		if (iconClass) {
+			return $('<span class="select2-icon"><i class="' + iconClass + state.id + '"></i>' + state.text + "</span>");
+		}
+		return $('<span class="select2-icon">' + state.text + "</span>");
 	}
 	return state.text;
 }
@@ -773,11 +783,11 @@ $(function () {
 			var hex = color.toHEXA().toString(0);
 			$(target).val(hex);
 		});
-		newPickr.on('change', function(color, e, pickr) {
+		newPickr.on("change", function (color, e, pickr) {
 			var hex = color.toHEXA().toString(0);
 			$(target).val(hex);
 		});
-		newPickr.on('hide', function(pickr) {
+		newPickr.on("hide", function (pickr) {
 			pickr.applyColor();
 		});
 	});

@@ -9,6 +9,7 @@ class TemplateModel extends MY_Model {
 	/** @var TemplateConfig */ public $career_config;
 	/** @var TemplateConfig */ public $career_application_config;
 	/** @var TemplateConfig */ public $contact_us_config;
+	// Config
 	/** @var TemplateConfig */ public $email_config;
 
 	public function __construct() {
@@ -20,6 +21,7 @@ class TemplateModel extends MY_Model {
 		$this->career_config = new TemplateConfig('careers', 'career_add', 'career_table', 'career_view', 'careers', 'id', 'career_name', 'career_status');
 		$this->career_application_config = new TemplateConfig('career_applications', null, 'career_application_table', 'career_application_view', 'career_applications', 'id', 'applicant_fname');
 		$this->contact_us_config = new TemplateConfig('contact_us', null, 'contact_us_table', 'contact_us_view', 'contact_us', 'id', 'contact_name', null);
+		$this->email_config = new TemplateConfig('email', 'email_form', null, 'email_view', null,);
 	}
 
 	#region Profile config
@@ -58,13 +60,13 @@ class TemplateModel extends MY_Model {
 	public function contact_social_links() {
 		$social_media_links = SOCIAL_MEDIA_NAMES;
 		return [
-			['type' => 'select-widget', 'label' => 'Social Media', 'name' => 'social_icon_class', 'options' => $social_media_links, 'required' => true],
+			['type' => 'select-widget', 'label' => 'Social Media', 'name' => 'social_icon_class', 'options' => $social_media_links, 'required' => true, 'attributes' => ['data-icon-class' => 'fab mr-1 fa-fw fa-']],
 			['type' => 'input', 'label' => 'Link', 'name' => 'social_icon_url', 'required' => true],
 		];
 	}
 	#endregion
 
-	// Users / Users
+	#region Users / Users
 	public function user_view() {
 		return [
 			'head' => 'Users',
@@ -104,23 +106,13 @@ class TemplateModel extends MY_Model {
 
 	public function get_user_access_navs() {
 		return  [
-			'Locations' => [
-				// states
-				['options' => ['v', 'a', 'e', 'b', 'd'], 'config' => $this->state_config, 'icon' => 'fas fa-globe-asia'],
-				// ciites
-				['options' => ['v', 'a', 'e', 'b', 'd'], 'config' => $this->city_config, 'icon' => 'fas fa-map-marked'],
-			],
 			'Masters' => [
 				// profile
 				['options' => ['v', 'e'], 'config' => $this->profile_config, 'icon' => 'fas fa-user'],
-				// brands
-				['options' => ['v', 'a', 'e', 'b', 'd'], 'config' => $this->brand_config, 'icon' => 'fas fa-tags'],
 			],
 			'Enquiries' => [
 				// contact us
 				['options' => ['v'], 'config' => $this->contact_us_config, 'icon' => 'fas fa-phone'],
-				// exhibitor enquiry
-				['options' => ['v'], 'config' => $this->exhibitor_enquiry_config, 'icon' => 'fas fa-user-plus'],
 			],
 			'Config' => [
 				['options' => ['v', 'e'], 'config' => $this->email_config, 'icon' => 'fas fa-envelope'],
@@ -155,8 +147,9 @@ class TemplateModel extends MY_Model {
 			}
 		}
 	}
+	#endregion
 
-	// Banners
+	#region Banners
 	public function web_banner_view() {
 		return [
 			'head' => 'Website Banners',
@@ -197,6 +190,7 @@ class TemplateModel extends MY_Model {
 			'banner_img' => BANNER_UPLOAD_PATH,
 		];
 	}
+	#endregion
 
 	#region Website / Testimonials
 	public function testimonial_view() {
@@ -280,7 +274,7 @@ class TemplateModel extends MY_Model {
 	}
 	#endregion
 
-	// Website / Careers
+	#region Website / Careers
 	public function career_view() {
 		return [
 			'head' => 'Job Corner',
@@ -312,9 +306,9 @@ class TemplateModel extends MY_Model {
 			['type' => 'key', 'label' => 'ID', 'name' => 'id'],
 		];
 	}
+	#endregion
 
-
-	// Enquiries / Career Applications
+	#region Enquiries / Career Applications
 	public function career_application_view($queries = true) {
 		$career_options = $queries ? $this->career_config->get_options() : [];
 		return [
@@ -362,8 +356,9 @@ class TemplateModel extends MY_Model {
 		];
 		return $this->get_export($config, $table_heads, $filter);
 	}
+	#endregion
 
-	// Website / Contact Us
+	#region Website / Contact Us
 	public function contact_us_view() {
 		return [
 			'head' => 'Contact Us',
@@ -399,6 +394,7 @@ class TemplateModel extends MY_Model {
 		];
 		return $this->get_export($config, $table_heads, $filter);
 	}
+	#endregion
 
 	#region Website / Album
 	public function album_view() {

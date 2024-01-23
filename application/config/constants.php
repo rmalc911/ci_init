@@ -137,10 +137,17 @@ define('user_date', 'jS M Y');
 define('user_time', 'g:i A');
 define('user_date_time', 'jS M Y, g:i A');
 define('input_date', 'd-m-Y');
+define('input_time', 'g:i A');
 define('input_date_time', 'd-m-Y g:i A');
 define('db_user_date', '%D %b %Y');
 define('db_user_time', '%l:%i %p');
 define('db_user_date_time', '%D %b %Y - %l:%i %p');
+define('db_date', '%Y-%m-%d');
+define('db_time', '%H:%i:%s');
+define('db_date_time', '%Y-%m-%d %H:%i:%s');
+define('db_input_date', '%d-%m-%Y');
+define('db_input_time', '%l:%i %p');
+define('db_input_date_time', '%d-%m-%Y %l:%i %p');
 
 define('CATEGORY_VIEW_DEPTH', 3);
 define('IMG_SPLIT', '~##~');

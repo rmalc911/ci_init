@@ -16,6 +16,33 @@ if (isset($view_template['sort_submit'])) {
 	</div>
 	<form method="post" action="<?= $action ?>">
 		<div class="row justify-content-center">
+			<?php
+			if ($parent_options) {
+			?>
+				<div class="col-md-4">
+					<div class="form-group">
+						<label for="filter">Filter</label>
+						<div class="select2-input">
+							<select id="filter" name="<?= $parent_field ?>" class="form-control select-widget">
+								<?php
+								foreach ($parent_options as $option) {
+									$selected = '';
+									if ($parent_value == $option['option_value']) {
+										$selected = 'selected';
+									}
+								?>
+									<option <?= $selected ?> value="<?= $option['option_value'] ?>"><?= $option['option_name'] ?></option>
+								<?php
+								}
+								echo json_encode($parent_options);
+								?>
+							</select>
+						</div>
+					</div>
+				</div>
+			<?php
+			}
+			?>
 			<div class="col-md-8 col-lg-7">
 				<div class="kanban-board w-100 mt-4">
 					<main class="kanban-drag" id="sortable">
@@ -78,4 +105,10 @@ if (isset($view_template['sort_submit'])) {
 			$("#sort-val").val(JSON.stringify(sort));
 		},
 	});
+
+	$("#filter").on("change", function() {
+		const filterName = $(this).attr("name");
+		const filterValue = $(this).val();
+		window.location.href = window.location.origin + window.location.pathname + "?" + filterName + "=" + filterValue;
+	})
 </script>

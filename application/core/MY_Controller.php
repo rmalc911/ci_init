@@ -50,6 +50,7 @@ class MY_Controller extends CI_Controller {
 		$default_sort_order = "ASC";
 		$table_sort = $this->TemplateModel->{$options->table_template}()['sort_order'] ?? [$options->id, $default_sort_order];
 		$img_fields = $this->TemplateModel->{$options->table_template}()['img_fields'] ?? [];
+		$form_template  = array_column($this->TemplateModel->{$options->form_template}(), null, 'name');
 		if (is_array($table_sort)) {
 			$sort_order = $table_sort[0];
 			$sort_direction = $default_sort_order;
@@ -61,12 +62,19 @@ class MY_Controller extends CI_Controller {
 		$table_alias = $options->table;
 		$this->TemplateModel->verify_access($options->access, 'edit_data');
 		$filter = [];
+		$parent_options = [];
+		$get_parent_field = "";
 		if ($options->parent_field !== null) {
-			$filter[$options->parent_field] = null;
+			$get_parent_field = $this->input->get($options->parent_field);
+			$parent_options = $form_template[$options->parent_field]['options'];
+			$filter[$options->parent_field] = $get_parent_field;
 		}
 		if ($img_fields) {
 			$this->db->select(array_keys($img_fields));
 		}
+		$this->data['parent_field'] = $options->parent_field;
+		$this->data['parent_value'] = $get_parent_field;
+		$this->data['parent_options'] = $parent_options;
 		$this->data['img_fields'] = $img_fields;
 		$this->data['sort_list'] = $options->get_options($filter, false, "ISNULL($table_alias.$sort_order) $sort_direction, $table_alias.$sort_order $sort_direction, $table_alias.{$options->id} $sort_direction");
 		$this->template('templates/sort_template', $this->data);
