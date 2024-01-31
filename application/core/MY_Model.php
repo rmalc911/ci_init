@@ -67,8 +67,8 @@ class MY_Model extends CI_Model {
 		if ($login_type == 'admin') {
 			$access_verified = true;
 		}
-		if ($login_type == 'service_vendor') {
-			$access_verified = $this->get_service_vendor_access()[$access_page][$access_type] ?? '0';
+		if ($login_type == 'type') {
+			$access_verified = $this->get_type_access()[$access_page][$access_type] ?? '0';
 		}
 		if ($login_type == 'user') {
 			$access_data = $this->db->get_where('user_access_map', ['user' => $login_id, 'page' => $access_page], 1)->row_array();
@@ -91,10 +91,39 @@ class MY_Model extends CI_Model {
 
 	public function get_user_access_map($edit_data) {
 		if (!$edit_data) return [];
+		if (!isset($edit_data['id'])) return [];
 
 		$user_id = $edit_data['id'];
 		$page_access = $this->db->get_where('user_access_map', ['user' => $user_id])->result_array();
 		return $page_access;
+	}
+
+	public function get_type_access() {
+		$type_navs = $this->TemplateModel->get_type_access_navs();
+		$access = [];
+		foreach ($type_navs as $pages) {
+			foreach ($pages as $page) {
+				$options = $page['options'];
+				$page_access = [];
+				if (in_array('v', $options)) {
+					$page_access['view_data'] = '1';
+				}
+				if (in_array('a', $options)) {
+					$page_access['add_data'] = '1';
+				}
+				if (in_array('e', $options)) {
+					$page_access['edit_data'] = '1';
+				}
+				if (in_array('b', $options)) {
+					$page_access['block_data'] = '1';
+				}
+				if (in_array('d', $options)) {
+					$page_access['delete_data'] = '1';
+				}
+				$access[$page['config']->access] = $page_access;
+			}
+		}
+		return $access;
 	}
 
 	public function change_pw_form() {

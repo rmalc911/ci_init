@@ -8,7 +8,7 @@ class Home extends MY_Controller {
 	}
 
 	public function index() {
-		$this->load->template('home', $this->data);
+		$this->template('home', $this->data);
 	}
 
 	public function profile() {
@@ -16,34 +16,34 @@ class Home extends MY_Controller {
 		$this->data['view_template'] = $this->TemplateModel->profile_view();
 		$this->TemplateModel->verify_access('profile', 'view_data');
 		$this->TemplateModel->set_validation($this->data['form_template']);
-
 		$config_items = [
 			'company_name',
-			// 'company_code',
 			'company_address',
 			'company_city',
-			'company_logo',
-			'site_favicon',
 			'company_phone',
 			'company_email',
+			'company_website',
+			PROFILE_LOGO_FIELD,
+			PROFILE_FAVICON_FIELD,
+		];
+		$config_icons = [
+			PROFILE_LOGO_FIELD,
+			PROFILE_FAVICON_FIELD,
 		];
 		$this->data['edit'] = $this->TemplateModel->get_config($config_items);
-		// $this->data['edit']['contact_social_links'] = $this->TemplateModel->get_edit_map('contact_social_links', null);
+		$this->data['edit']['contact_social_links'] = $this->TemplateModel->get_edit_map('contact_social_links', null);
 		// $this->data['edit']['company_contact_persons'] = $this->TemplateModel->get_edit_map('company_contact_persons', null);
 
 		if ($this->form_validation->run()) {
 			$post_data = $this->input->post();
-			$post_data['company_logo'] = $this->data['edit']['company_logo'] ?? "";
-			$post_data['site_favicon'] = $this->data['edit']['site_favicon'] ?? "";
-			$company_logo = $this->TemplateModel->save_image('company_logo', COMPANY_LOGO_UPLOAD_PATH, null, null, $post_data['company_logo']);
-			$site_favicon = $this->TemplateModel->save_image('site_favicon', COMPANY_LOGO_UPLOAD_PATH, null, null, $post_data['site_favicon']);
-			if ($company_logo) {
-				$post_data['company_logo'] = $company_logo;
+			foreach ($config_icons as $icon) {
+				$post_data[$icon] = $this->data['edit'][$icon] ?? "";
+				$icon_image = $this->TemplateModel->save_image($icon, PROFILE_LOGO_UPLOAD_PATH, null, null, $post_data[$icon]);
+				if ($icon_image) {
+					$post_data[$icon] = $icon_image;
+				}
 			}
-			if ($site_favicon) {
-				$post_data['site_favicon'] = $site_favicon;
-			}
-			// $this->TemplateModel->save_table_map('contact_social_links', null, null, ['social_icon_class', 'social_icon_url']);
+			$this->TemplateModel->save_table_map('contact_social_links', null, null, ['social_icon_class', 'social_icon_url']);
 			// $this->TemplateModel->save_table_map('company_contact_persons', null, null, ['contact_name', 'contact_phone'], null);
 			$this->TemplateModel->set_config($config_items, $post_data);
 			$status = $this->db->error()['code'] == 0;
@@ -73,7 +73,7 @@ class Home extends MY_Controller {
 			redirect(base_url(uri_string()));
 		}
 		$this->data['config'] = $this->TemplateModel->get_config($config_items);
-		$this->load->template('config/manage', $this->data);
+		$this->template('config/manage', $this->data);
 	}
 
 	public function mail_config_view() {
@@ -91,7 +91,6 @@ class Home extends MY_Controller {
 	}
 
 	public function change_password() {
-		$this->data['message'] = $this->session->flashdata('message');
 		$this->data['form_template'] = $this->TemplateModel->change_pw_form();
 		$this->data['view_template'] = $this->TemplateModel->change_pw_view();
 		$this->TemplateModel->set_validation($this->data['form_template']);
@@ -114,7 +113,7 @@ class Home extends MY_Controller {
 		}
 		$this->data['edit'] = $post_data;
 		$this->data['edit']['username'] = $this->session->userdata('user')['user_mobile'];
-		$this->load->template('templates/add_template', $this->data);
+		$this->template('templates/add_template', $this->data);
 	}
 
 	public function payment_config() {
@@ -170,7 +169,7 @@ class Home extends MY_Controller {
 			redirect(base_url(uri_string()));
 		}
 		$this->data['config'] = $this->TemplateModel->get_config($config_items);
-		$this->load->template('config/payment', $this->data);
+		$this->template('config/payment', $this->data);
 	}
 
 	public function get_create_table($config_name) {

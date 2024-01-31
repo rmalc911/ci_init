@@ -88,3 +88,9 @@ CREATE TABLE `media_images` (
 	`updated_date` datetime DEFAULT NULL,
 	PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;
+CREATE TABLE `contact_social_links` (
+	`social_icon_class` VARCHAR(50) NOT NULL,
+	`social_icon_url` VARCHAR(50) NOT NULL,
+	PRIMARY KEY (`social_icon_class`, `social_icon_url`)
+) ENGINE = InnoDB;
+-- xx --

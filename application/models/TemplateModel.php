@@ -38,15 +38,15 @@ class TemplateModel extends MY_Model {
 		// $city_options = $this->state_city_options();
 		return [
 			['type' => 'input', 'label' => 'Company Name', 'name' => 'company_name', 'required' => true],
-			['type' => 'input', 'label' => 'Company Address', 'name' => 'company_address', 'required' => true],
+			['type' => 'textarea', 'label' => 'Company Address', 'name' => 'company_address', 'required' => true],
 			['type' => 'input', 'label' => 'City', 'name' => 'company_city', 'required' => true],
 			['type' => 'input', 'label' => 'Contact Phone', 'name' => 'company_phone', 'required' => true],
 			['type' => 'input', 'label' => 'Contact Email', 'name' => 'company_email', 'required' => true],
-			['type' => 'input', 'label' => 'Website URL', 'name' => 'company_website', 'required' => true],
-			['type' => 'image', 'label' => 'Company Logo', 'name' => 'company_logo', 'size' => [500, 500], 'accept' => ['jpeg', 'png', 'webp'], 'path' => COMPANY_LOGO_UPLOAD_PATH],
-			['type' => 'image', 'label' => 'Site Favicon', 'name' => 'site_favicon', 'size' => [200, 200], 'accept' => ['jpeg', 'png', 'webp'], 'path' => COMPANY_LOGO_UPLOAD_PATH],
+			['type' => 'input', 'label' => 'Website URL', 'name' => 'company_website', 'required' => false],
+			['type' => 'image', 'label' => 'Company Logo', 'name' => PROFILE_LOGO_FIELD, 'size' => [500, 500], 'accept' => ['jpeg', 'png', 'webp'], 'path' => PROFILE_LOGO_UPLOAD_PATH],
+			['type' => 'image', 'label' => 'Site Favicon', 'name' => PROFILE_FAVICON_FIELD, 'size' => [200, 200], 'accept' => ['jpeg', 'png', 'webp'], 'path' => PROFILE_LOGO_UPLOAD_PATH, 'help_text' => 'Square required'],
 			// ['type' => 'input-table', 'label' => 'Contact Persons', 'name' => 'company_contact_persons', 'fields' => 'company_contact_persons', 'table-inline' => true],
-			// ['type' => 'input-table', 'label' => 'Social Links', 'name' => 'contact_social_links', 'fields' => 'contact_social_links', 'table-inline' => true],
+			['type' => 'input-table', 'label' => 'Social Links', 'name' => 'contact_social_links', 'fields' => 'contact_social_links', 'table-inline' => true],
 		];
 	}
 
@@ -100,6 +100,7 @@ class TemplateModel extends MY_Model {
 			['type' => 'custom', 'name' => 'user_access', 'validation' => false, 'view' => 'users/map-rights', 'params' => ['navs' => $user_access_navs]],
 			['type' => 'hidden', 'label' => 'ID', 'name' => 'login_password'],
 			['type' => 'hidden', 'label' => 'ID', 'name' => 'user_name'],
+			['type' => 'hidden', 'label' => 'ID', 'name' => 'user_type'],
 			['type' => 'key', 'label' => 'ID', 'name' => 'id'],
 		];
 	}

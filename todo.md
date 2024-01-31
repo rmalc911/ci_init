@@ -7,8 +7,8 @@
 - [x] Template for form validation
 - [x] Template for image uploads
 - [x] Template for routes
-- [ ] Template for Sorting with images
-- [ ] Template for navigation
+- [x] Template for Sorting with images
+- [x] Template for navigation
 - [x] Change password
 - [ ] Fix form template labels for select fields
 - [ ] Add Content form template
@@ -16,6 +16,6 @@
 ## Future
 
 - [ ] Template config generator
-- [ ] DB create table query generator
+- [x] DB create table query generator
 - [ ] Theme Switcher
 - [ ] Make installable

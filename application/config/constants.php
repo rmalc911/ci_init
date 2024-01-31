@@ -96,9 +96,11 @@ define('BANNER_UPLOAD_PATH', 'assets/uploads/banners/');
 define('GALLERY_UPLOAD_PATH', 'assets/uploads/gallery/');
 define('PRODUCT_IMG_UPLOAD_PATH', 'assets/uploads/products/');
 define('RESUME_UPLOAD_PATH', 'assets/uploads/resume/');
+define('BLOG_IMAGE_UPLOAD_PATH', 'assets/uploads/blog/');
 define('PROFILE_LOGO_UPLOAD_PATH', 'assets/uploads/logo/');
 
 define('PROFILE_LOGO_FIELD', 'profile_logo');
+define('PROFILE_FAVICON_FIELD', 'profile_favicon');
 
 define('SOCIAL_MEDIA_NAMES', [
 	'' => '',

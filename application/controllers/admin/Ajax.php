@@ -7,6 +7,15 @@ class Ajax extends MY_Controller {
 		header('Content-Type: application/json');
 	}
 
+	public function reset_user_password() {
+		$user_id = $this->input->post('value');
+		echo json_encode([
+			'data' => '',
+			'title' => 'Reset Login Password',
+			'content' => $this->load->view(ADMIN_VIEWS_PATH . 'users/reset_user_password', ['user_id' => $user_id], true)
+		]);
+	}
+
 	public function view_career_about() {
 		$application_id = $this->input->post('value');
 		$this->data['application'] = $this->TemplateModel->get_edit_row('career_applications', $application_id);

@@ -722,7 +722,10 @@ foreach ($template as $template_row) {
 	}
 
 	if ($template_row['type'] == 'custom') {
-		echo $this->load->view(ADMIN_VIEWS_PATH . $template_row['view'], $template_row, true);
+		$custom_params = $template_row['params'] ?? [];
+		$custom_params['template_row'] = $template_row;
+		$custom_params['value'] = $value;
+		echo $this->load->view(ADMIN_VIEWS_PATH . $template_row['view'], $custom_params, true);
 	}
 }
 ?>

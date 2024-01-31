@@ -46,7 +46,7 @@ function formatIcon(state) {
 	if (img) {
 		return $('<span class="select2-icon"><img src="' + img + '" height="20" class="img-responsive mr-2" />' + state.text + "</span>");
 	}
-	if (state.element) {
+	if (state.element && state.element.tagName === "OPTION") {
 		const select = $(state.element).parents("select");
 		const iconClass = select.data("icon-class");
 		if (iconClass) {
@@ -109,6 +109,36 @@ let validatorConfig = {
 			appendAfter = toggleBtnParent;
 		}
 		error.insertAfter(appendAfter);
+	},
+};
+const summernoteConfig = {
+	toolbar: [
+		["style", ["style", "bold", "italic", "underline", "clear"]],
+		["font", ["strikethrough", "superscript", "subscript"]],
+		["fontsize", ["fontsize"]],
+		["color", ["color"]],
+		["para", ["ul", "ol", "paragraph", "hr"]],
+		["edit", ["fullscreen", "codeview", "undo", "redo", "help"]],
+	],
+	height: 250,
+	callbacks: {
+		onPaste: function (e) {
+			var clipboardData = (e.originalEvent || e).clipboardData || window.clipboardData;
+			var bufferText = clipboardData.getData("text/html");
+			if (bufferText == "") {
+				bufferText = clipboardData.getData("text").split("\n").join("<br>");
+			}
+			e.preventDefault();
+			var div = $("<div />");
+			div.append(bufferText);
+			div.find("*").removeAttr("style");
+			setTimeout(function () {
+				div.find("*").removeAttr("class");
+				div.find("*").removeAttr("id");
+				var divContent = div.html();
+				document.execCommand("insertHtml", false, divContent);
+			}, 30);
+		},
 	},
 };
 $(function () {
@@ -180,36 +210,7 @@ $(function () {
 			useCurrent: false,
 		});
 	}
-	$(".wysiwyg-editor").summernote({
-		toolbar: [
-			["style", ["style", "bold", "italic", "underline", "clear"]],
-			["font", ["strikethrough", "superscript", "subscript"]],
-			["fontsize", ["fontsize"]],
-			["color", ["color"]],
-			["para", ["ul", "ol", "paragraph", "hr"]],
-			["edit", ["fullscreen", "codeview", "undo", "redo", "help"]],
-		],
-		height: 250,
-		callbacks: {
-			onPaste: function (e) {
-				var clipboardData = (e.originalEvent || e).clipboardData || window.clipboardData;
-				var bufferText = clipboardData.getData("text/html");
-				if (bufferText == "") {
-					bufferText = clipboardData.getData("text").split("\n").join("<br>");
-				}
-				e.preventDefault();
-				var div = $("<div />");
-				div.append(bufferText);
-				div.find("*").removeAttr("style");
-				setTimeout(function () {
-					div.find("*").removeAttr("class");
-					div.find("*").removeAttr("id");
-					var divContent = div.html();
-					document.execCommand("insertHtml", false, divContent);
-				}, 30);
-			},
-		},
-	});
+	$(".wysiwyg-editor").summernote(summernoteConfig);
 	$(document).on("input", ".auto-grow", function () {
 		auto_grow(this);
 	});
@@ -724,6 +725,7 @@ $(function () {
 		$(".select-widget", inputListContainer).select2("destroy");
 		$(".select-widget", inputListContainer).removeAttr("data-live-search").removeAttr("data-select2-id").removeAttr("aria-hidden").removeAttr("tabindex");
 		$("[data-select2-id]", inputListContainer).removeAttr("data-select2-id");
+		$(".wysiwyg-editor", inputListContainer).summernote("destroy");
 		var inputListItem = $(".input-group-list-item:first-child", inputList).clone();
 		var resetSrc = $(".reset-src", inputListItem).val();
 		$(".form-control", inputListItem).val("");
@@ -748,6 +750,7 @@ $(function () {
 			format: "DD-MM-YYYY hh:mm A",
 			sideBySide: true,
 		});
+		$(".wysiwyg-editor", inputListContainer).summernote(summernoteConfig);
 		updateInputListIndex(inputListContainer);
 	});
 

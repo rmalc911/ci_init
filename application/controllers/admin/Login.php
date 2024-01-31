@@ -58,7 +58,7 @@ class Login extends CI_Controller {
 			redirect_base(ADMIN_PATH . "$user_type/profile");
 			return;
 		} else {
-			$view_access = $this->db->get_where('role_access_map', ['user' => $user['id'], 'view_data' => '1'], 1)->row_array();
+			$view_access = $this->db->order_by('id')->get_where('user_access_map', ['user' => $user['id'], 'view_data' => '1'], 1)->row_array();
 			if (!$view_access) {
 				$this->session->set_flashdata('login', 'No access provided, please ask admin to update your user rights');
 				$this->logout();
@@ -68,8 +68,14 @@ class Login extends CI_Controller {
 				$break = 0;
 				foreach ($navs as $pages) {
 					foreach ($pages as $page) {
-						if ($view_access['page'] == $page['name']) {
-							$this->login_redirect = ADMIN_PATH . $page['url'];
+						/** @var TemplateConfig $page_config */
+						$page_config = $page['config'];
+						$page_name = $page_config->access;
+						if ($view_access['page'] == $page_name) {
+							$nav_view = $this->TemplateModel->{$page_config->view_template}(false);
+							$nav_links = $nav_view['links'];
+							$url = $nav_links['view'];
+							$this->login_redirect = ADMIN_PATH . $url;
 							$break = 1;
 							break;
 						}

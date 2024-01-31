@@ -3,7 +3,7 @@ $navs = [];
 $custom_user_type = "user_type";
 switch ($user_type) {
 	case 'admin':
-	case 'staff':
+	case 'user':
 		$navs = $this->TemplateModel->get_user_access_navs();
 		break;
 	case $custom_user_type:

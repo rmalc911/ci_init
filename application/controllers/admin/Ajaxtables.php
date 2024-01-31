@@ -7,6 +7,18 @@ class Ajaxtables extends MY_Controller {
 		$this->load->library('datatables');
 	}
 
+	public function user_table() {
+		$this->db->where('user_name !=', 'admin');
+		$this->datatables
+			->add_column(
+				'password',
+				'<div class="d-flex justify-content-center">
+				<button class="btn btn-secondary btn-sm btn-round btn-icon" data-popup-view="reset_user_password" data-id="$1" data-no-btn="1" data-modal-size="swal-sm"><i class="fa fa-key"></i></button>
+				</div>',
+				'id'
+			);
+	}
+
 	public function career_applications() {
 		$this->action_field = false;
 		/**
