@@ -249,6 +249,15 @@ class Home extends MY_Controller {
 				}
 			}
 			// if (($template['validation'] ?? true) == false) continue;
+			if ($template['type'] == 'radio') {
+				$options = $template['options'];
+				$type = "ENUM('" . implode("', '", array_keys($options)) . "')";
+				$comment = " COMMENT '";
+				foreach ($options as $option_key => $option) {
+					$comment .= $option_key . " - " . $option . ", ";
+				}
+				$comment = substr($comment, 0, -2) . "'";
+			}
 			if ($template['type'] == 'textarea') {
 				$type = 'VARCHAR(1000)';
 			}

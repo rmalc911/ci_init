@@ -417,7 +417,7 @@ foreach ($template as $template_row) {
 			$accept_types = join(' / ', $template_row['accept']);
 			$accept = [];
 			foreach ($template_row['accept'] as $accept_type) {
-				$accept[] = 'image/' . $accept_type;
+				$accept[] = '.' . $accept_type;
 			}
 			$accept_type = join(', ', $accept);
 		}
@@ -460,7 +460,7 @@ foreach ($template as $template_row) {
 									<img class="img-upload-preview" height="<?= $cap_height ?>" src="<?= $src ?>" alt="preview">
 								</td>
 								<td>
-									<label class="input-file">
+									<label class="input-file form-file-label-group">
 										<input type="file" class="form-control form-control-file" id="select-<?= $template_row['name'] ?>-<?= $img_row_index ?>" name="<?= $template_row['name'] ?>[]" accept="<?= $accept_type ?>;capture=camera" <?= $required ?> <?= $readonly ?> <?= $attributes ?>>
 										<span for="select-<?= $template_row['name'] ?>-<?= $img_row_index ?>" class="label-input-file btn btn-default btn-round">
 											<span class="btn-label">
@@ -612,7 +612,7 @@ foreach ($template as $template_row) {
 												<div class="mb-2 mr-2 flex-shrink-0">
 													<img class="img-upload-preview" height="<?= $cap_height ?>" src="<?= $src ?>" alt="preview">
 												</div>
-												<label class="input-file mb-0">
+												<label class="input-file mb-0 form-file-label-group">
 													<input type="file" class="form-control form-control-file" name="<?= $field['name'] ?>[]" accept="<?= $accept_type ?>;capture=camera" <?= join(' ', $row_attributes) ?>>
 													<span class="label-input-file btn btn-default btn-round">
 														<span class="btn-label">
@@ -627,6 +627,12 @@ foreach ($template as $template_row) {
 										<?php
 										} elseif ($field['type'] == 'textarea') {
 											echo form_textarea(['name' => $field['name'] . "[]"] + ($row_attributes), $field_value, ['class' => "form-control auto-grow $class_list"]);
+										} elseif ($field['type'] == 'wysiwyg') {
+										?>
+											<div class="wysiwyg-editor-container">
+												<textarea name="<?= $field['name'] ?>[]" class="wysiwyg-editor form-control" <?= _attributes_to_string($row_attributes) ?>><?= $field_value ?></textarea>
+											</div>
+										<?php
 										} elseif ($field['type'] == 'custom') {
 											$field['input_row'] = $input_row;
 											echo $this->load->view(ADMIN_VIEWS_PATH . $field['view'], $field, true);

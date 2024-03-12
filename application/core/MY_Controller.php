@@ -149,7 +149,7 @@ class MY_Controller extends CI_Controller {
 				$input_tables = array_filter(
 					array_column($this->TemplateModel->{$config->form_template}(), null, 'name'),
 					function ($val) {
-						return $val['type'] == 'input-table';
+						return $val['type'] == 'input-table' || $val['type'] == 'image-list';
 					}
 				);
 				foreach ($input_tables as $ti => $input_table) {
@@ -192,7 +192,7 @@ class MY_Controller extends CI_Controller {
 						}
 						$accept = join("|", $accept);
 						if (is_array($file_field)) {
-							$images = $this->TemplateModel->save_files($img_field, $path, $accept, null, true, explode(IMG_SPLIT, $edit[$img_field] ?? ''), $post_data['old_img']);
+							$images = $this->TemplateModel->save_files($img_field, $path, $accept, null, true, explode(IMG_SPLIT, $edit[$img_field] ?? ''), $post_data['old_img'][$img_field] ?? []);
 							$image = join(IMG_SPLIT, array_column($images, 'image'));
 						} else {
 							$image = $this->TemplateModel->save_image($img_field, $path, $accept, null, $edit[$img_field] ?? null);

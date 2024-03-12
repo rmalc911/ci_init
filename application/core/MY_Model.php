@@ -605,6 +605,9 @@ class MY_Model extends CI_Model {
 			$data = $this->upload->data();
 			if ($upload_status) {
 				$upload_image = ['status' => true, 'image' => $data['file_name']];
+				if ($old_images[$key] ?? null) {
+					$delete_images[] = $old_images[$key];
+				}
 			} else {
 				if ($preserve_index && ($old_images[$key] ?? null) != null) {
 					$upload_image = ['status' => true, 'image' => $old_images[$key]];
@@ -619,13 +622,11 @@ class MY_Model extends CI_Model {
 				$images[] = $upload_image;
 			}
 		}
-		// $saved_images = array_column($images, 'image');
-		// foreach ($delete_images as $delete_image) {
-		// 	// if (in_array($old_img, $saved_images)) continue;
-		// 	if (file_exists($path . $delete_image)) {
-		// 		unlink($path . $delete_image);
-		// 	}
-		// }
+		foreach ($delete_images as $delete_image) {
+			if (file_exists($path . $delete_image)) {
+				unlink($path . $delete_image);
+			}
+		}
 
 		return $images;
 	}
