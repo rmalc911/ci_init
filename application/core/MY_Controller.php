@@ -246,6 +246,20 @@ class MY_Controller extends CI_Controller {
 				}
 				return $post_data;
 			}, function ($post_data, $update) use ($option) {
+				/** @var TemplateConfig */
+				$config = $this->TemplateModel->{"{$option}_config"};
+				$input_tables = array_filter(
+					array_column($this->TemplateModel->{$config->form_template}(), null, 'name'),
+					function ($val) {
+						return $val['type'] == 'input-table' || $val['type'] == 'image-list';
+					}
+				);
+				foreach ($input_tables as $ti => $input_table) {
+					if (($input_table['table'] ?? "") != "") {
+						$fields = array_column($this->TemplateModel->{$input_table['fields']}(), 'name');
+						$this->TemplateModel->save_table_map($input_table['table'], $input_table['key'], $update, $fields);
+					}
+				}
 				if (method_exists($this, "{$option}_after_submit")) {
 					return $this->{"{$option}_after_submit"}($post_data, $update);
 				}

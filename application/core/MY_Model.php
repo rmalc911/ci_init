@@ -222,7 +222,7 @@ class MY_Model extends CI_Model {
 			['type' => 'file', 'label' => 'File Input', 'name' => ''],
 			// Custom props: [multiple, prepend_text]
 			['type' => 'list', 'label' => 'List Input', 'name' => ''],
-			// Custom props: [footer => view file, table-inline => bool]
+			// Custom props: [footer => view file, table-inline => bool] ['table' => 'map_table_name', 'key' => 'FK in input-table fields', 'edit_key' => 'PK of this form']
 			['type' => 'input-table', 'label' => 'Input Table', 'name' => '', 'fields' => 'input_template_fn'],
 			// Custom props: []
 			['type' => 'tags', 'label' => 'Tags Input', 'name' => ''],
