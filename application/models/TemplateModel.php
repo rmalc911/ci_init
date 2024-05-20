@@ -64,6 +64,12 @@ class TemplateModel extends MY_Model {
 			['type' => 'input', 'label' => 'Link', 'name' => 'social_icon_url', 'required' => true],
 		];
 	}
+
+	public function profile_img_config() {
+		return [
+			PROFILE_LOGO_FIELD => PROFILE_LOGO_UPLOAD_PATH,
+		];
+	}
 	#endregion
 
 	#region Users / Users

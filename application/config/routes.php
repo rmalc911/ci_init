@@ -7,6 +7,7 @@ $route['translate_uri_dashes'] = TRUE;
 
 $route['admin'] = 'admin/home';
 $route['admin/login'] = 'admin/login';
+$route['admin/(:any)/(config_([a-zA-Z0-9_]+))'] = 'admin/$1/config_wildcard/$1/$3';
 $route['admin/(:any)/(view_([a-zA-Z0-9_]+))'] = 'admin/$1/view_wildcard/$1/$3';
 $route['admin/(:any)/(add_([a-zA-Z0-9_]+))'] = 'admin/$1/add_wildcard/$1/$3';
 $route['admin/(:any)/(submit_sort_([a-zA-Z0-9_]+))'] = 'admin/$1/submit_sort_wildcard/$1/$3';

@@ -17,6 +17,32 @@ class MY_Controller extends CI_Controller {
 		$this->data['config'] = $this->TemplateModel->get_config();
 	}
 
+	protected function _config_template(TemplateConfig $options, string $option) {
+		$this->data['form_template'] = $this->TemplateModel->{$options->form_template}();
+		$this->data['view_template'] = $this->TemplateModel->{$options->view_template}();
+		$this->TemplateModel->verify_access($options->access, 'view_data');
+		$this->TemplateModel->set_validation($this->data['form_template']);
+		$config_items = array_column($this->data['form_template'], 'name');
+		$config_icons = $this->TemplateModel->{"{$option}_img_config"}() ?? [];
+		$this->data['edit'] = $this->TemplateModel->get_config($config_items);
+		if ($this->form_validation->run()) {
+			$post_data = $this->input->post();
+			foreach ($config_icons as $icon => $path) {
+				$post_data[$icon] = $this->data['edit'][$icon] ?? "";
+				$icon_image = $this->TemplateModel->save_image($icon, $path, null, null, $post_data[$icon]);
+				if ($icon_image) {
+					$post_data[$icon] = $icon_image;
+				}
+			}
+			$this->TemplateModel->set_config($config_items, $post_data);
+			$status = $this->db->error()['code'] == 0;
+			$alert = $status ? $this->TemplateModel->show_alert('suc', 'Successfully updated') : $this->TemplateModel->show_alert('err', 'Failed to update');
+			$this->session->set_flashdata('message', $alert);
+			redirect(base_url(uri_string()));
+		}
+		$this->template('templates/add_template', $this->data);
+	}
+
 	protected function _view_template(TemplateConfig $options) {
 		$this->data['message'] = $this->session->flashdata('message');
 		$this->TemplateModel->verify_access($options->access, 'view_data');
@@ -126,6 +152,15 @@ class MY_Controller extends CI_Controller {
 			echo json_encode(['save_id' => $update, 'status' => $update !== false, 'return_url' => $return_url, 'errors' => $this->form_validation->error_array(), 'error_data' => $error_data]);
 		} else {
 			echo json_encode(['status' => false, 'errors' => $this->form_validation->error_array()]);
+		}
+	}
+
+	public function config_wildcard($path, $option) {
+		if (method_exists($path, "config_{$option}")) {
+			$this->{"config_{$option}"}();
+		} else {
+			$option = singular($option);
+			$this->_config_template($this->TemplateModel->{"{$option}_config"}, $option);
 		}
 	}
 
