@@ -188,14 +188,18 @@ class Home extends MY_Controller {
 		$form_template = array_column($form_template, null, 'name');
 		$table_name = $config->table;
 		$create_table_fields = [];
+		$interface_props = [];
 		if ($config->id == 'id') {
 			$create_table_fields[] = "`{$config->id}` INT(11) NOT NULL AUTO_INCREMENT";
+			$interface_props[] = "public int \${$config->id};";
 		} else {
 			$create_table_fields[] = "`{$config->id}` VARCHAR(50) NOT NULL";
+			$interface_props[] = "public varchar \${$config->id};";
 		}
 		$unique_keys = [];
 		$unique_key_fields = [];
 		$mapping_tables = [];
+		$interface_mapping_tables = [];
 		foreach ($form_template as $key => $template) {
 			if ($key == $config->id) continue;
 			if ($template['type'] == "form-separator") continue;
@@ -204,9 +208,13 @@ class Home extends MY_Controller {
 			$null = "NOT NULL";
 			$maxlength = 250;
 			$type = "VARCHAR($maxlength)";
+			$interface_prop_type = "varchar";
+			$interface_prop_nullable = "";
+			$interface_prop_comment = "";
 			$comment = "";
 			if (($template['allow_null'] ?? false) == true) {
 				$null = "NULL DEFAULT NULL";
+				$interface_prop_nullable = "?";
 			}
 			if (array_key_exists('unique', $template)) {
 				$unique_keys[] = $key;
@@ -214,24 +222,29 @@ class Home extends MY_Controller {
 			if ($template['type'] == 'select-widget') {
 				if ((($template['multiple']) ?? false) == false) {
 					$type = 'INT(11)';
+					$interface_prop_type = "int";
 					if (($template['fixed_options'] ?? false) == true) {
 						$options = array_column($template['options'], 'option_name', 'option_value');
 						$options = array_filter($options, function ($val, $key) {
 							return $key;
 						}, ARRAY_FILTER_USE_BOTH);
 						$type = "ENUM('" . implode("', '", array_keys($options)) . "')";
+						$interface_prop_type = "enum";
 						$comment = " COMMENT '";
 						foreach ($options as $option_key => $option) {
 							$comment .= $option_key . " - " . $option . ", ";
 						}
 						$comment = substr($comment, 0, -2) . "'";
+						$interface_prop_comment = "/** @var enum `" . implode("`|`", array_keys($options)) . "` */ ";
 					} else {
 						$option_value = ($template['options'][1]['option_value'] ?? null);
 						if (is_numeric($option_value)) {
 							$type = 'INT(11)';
+							$interface_prop_type = "int";
 						} else {
 							$type_length = ceil((strlen($option_value) + 5) / 10) * 10;
 							$type = "VARCHAR($type_length)";
+							$interface_prop_type = "varchar";
 						}
 					}
 				} else {
@@ -260,48 +273,86 @@ class Home extends MY_Controller {
 			}
 			if ($template['type'] == 'textarea') {
 				$type = 'VARCHAR(1000)';
+				$interface_prop_type = "varchar";
 			}
 			if ($template['type'] == 'wysiwyg') {
 				$type = 'TEXT';
+				$interface_prop_type = "text";
 			}
 			if ($template['type'] == 'time') {
 				$type = 'TIME';
+				$interface_prop_type = "time";
 			}
 			if ($template['type'] == 'date-widget') {
 				$type = 'DATE';
+				$interface_prop_type = "date";
 			}
 			if ($template['type'] == 'datetime-widget') {
 				$type = 'DATETIME';
+				$interface_prop_type = "datetime";
 			}
 			if ($template['type'] == 'input-table') {
-				$map_key_name = singular($table_name);
+				$map_key_name = singular($table_name) . "_id";
 				$input_table_fields = $this->TemplateModel->{$template['fields']}();
-				$mapping_table_fields = array_map(function ($field) {
+				$mapping_interface_fields = [];
+				$mapping_table_fields = array_map(function ($field) use (&$mapping_interface_fields) {
 					$field_type = "VARCHAR(250)";
 					$field_type_null = "NOT NULL";
+					$interface_prop_type = "varchar";
+					$interface_prop_comment = "";
 					if (strpos(($field['class_list'] ?? ""), "time-widget") !== false) {
 						$field_type = "TIME";
+						$interface_prop_type = "time";
 					}
+					if ($field['type'] == 'select-widget') {
+						$field_type = 'INT(11)';
+						$interface_prop_type = "int";
+						if (($field['fixed_options'] ?? false) == true) {
+							$options = $field['options'];
+							$options = array_filter($options, function ($val, $key) {
+								return $key;
+							}, ARRAY_FILTER_USE_BOTH);
+							$field_type = "ENUM('" . implode("', '", array_keys($options)) . "')";
+							$interface_prop_type = "enum";
+							$interface_prop_comment = "/** @var enum `" . implode("`|`", array_keys($options)) . "` */ ";
+						}
+					}
+					if (($field['class_list'] ?? null) == 'numeric') {
+						$field_type = 'INT(11)';
+						if (($field['attributes']['data-currency'] ?? false)) {
+							$field_type = 'DECIMAL(10, 2)';
+						}
+					}
+					$mapping_interface_fields[] = "{$interface_prop_comment}public {$interface_prop_type} \${$field['name']};";
 					return "`{$field['name']}` {$field_type} {$field_type_null}";
 				}, $input_table_fields);
 				$mapping_table_fields[] = "`{$map_key_name}` INT(11) NOT NULL";
 				$mapping_table_fields[] = "UNIQUE `{$template['name']}`(\n\t\t`{$map_key_name}`, \n\t\t`" . join("`, \n\t\t`", array_column($input_table_fields, 'name')) . "`\n\t)";
+				$mapping_interface_fields[] = "public int \${$map_key_name};";
 				$mapping_tables[] = [
 					'table' => $template['name'],
 					'fields' => $mapping_table_fields,
+				];
+				$interface_mapping_tables[] = [
+					'table' => $template['name'],
+					'fields' => $mapping_interface_fields,
 				];
 				continue;
 			}
 			if (($template['class_list'] ?? "") == "numeric") {
 				$type = 'INT(11)';
+				$interface_prop_type = "int";
 				if ((($template['attributes']['data-currency']) ?? false) != false) {
 					$type = 'DECIMAL(10, 2)';
+					$interface_prop_type = "float";
 				}
 			}
 			if (($template['attributes']['maxlength']) ?? false) {
 				$type = "VARCHAR({$template['attributes']['maxlength']})";
+				$interface_prop_type = "varchar";
 			}
 			$create_table_fields[] = "`{$key}` $type $null$comment";
+			$interface_props[] = "{$interface_prop_comment}public {$interface_prop_nullable}{$interface_prop_type} \${$key};";
 		}
 
 		foreach ($unique_keys as $unique_key) {
@@ -312,15 +363,19 @@ class Home extends MY_Controller {
 		$view_template = $this->TemplateModel->{$config->view_template}();
 		if (array_key_exists('sort', $view_template['links'])) {
 			$create_table_fields[] = "`sort_order` INT(11) NULL DEFAULT NULL";
+			$interface_props[] = "public int \$sort_order;";
 		}
 
 		$status_field = $config->status_field;
 		if ($status_field) {
 			$create_table_fields[] = "`{$status_field}` ENUM('1', '0') NOT NULL DEFAULT '1'";
+			$interface_props[] = "/** @var enum `1`|`0` */ public enum \${$status_field};";
 		}
 
 		$create_table_fields[] = "`created_date` DATETIME NULL DEFAULT NULL";
+		$interface_props[] = "public ?datetime \$created_date;";
 		$create_table_fields[] = "`updated_date` DATETIME NULL DEFAULT NULL";
+		$interface_props[] = "public ?datetime \$updated_date;";
 
 		if ($config->id == 'id') {
 			$create_table_fields[] = "PRIMARY KEY(`{$key}`)";
@@ -333,12 +388,21 @@ class Home extends MY_Controller {
 		$create_query .= "\n) ENGINE = INNODB;";
 		// echo json_encode($create_table_fields);
 		$mapping_table_create_query = "";
-		foreach ($mapping_tables as $map) {
+		$interface_body = "\n\ninterface {$table_name} extends table {\n\t";
+		$interface_body .= implode("\n\t", $interface_props);
+		$interface_body .= "\n}";
+		$mapping_interface = "";
+		foreach ($mapping_tables as $m => $map) {
 			$mapping_table_create_query .= "\nCREATE TABLE `{$map['table']}_map`(\n\t";
 			$mapping_table_create_query .= implode(",\n\t", $map['fields']);
 			$mapping_table_create_query .= "\n) ENGINE = INNODB;";
+			$mapping_interface .= "\n\ninterface {$interface_mapping_tables[$m]['table']}_map extends table {\n\t";
+			$mapping_interface .= implode("\n\t", $interface_mapping_tables[$m]['fields']);
+			$mapping_interface .= "\n}";
 		}
 		echo $create_query;
 		echo $mapping_table_create_query;
+		echo $interface_body;
+		echo $mapping_interface;
 	}
 }
