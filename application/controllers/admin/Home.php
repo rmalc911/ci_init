@@ -11,49 +11,6 @@ class Home extends MY_Controller {
 		$this->template('home', $this->data);
 	}
 
-	public function profile() {
-		$this->data['form_template'] = $this->TemplateModel->profile_form();
-		$this->data['view_template'] = $this->TemplateModel->profile_view();
-		$this->TemplateModel->verify_access('profile', 'view_data');
-		$this->TemplateModel->set_validation($this->data['form_template']);
-		$config_items = [
-			'company_name',
-			'company_address',
-			'company_city',
-			'company_phone',
-			'company_email',
-			'company_website',
-			PROFILE_LOGO_FIELD,
-			PROFILE_FAVICON_FIELD,
-		];
-		$config_icons = [
-			PROFILE_LOGO_FIELD,
-			PROFILE_FAVICON_FIELD,
-		];
-		$this->data['edit'] = $this->TemplateModel->get_config($config_items);
-		$this->data['edit']['contact_social_links'] = $this->TemplateModel->get_edit_map('contact_social_links', null);
-		// $this->data['edit']['company_contact_persons'] = $this->TemplateModel->get_edit_map('company_contact_persons', null);
-
-		if ($this->form_validation->run()) {
-			$post_data = $this->input->post();
-			foreach ($config_icons as $icon) {
-				$post_data[$icon] = $this->data['edit'][$icon] ?? "";
-				$icon_image = $this->TemplateModel->save_image($icon, PROFILE_LOGO_UPLOAD_PATH, null, null, $post_data[$icon]);
-				if ($icon_image) {
-					$post_data[$icon] = $icon_image;
-				}
-			}
-			$this->TemplateModel->save_table_map('contact_social_links', null, null, ['social_icon_class', 'social_icon_url']);
-			// $this->TemplateModel->save_table_map('company_contact_persons', null, null, ['contact_name', 'contact_phone'], null);
-			$this->TemplateModel->set_config($config_items, $post_data);
-			$status = $this->db->error()['code'] == 0;
-			$alert = $status ? $this->TemplateModel->show_alert('suc', 'Successfully updated') : $this->TemplateModel->show_alert('err', 'Failed to update');
-			$this->session->set_flashdata('message', $alert);
-			redirect(base_url(uri_string()));
-		}
-		$this->template('templates/add_template', $this->data);
-	}
-
 	public function email_config() {
 		$this->TemplateModel->verify_access('email_config', 'view_data');
 		$this->form_validation->set_rules('sendmail_mode', 'Sendmail Mode', 'required');
@@ -118,54 +75,32 @@ class Home extends MY_Controller {
 
 	public function payment_config() {
 		$this->TemplateModel->verify_access('payment_config', 'view_data');
-		$this->form_validation->set_rules('payment_gateway', 'Payment Gateway', 'required');
-		$this->form_validation->set_rules('payment_key_state', 'Active Payment Keys', 'required');
+		$this->form_validation->set_rules('razorpay_key_state', 'Payment Keys', 'required');
 		$post_data = $this->input->post();
 		if ($post_data) {
-			if ($post_data['payment_gateway'] == 'razorpay') {
-				if ($post_data['payment_key_state'] == 'live') {
-					$this->form_validation->set_rules('razp_live_key_id', 'Razorpay Live Key ID', 'required');
-					$this->form_validation->set_rules('razp_live_key_secret', 'Razorpay Live Key Secret', 'required');
-					// $this->form_validation->set_rules('razp_live_wh_secret', 'Razorpay Live Webhook Secret', 'required');
-				} else if ($post_data['payment_key_state'] == 'test') {
-					$this->form_validation->set_rules('razp_test_key_id', 'Razorpay Test Key ID', 'required');
-					$this->form_validation->set_rules('razp_test_key_secret', 'Razorpay Test Key Secret', 'required');
-					// $this->form_validation->set_rules('razp_test_wh_secret', 'Razorpay Test Webhook Secret', 'required');
-				}
-			} else if ($post_data['payment_gateway'] == 'cashfree') {
-				if ($post_data['payment_key_state'] == 'live') {
-					$this->form_validation->set_rules('cf_live_key_id', 'Cashfree Live App ID', 'required');
-					$this->form_validation->set_rules('cf_live_key_secret', 'Cashfree Live Key Secret', 'required');
-				} else if ($post_data['payment_key_state'] == 'test') {
-					$this->form_validation->set_rules('cf_test_key_id', 'Cashfree Test App ID', 'required');
-					$this->form_validation->set_rules('cf_test_key_secret', 'Cashfree Test Key Secret', 'required');
-				}
+			if ($post_data['razorpay_key_state'] == 'live') {
+				$this->form_validation->set_rules('razp_live_key_id', 'Razorpay Live Key ID', 'required');
+				$this->form_validation->set_rules('razp_live_key_secret', 'Razorpay Live Key Secret', 'required');
+				// $this->form_validation->set_rules('razp_live_wh_secret', 'Razorpay Live Webhook Secret', 'required');
+			} else if ($post_data['razorpay_key_state'] == 'test') {
+				$this->form_validation->set_rules('razp_test_key_id', 'Razorpay Test Key ID', 'required');
+				$this->form_validation->set_rules('razp_test_key_secret', 'Razorpay Test Key Secret', 'required');
+				// $this->form_validation->set_rules('razp_test_wh_secret', 'Razorpay Test Webhook Secret', 'required');
 			}
 		}
 		$config_items = [
-			'payment_gateway',
-			'payment_key_state',
+			'razorpay_key_state',
 			'razp_live_key_id',
 			'razp_live_key_secret',
-			'razp_live_wh_secret',
+			// 'razp_live_wh_secret',
 			'razp_test_key_id',
 			'razp_test_key_secret',
-			'razp_test_wh_secret',
-			'cf_live_key_id',
-			'cf_live_key_secret',
-			'cf_test_key_id',
-			'cf_test_key_secret',
+			// 'razp_test_wh_secret',
 		];
 		if ($this->form_validation->run()) {
-			foreach ($config_items as $config) {
-				$set_config = [
-					'config_key' => $config,
-					'config_value' => $post_data[$config],
-					'config_date' => date(date_time_format),
-					'config_user' => $this->session->userdata('user')['id'],
-				];
-				$this->db->replace('admin_config', $set_config);
-			}
+			$status = $this->TemplateModel->set_config($config_items, $post_data);
+			$alert = $status ? $this->TemplateModel->show_alert('suc', 'Successfully updated') : $this->TemplateModel->show_alert('err', 'Failed to update');
+			$this->session->set_flashdata('message', $alert);
 			redirect(base_url(uri_string()));
 		}
 		$this->data['config'] = $this->TemplateModel->get_config($config_items);
@@ -248,14 +183,28 @@ class Home extends MY_Controller {
 						}
 					}
 				} else {
-					$map_key_name = singular($table_name);
+					$map_key_name = $template['key'] ?? (singular($table_name) . '_id');
 					$map_join_name = singular($template['name']);
+					$map_table_name = $template['table'] ?? ($map_join_name . '_map');
+					$field_type = 'INT(11)';
+					$interface_prop_type = "int";
+					if (($template['fixed_options'] ?? false) == true) {
+						$field_type = 'VARCHAR(50)';
+						$interface_prop_type = "varchar";
+					}
 					$mapping_tables[] = [
-						'table' => $template['name'],
+						'table' => $map_table_name,
 						'fields' => [
-							"`$map_key_name` INT(11) NOT NULL",
-							"`{$map_join_name}` INT(11) NOT NULL",
-							"UNIQUE `{$map_key_name}_{$map_join_name}`(\n\t\t`{$map_key_name}`, \n\t\t`{$map_join_name}`\n\t)",
+							"`{$map_key_name}` INT(11) NOT NULL",
+							"`{$map_join_name}_id` {$field_type} NOT NULL",
+							"UNIQUE `{$map_key_name}_{$map_join_name}`(\n\t\t`{$map_key_name}`, \n\t\t`{$map_join_name}_id`\n\t)",
+						],
+					];
+					$interface_mapping_tables[] = [
+						'table' => $map_table_name,
+						'fields' => [
+							"public int \${$map_key_name};",
+							"public {$interface_prop_type} \${$map_join_name}_id;"
 						],
 					];
 					continue;
@@ -292,10 +241,11 @@ class Home extends MY_Controller {
 				$interface_prop_type = "datetime";
 			}
 			if ($template['type'] == 'input-table') {
-				$map_key_name = singular($table_name) . "_id";
+				$map_key_name = $template['key'] ?? (singular($table_name) . "_id");
 				$input_table_fields = $this->TemplateModel->{$template['fields']}();
 				$mapping_interface_fields = [];
 				$mapping_table_fields = array_map(function ($field) use (&$mapping_interface_fields) {
+					if ($field['ignore_field'] ?? false) return null;
 					$field_type = "VARCHAR(250)";
 					$field_type_null = "NOT NULL";
 					$interface_prop_type = "varchar";
@@ -319,23 +269,49 @@ class Home extends MY_Controller {
 					}
 					if (($field['class_list'] ?? null) == 'numeric') {
 						$field_type = 'INT(11)';
+						$interface_prop_type = "int";
 						if (($field['attributes']['data-currency'] ?? false)) {
 							$field_type = 'DECIMAL(10, 2)';
+							$interface_prop_type = "float";
 						}
 					}
 					$mapping_interface_fields[] = "{$interface_prop_comment}public {$interface_prop_type} \${$field['name']};";
 					return "`{$field['name']}` {$field_type} {$field_type_null}";
 				}, $input_table_fields);
 				$mapping_table_fields[] = "`{$map_key_name}` INT(11) NOT NULL";
-				$mapping_table_fields[] = "UNIQUE `{$template['name']}`(\n\t\t`{$map_key_name}`, \n\t\t`" . join("`, \n\t\t`", array_column($input_table_fields, 'name')) . "`\n\t)";
+				$mapping_table_fields[] = "UNIQUE `{$template['name']}`(\n\t\t`{$map_key_name}`, \n\t\t`" . join("`, \n\t\t`", array_column(array_filter($input_table_fields, function ($field) {
+					return !($field['ignore_field'] ?? false);
+				}), 'name')) . "`\n\t)";
+				$mapping_table_name = $template['table'] ?? ($template['name'] . '_map');
 				$mapping_interface_fields[] = "public int \${$map_key_name};";
 				$mapping_tables[] = [
-					'table' => $template['name'],
+					'table' => $mapping_table_name,
 					'fields' => $mapping_table_fields,
 				];
 				$interface_mapping_tables[] = [
-					'table' => $template['name'],
+					'table' => $mapping_table_name,
 					'fields' => $mapping_interface_fields,
+				];
+				continue;
+			}
+			if ($template['type'] == 'list') {
+				$map_key_name = $template['key'] ?? (singular($table_name) . '_id');
+				$map_join_name = singular($template['name']);
+				$map_table_name = $template['table'] ?? ($map_join_name . '_map');
+				$mapping_tables[] = [
+					'table' => $map_table_name,
+					'fields' => [
+						"`{$map_key_name}` INT(11) NOT NULL",
+						"`{$map_join_name}` VARCHAR(50) NOT NULL",
+						"UNIQUE `{$map_key_name}_{$map_join_name}`(\n\t\t`{$map_key_name}`, \n\t\t`{$map_join_name}`\n\t)",
+					],
+				];
+				$interface_mapping_tables[] = [
+					'table' => $map_table_name,
+					'fields' => [
+						"public int \${$map_key_name};",
+						"public varchar \${$template['name']};"
+					],
 				];
 				continue;
 			}
@@ -393,10 +369,10 @@ class Home extends MY_Controller {
 		$interface_body .= "\n}";
 		$mapping_interface = "";
 		foreach ($mapping_tables as $m => $map) {
-			$mapping_table_create_query .= "\nCREATE TABLE `{$map['table']}_map`(\n\t";
-			$mapping_table_create_query .= implode(",\n\t", $map['fields']);
+			$mapping_table_create_query .= "\nCREATE TABLE `{$map['table']}`(\n\t";
+			$mapping_table_create_query .= implode(",\n\t", array_filter($map['fields']));
 			$mapping_table_create_query .= "\n) ENGINE = INNODB;";
-			$mapping_interface .= "\n\ninterface {$interface_mapping_tables[$m]['table']}_map extends table {\n\t";
+			$mapping_interface .= "\n\ninterface {$interface_mapping_tables[$m]['table']} extends table {\n\t";
 			$mapping_interface .= implode("\n\t", $interface_mapping_tables[$m]['fields']);
 			$mapping_interface .= "\n}";
 		}

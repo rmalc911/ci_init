@@ -25,6 +25,9 @@ interface datetime extends string_types {
 interface date extends string_types {
 }
 
+interface time extends string_types {
+}
+
 interface varchar extends string_types {
 }
 

@@ -19,6 +19,15 @@
 	background: var(--theme-color);
 }
 
+.nav-pills.nav-theme .nav-link {
+	transition: ease 0.3s;
+	transition-property: background-color, color;
+}
+
+.nav-pills.nav-theme .nav-link.active {
+	background-color: var(--theme-color);
+}
+
 .form-control {
 	/* font-size: 16px; */
 	height: calc(2em + 0.75rem);
@@ -275,4 +284,14 @@ body.swal2-shown > .select2-container--bootstrap {
 	border: 1px solid #dadada;
 	width: 35px;
 	height: 35px;
+}
+
+.btn-icon {
+	display: inline-grid;
+	place-content: center;
+}
+
+.swal2-html-container .bootstrap-datetimepicker-widget {
+	position: fixed !important;
+	inset: auto !important;
 }

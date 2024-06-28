@@ -1,7 +1,3 @@
-<?php
-$login = $this->TemplateModel->verify_admin();
-$login_username = $login['user_name'];
-?>
 <!DOCTYPE html>
 <html lang="en">
 

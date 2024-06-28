@@ -22,9 +22,42 @@ class MY_Controller extends CI_Controller {
 		$this->data['view_template'] = $this->TemplateModel->{$options->view_template}();
 		$this->TemplateModel->verify_access($options->access, 'view_data');
 		$this->TemplateModel->set_validation($this->data['form_template']);
-		$config_items = array_column($this->data['form_template'], 'name');
+		$config_items = array_column(array_filter(
+			$this->data['form_template'],
+			function ($val) {
+				return ($val['validation'] ?? true);
+			}
+		), 'name');
 		$config_icons = $this->TemplateModel->{"{$option}_img_config"}() ?? [];
-		$this->data['edit'] = $this->TemplateModel->get_config($config_items);
+		if (method_exists($this, "config_{$option}_edit")) {
+			$this->data['message'] = $this->session->flashdata('message');
+			$this->data['edit'] = $this->{"config_{$option}_edit"}();
+		} else {
+			$this->data['edit'] = $this->TemplateModel->get_config($config_items);
+		}
+		$input_tables = array_filter(
+			array_column($this->data['form_template'], null, 'name'),
+			function ($val) {
+				return $val['type'] == 'input-table' || $val['type'] == 'image-list' || $val['type'] == 'list';
+			}
+		);
+		foreach ($input_tables as $ti => $input_table) {
+			if (($input_table['table'] ?? "") != "") {
+				$this->data['edit'][$input_table['name']] = $this->TemplateModel->get_edit_map($input_table['table'], null);
+			}
+		}
+		$select_widgets = array_filter(
+			array_column($this->data['form_template'], null, 'name'),
+			function ($val) {
+				return $val['type'] == 'select-widget' && ($val['multiple'] ?? false) == true;
+			}
+		);
+		foreach ($select_widgets as $sw => $select_widget) {
+			$this->data['edit'][$select_widget['name']] = array_column(
+				$this->TemplateModel->get_edit_map($select_widget['table'], null),
+				($select_widget['field'] ?? $select_widget['name']),
+			);
+		}
 		if ($this->form_validation->run()) {
 			$post_data = $this->input->post();
 			foreach ($config_icons as $icon => $path) {
@@ -34,7 +67,40 @@ class MY_Controller extends CI_Controller {
 					$post_data[$icon] = $icon_image;
 				}
 			}
-			$this->TemplateModel->set_config($config_items, $post_data);
+			if (method_exists($this, "config_{$option}_submit")) {
+				$this->{"config_{$option}_submit"}($post_data);
+			} else {
+				$this->TemplateModel->set_config($config_items, $post_data);
+				$input_tables = array_filter(
+					array_column($this->data['form_template'], null, 'name'),
+					function ($val) {
+						return $val['type'] == 'input-table' || $val['type'] == 'image-list' || $val['type'] == 'list';
+					}
+				);
+				foreach ($input_tables as $ti => $input_table) {
+					if (($input_table['table'] ?? "") != "") {
+						$fields = array_column(array_filter(
+							$this->TemplateModel->{$input_table['fields']}(),
+							function ($val) {
+								return !($val['ignore_field'] ?? false);
+							}
+						), 'name');
+						$this->TemplateModel->save_table_map($input_table['table'], null, null, $fields);
+					}
+				}
+				$select_widgets = array_filter(
+					array_column($this->data['form_template'], null, 'name'),
+					function ($val) {
+						return $val['type'] == 'select-widget' && ($val['multiple'] ?? false) == true;
+					}
+				);
+				foreach ($select_widgets as $si => $select_widget) {
+					if (($select_widget['table'] ?? "") != "") {
+						$fields = [$select_widget['field'] ?? $select_widget['name']];
+						$this->TemplateModel->save_table_map($select_widget['table'], null, null, $fields);
+					}
+				}
+			}
 			$status = $this->db->error()['code'] == 0;
 			$alert = $status ? $this->TemplateModel->show_alert('suc', 'Successfully updated') : $this->TemplateModel->show_alert('err', 'Failed to update');
 			$this->session->set_flashdata('message', $alert);
@@ -102,7 +168,7 @@ class MY_Controller extends CI_Controller {
 		$this->data['parent_value'] = $get_parent_field;
 		$this->data['parent_options'] = $parent_options;
 		$this->data['img_fields'] = $img_fields;
-		$this->data['sort_list'] = $options->get_options($filter, false, "ISNULL($table_alias.$sort_order) $sort_direction, $table_alias.$sort_order $sort_direction, $table_alias.{$options->id} $sort_direction");
+		$this->data['sort_list'] = $options->get_options($filter, false, "ISNULL(table.$sort_order) $sort_direction, table.$sort_order $sort_direction, table.{$options->id} $sort_direction");
 		$this->template('templates/sort_template', $this->data);
 	}
 
@@ -184,13 +250,25 @@ class MY_Controller extends CI_Controller {
 				$input_tables = array_filter(
 					array_column($this->TemplateModel->{$config->form_template}(), null, 'name'),
 					function ($val) {
-						return $val['type'] == 'input-table' || $val['type'] == 'image-list';
+						return $val['type'] == 'input-table' || $val['type'] == 'image-list' || $val['type'] == 'list';
 					}
 				);
 				foreach ($input_tables as $ti => $input_table) {
 					if (($input_table['table'] ?? "") != "") {
 						$edit[$input_table['name']] = $this->TemplateModel->get_edit_map($input_table['table'], $input_table['key'], ($edit[$input_table['edit_key']] ?? ""));
 					}
+				}
+				$select_widgets = array_filter(
+					array_column($this->TemplateModel->{$config->form_template}(), null, 'name'),
+					function ($val) {
+						return $val['type'] == 'select-widget' && ($val['multiple'] ?? false) == true;
+					}
+				);
+				foreach ($select_widgets as $sw => $select_widget) {
+					$edit[$select_widget['name']] = array_column(
+						$this->TemplateModel->get_edit_map($select_widget['table'], $select_widget['key'], ($edit[$select_widget['edit_key']] ?? "")),
+						($select_widget['field'] ?? $select_widget['name']),
+					);
 				}
 				if (method_exists($this, "{$option}_edit_map")) {
 					$edit = $this->{"{$option}_edit_map"}($edit);
@@ -251,13 +329,30 @@ class MY_Controller extends CI_Controller {
 				$input_tables = array_filter(
 					array_column($this->TemplateModel->{$config->form_template}(), null, 'name'),
 					function ($val) {
-						return $val['type'] == 'input-table' || $val['type'] == 'image-list';
+						return $val['type'] == 'input-table' || $val['type'] == 'image-list' || $val['type'] == 'list';
 					}
 				);
 				foreach ($input_tables as $ti => $input_table) {
 					if (($input_table['table'] ?? "") != "") {
-						$fields = array_column($this->TemplateModel->{$input_table['fields']}(), 'name');
+						$fields = array_column(array_filter(
+							$this->TemplateModel->{$input_table['fields']}(),
+							function ($val) {
+								return !($val['ignore_field'] ?? false);
+							}
+						), 'name');
 						$this->TemplateModel->save_table_map($input_table['table'], $input_table['key'], $update, $fields);
+					}
+				}
+				$select_widgets = array_filter(
+					array_column($this->TemplateModel->{$config->form_template}(), null, 'name'),
+					function ($val) {
+						return $val['type'] == 'select-widget' && ($val['multiple'] ?? false) == true;
+					}
+				);
+				foreach ($select_widgets as $si => $select_widget) {
+					if (($select_widget['table'] ?? "") != "") {
+						$fields = [$select_widget['field'] ?? $select_widget['name']];
+						$this->TemplateModel->save_table_map($select_widget['table'], $select_widget['key'], $update, $fields);
 					}
 				}
 				if (method_exists($this, "{$option}_after_submit")) {
@@ -394,6 +489,7 @@ class MY_Controller extends CI_Controller {
 		$text_fields_select = (count($text_fields) > 0) ? join(', ', array_map(function ($key, $val) use ($table_alias) {
 			if (substr_count($val, '.')) return $val;
 			$column_alias = $table_alias;
+			$original_key = $key;
 			if (substr_count($key, '.')) {
 				$key = explode(".", $key);
 				$column_alias = $key[0];
@@ -410,7 +506,7 @@ class MY_Controller extends CI_Controller {
 				$select = 'DATE_FORMAT(' . $column_alias . "." . $key . ', "' . db_user_time . '")';
 			}
 			if ($val === "CASE") {
-				$select = $key;
+				$select = $original_key;
 				$key = "";
 			}
 			if (is_int($key)) $key = $val;
@@ -478,6 +574,8 @@ class MY_Controller extends CI_Controller {
 	}
 
 	protected function template($template_name, $vars = array(), $return = FALSE) {
+		$vars['login'] = $this->TemplateModel->verify_admin();
+		$vars['login_username'] = $vars['login']['user_name'];
 		$view = $this->load->view(ADMIN_VIEWS_PATH . 'includes/header', $vars, true);
 
 		if (is_array($template_name)) {

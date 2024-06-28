@@ -58,7 +58,7 @@
 			<div class="form-group">
 				<button type="reset" class="btn btn-primary" id="filter-reset">Reset</button>
 				<?php
-				if (isset($export)) {
+				if (isset($export) && $export != "") {
 				?>
 					<button type="submit" class="btn btn-success ml-2" id="filter-reset" name="export" value="export"><i class="fa fa-file-excel"></i> Export</button>
 				<?php
