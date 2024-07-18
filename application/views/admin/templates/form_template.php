@@ -13,6 +13,7 @@ function get_label($template_row) {
 
 	return '<label for="input-' . $name . '" class="col-md-3 mt-2 text-left">' . $template_row['label'] . ($required == true ? ' <span class="required-label">*</span>' : '') . $help_text_html . '</label>';
 }
+$max_file_size = getMaximumFileUploadSize();
 $col_class = ($popup_mode ?? false) ? 'col-md-9' : 'col-xl-5 col-lg-6 col-md-9';
 $edit_id = $this->input->get('edit');
 foreach ($template as $template_row) {
@@ -39,11 +40,33 @@ foreach ($template as $template_row) {
 		}
 	}
 	if ($template_row['type'] == 'input') {
+		$prepend_text = $template_row['prepend_text'] ?? '';
+		$append_text = $template_row['append_text'] ?? '';
 ?>
 		<div class="form-group row">
 			<?= get_label($template_row) ?>
 			<div class="<?= $col_class ?>">
-				<input type="text" class="form-control <?= $class_list ?>" id="input-<?= $template_row['name'] ?>" name="<?= $template_row['name'] ?>" <?= $required ?> <?= $readonly ?> value="<?= $value ?>" <?= $attributes ?>>
+				<div class="input-group">
+					<?php
+					if ($prepend_text) {
+					?>
+						<div class="input-group-prepend">
+							<span class="input-group-text"><?= $prepend_text ?></span>
+						</div>
+					<?php
+					}
+					?>
+					<input type="text" class="form-control <?= $class_list ?>" id="input-<?= $template_row['name'] ?>" name="<?= $template_row['name'] ?>" <?= $required ?> <?= $readonly ?> value="<?= $value ?>" <?= $attributes ?>>
+					<?php
+					if ($append_text) {
+					?>
+						<div class="input-group-append">
+							<span class="input-group-text"><?= $append_text ?></span>
+						</div>
+					<?php
+					}
+					?>
+				</div>
 				<?= form_error($template_row['name']) ?>
 			</div>
 		</div>
@@ -253,7 +276,6 @@ foreach ($template as $template_row) {
 		$size = null;
 		$accept_type = 'image/*';
 		$accept_types = '';
-		$max_file_size = '4 MB';
 		if (isset($template_row['size'])) {
 			$size = $template_row['size'];
 		}
@@ -351,11 +373,26 @@ foreach ($template as $template_row) {
 
 	if ($template_row['type'] == 'file') {
 		$multiple = (isset($template_row['multiple']) && $template_row['multiple'] == true) ? 'multiple' : '';
+		if ($value != "") {
+			$required = '';
+		}
+		$accept_type = '*';
+		$accept_types = '';
+		if (isset($template_row['accept'])) {
+			$accept_types = join(' / ', $template_row['accept']);
+			$accept = [];
+			foreach ($template_row['accept'] as $accept_type) {
+				$accept[] = '.' . $accept_type;
+			}
+			$accept_type = join(', ', $accept);
+		}
 	?>
 		<div class="form-group row">
 			<?= get_label($template_row) ?>
 			<div class="<?= $col_class ?>">
-				<input type="file" class="form-control p-2 h-auto <?= $class_list ?>" id="input-<?= $template_row['name'] ?>" name="<?= $template_row['name'] . ($multiple ? '[]' : '') ?>" <?= $required ?> <?= $attributes ?>>
+				<input type="file" class="form-control p-2 h-auto <?= $class_list ?>" id="input-<?= $template_row['name'] ?>" accept="<?= $accept_type ?>" name="<?= $template_row['name'] . ($multiple ? '[]' : '') ?>" <?= $required ?> <?= $attributes ?>>
+				<?= ($accept_types != '') ? ('<p class="text-muted mb-0">Format: ' . $accept_types . '</p>') : '' ?>
+				<p class="text-muted mb-0">Max size: <?= $max_file_size ?></p>
 				<?= form_error($template_row['name']) ?>
 			</div>
 			<?php
@@ -409,7 +446,6 @@ foreach ($template as $template_row) {
 		$size = null;
 		$accept_type = 'image/*';
 		$accept_types = '';
-		$max_file_size = '4 MB';
 		if (isset($template_row['size'])) {
 			$size = $template_row['size'];
 		}
@@ -513,7 +549,6 @@ foreach ($template as $template_row) {
 					$size = $field['size'] ?? [100, 100];
 					$accept_type = 'image/*';
 					$accept_types = '';
-					$max_file_size = '4 MB';
 					if (isset($field['size'])) {
 						$size = $field['size'];
 					}
@@ -532,6 +567,7 @@ foreach ($template as $template_row) {
 						<h4><?= $field['label'] ?></h4>
 						<?= $size ? ('<p class="text-muted mb-0">Dimensions: ' . $size[0] . 'px &times; ' . $size[1] . 'px</p>') : '' ?>
 						<?= ($accept_types != '') ? ('<p class="text-muted mb-0">Format: ' . $accept_types . '</p>') : '' ?>
+						<p class="text-muted mb-0">Max size: <?= $max_file_size ?></p>
 					</div>
 				<?php
 				}
@@ -542,6 +578,7 @@ foreach ($template as $template_row) {
 							<th width="50px">Sl. No</th>
 							<?php
 							foreach ($fields as $field) {
+								if ($field['type'] == 'hidden') continue;
 							?>
 								<th><?= $field['label'] ?></th>
 							<?php
@@ -562,6 +599,10 @@ foreach ($template as $template_row) {
 									$field_value = $edit[$template_row['name']][$input_row][$field['name']] ?? "";
 									$class_list = $field['class_list'] ?? "";
 									$row_attributes = $field['attributes'] ?? [];
+									if ($field['type'] == 'hidden') {
+										echo form_hidden($field['name'] . "[]", $field_value);
+										continue;
+									}
 								?>
 									<td style="position: relative;">
 										<?php
