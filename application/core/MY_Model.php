@@ -880,11 +880,12 @@ class MY_Model extends CI_Model {
 	public function get_export($config, $table_heads, $filter_data) {
 		$joins = $this->TemplateModel->{$config->table_template}()['joins'] ?? [];
 		$table_alias = $this->TemplateModel->{$config->table_template}()['table_alias'] ?? "a";
-		$view_filters = $this->TemplateModel->{$config->view_template}()['filter'];
+		$view_filters = $this->TemplateModel->{$config->view_template}()['filter'] ?? [];
 		$sort_order = $this->TemplateModel->{$config->table_template}()['sort_order'] ?? "$table_alias.{$config->id} DESC";
-		foreach ($view_filters as $filter) {
+		foreach ($view_filters as &$filter) {
 			$filter_name = $filter['name'];
 			$filter_value = $filter_data[$filter_name] ?? "";
+			$filter_name = str_replace("--", ".", $filter_name);
 			if ($filter_value == '') continue;
 			if ($filter['type'] == 'date') {
 				$filter_value = date(date_format, strtotime($filter_value));
@@ -907,7 +908,13 @@ class MY_Model extends CI_Model {
 			$this->db->join("$join_table $join_alias", $join_condition, $join_type);
 		}
 		$results = $this->db->get()->result_array();
-		return [$table_heads, $results];
+		$table_heads_q = [];
+		foreach ($table_heads as $thead => $tlabel) {
+			$thead_ex = preg_split('/ as /i', $thead);
+			$thead_ex = explode('.', trim(end($thead_ex)));
+			$table_heads_q[trim(end($thead_ex))] = $tlabel;
+		}
+		return [$table_heads_q, $results];
 	}
 
 	public function get_array_case_select($options, $field) {

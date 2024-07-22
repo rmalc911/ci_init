@@ -336,7 +336,7 @@ abstract class CI_DB_driver {
 	 *
 	 * @var	string
 	 */
-	protected $_like_escape_chr = '!';
+	protected $_like_escape_chr = '\\';
 
 	/**
 	 * ORDER BY random keyword

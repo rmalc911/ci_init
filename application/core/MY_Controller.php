@@ -394,7 +394,7 @@ class MY_Controller extends CI_Controller {
 			$table_template = $this->TemplateModel->{$options->table_template}();
 			$text_fields = $table_template['text_fields'];
 			$select_fields = $table_template['select_fields'] ?? "";
-			$search_fields = range(1, count($text_fields) + count(explode(',', $select_fields)));
+			$search_fields = range(1, count($text_fields) + count(explode(',', $select_fields)) - 1);
 			$this->_ajaxtable_template($options, $search_fields, $select_fields);
 		}
 	}
@@ -460,6 +460,7 @@ class MY_Controller extends CI_Controller {
 		$table_alias = $this->TemplateModel->{$options->table_template}()['table_alias'] ?? "a";
 		$default_sort_order = "ASC";
 		$table_sort = $this->TemplateModel->{$options->table_template}()['sort_order'] ?? [$options->id, $default_sort_order];
+		$where = $this->TemplateModel->{$options->table_template}()['where'] ?? null;
 		if (is_array($table_sort)) {
 			$sort_order = $table_sort[0];
 			$sort_direction = $table_sort[1] ?? $default_sort_order;
@@ -526,6 +527,10 @@ class MY_Controller extends CI_Controller {
 			->select("1 as sl, $select_fields $text_fields_select $img_fields_select $table_alias.$id_field $status_field")
 			->unset_column($id_field);
 
+		if ($where) {
+			$this->datatables->where($where);
+		}
+
 		if ($this->action_field) {
 			$action_btns = [
 				'edit' => $template['links']['add'],
@@ -557,9 +562,10 @@ class MY_Controller extends CI_Controller {
 		}
 
 		$filter_data = $this->input->post('filter') ?? [];
-		foreach ($view_filters as $filter) {
+		foreach ($view_filters as &$filter) {
 			$filter_name = $filter['name'];
 			$filter_value = $filter_data[$filter_name] ?? "";
+			$filter_name = str_replace("--", ".", $filter_name);
 			if ($filter_value == '') continue;
 			if ($filter['type'] == 'date') {
 				$filter_value = date(date_format, strtotime($filter_value));
