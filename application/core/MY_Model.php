@@ -964,7 +964,12 @@ class TemplateConfig {
 	public function get_options($filter = [], $select = true, $order = null) {
 		/** @var CI */
 		$ci = &get_instance();
-		return $ci->TemplateModel->select_options($this->table, $this->id, $this->display_name, $filter, null, $select, $order);
+		$option_value = strpos($this->id, '.') ? $this->id : "table.{$this->id}";
+		$option_name = strpos($this->display_name, '.') ? $this->display_name : "table.{$this->display_name}";
+		if ($this->status_field) {
+			$filter[$this->status_field] = '1';
+		}
+		return $ci->TemplateModel->select_options("$this->table table", $option_value, $option_name, $filter, null, $select, $order);
 	}
 
 	public function get_row($row_id, $return_type = "array") {

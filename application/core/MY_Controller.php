@@ -250,7 +250,7 @@ class MY_Controller extends CI_Controller {
 				$input_tables = array_filter(
 					array_column($this->TemplateModel->{$config->form_template}(), null, 'name'),
 					function ($val) {
-						return $val['type'] == 'input-table' || $val['type'] == 'image-list' || $val['type'] == 'list';
+						return $val['type'] == 'input-table' || $val['type'] == 'image-list';
 					}
 				);
 				foreach ($input_tables as $ti => $input_table) {
@@ -258,16 +258,16 @@ class MY_Controller extends CI_Controller {
 						$edit[$input_table['name']] = $this->TemplateModel->get_edit_map($input_table['table'], $input_table['key'], ($edit[$input_table['edit_key']] ?? ""));
 					}
 				}
-				$select_widgets = array_filter(
+				$array_lists = array_filter(
 					array_column($this->TemplateModel->{$config->form_template}(), null, 'name'),
 					function ($val) {
-						return $val['type'] == 'select-widget' && ($val['multiple'] ?? false) == true;
+						return ($val['type'] == 'select-widget' && ($val['multiple'] ?? false) == true) || ($val['type'] == 'list');
 					}
 				);
-				foreach ($select_widgets as $sw => $select_widget) {
-					$edit[$select_widget['name']] = array_column(
-						$this->TemplateModel->get_edit_map($select_widget['table'], $select_widget['key'], ($edit[$select_widget['edit_key']] ?? "")),
-						($select_widget['field'] ?? $select_widget['name']),
+				foreach ($array_lists as $sw => $array_list) {
+					$edit[($array_list['field'] ?? $array_list['name'])] = array_column(
+						$this->TemplateModel->get_edit_map($array_list['table'], $array_list['key'], ($edit[$array_list['edit_key']] ?? "")),
+						($array_list['field'] ?? $array_list['name']),
 					);
 				}
 				if (method_exists($this, "{$option}_edit_map")) {
@@ -312,6 +312,7 @@ class MY_Controller extends CI_Controller {
 						}
 						if ($image) {
 							$post_data[$img_field] = $image;
+							$_POST[$img_field] = $image;
 						}
 						if (!$image && isset($file_field) && !empty($file_field)) {
 							echo json_encode(['status' => false, 'errors' => [$img_field => $this->upload->display_errors('', '')]]);
@@ -329,30 +330,44 @@ class MY_Controller extends CI_Controller {
 				$input_tables = array_filter(
 					array_column($this->TemplateModel->{$config->form_template}(), null, 'name'),
 					function ($val) {
-						return $val['type'] == 'input-table' || $val['type'] == 'image-list' || $val['type'] == 'list';
+						return $val['type'] == 'input-table' || $val['type'] == 'image-list';
 					}
 				);
 				foreach ($input_tables as $ti => $input_table) {
 					if (($input_table['table'] ?? "") != "") {
+						$images = [];
 						$fields = array_column(array_filter(
 							$this->TemplateModel->{$input_table['fields']}(),
-							function ($val) {
+							function ($val) use ($post_data, $input_table) {
+								if ($val['type'] == 'image') {
+									$old_images = $post_data['old_img'][$input_table['name']] ?? [];
+									$accept = $val['accept'];
+									if (in_array('jpeg', $accept)) {
+										$accept[] = 'jpg';
+										$accept[] = 'jpe';
+									}
+									$accept = join("|", $accept);
+									$save_images = $this->TemplateModel->save_files($val['name'], $val['path'], $accept, null, true, $old_images, $old_images);
+									$_POST[$val['name']] = array_column($save_images, 'image');
+								}
 								return !($val['ignore_field'] ?? false);
 							}
 						), 'name');
-						$this->TemplateModel->save_table_map($input_table['table'], $input_table['key'], $update, $fields);
+						$formatting = $input_table['formatting'] ?? [];
+						$this->TemplateModel->save_table_map($input_table['table'], $input_table['key'], $update, $fields, $formatting);
 					}
 				}
-				$select_widgets = array_filter(
+				$array_lists = array_filter(
 					array_column($this->TemplateModel->{$config->form_template}(), null, 'name'),
 					function ($val) {
-						return $val['type'] == 'select-widget' && ($val['multiple'] ?? false) == true;
+						return ($val['type'] == 'select-widget' && ($val['multiple'] ?? false) == true) || ($val['type'] == 'list');
 					}
 				);
-				foreach ($select_widgets as $si => $select_widget) {
-					if (($select_widget['table'] ?? "") != "") {
-						$fields = [$select_widget['field'] ?? $select_widget['name']];
-						$this->TemplateModel->save_table_map($select_widget['table'], $select_widget['key'], $update, $fields);
+				foreach ($array_lists as $si => $array_list) {
+					if (($array_list['table'] ?? "") != "") {
+						$fields = [$array_list['field'] ?? $array_list['name']];
+						$formatting = $array_list['formatting'] ?? [];
+						$this->TemplateModel->save_table_map($array_list['table'], $array_list['key'], $update, $fields, $formatting);
 					}
 				}
 				if (method_exists($this, "{$option}_after_submit")) {

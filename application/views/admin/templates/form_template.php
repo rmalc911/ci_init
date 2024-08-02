@@ -215,6 +215,7 @@ foreach ($template as $template_row) {
 		$multiple = (isset($template_row['multiple']) && $template_row['multiple'] == true) ? 'multiple' : '';
 		$update = (isset($template_row['update'])) ? $template_row['update'] : '';
 		$change = (isset($template_row['change'])) ? $template_row['change'] : '';
+		$template_row['name'] = $template_row['field'] ?? $template_row['name'];
 	?>
 		<div class="form-group row">
 			<?= get_label($template_row) ?>
@@ -409,6 +410,7 @@ foreach ($template as $template_row) {
 	}
 
 	if ($template_row['type'] == 'list') {
+		$template_row['name'] = $template_row['field'] ?? $template_row['name'];
 	?>
 		<div class="form-group row">
 			<?= get_label($template_row) ?>
@@ -540,7 +542,7 @@ foreach ($template as $template_row) {
 	?>
 		<div class="form-group row">
 			<?= get_label($template_row) ?>
-			<div class="<?= $table_col ?>">
+			<div class="<?= $table_col ?> table-responsive">
 				<?php
 				foreach ($fields as $field) {
 					if ($field['type'] != 'image') {
@@ -663,7 +665,7 @@ foreach ($template as $template_row) {
 													</span>
 												</label>
 												<input type="hidden" class="reset-src" value="<?= $placeholder_img ?>">
-												<input type="hidden" name="old_img[]" value="<?= $old_img ?>" class="form-control">
+												<input type="hidden" name="old_img[<?= $template_row['name'] ?>][]" value="<?= $old_img ?>" class="form-control">
 											</div>
 										<?php
 										} elseif ($field['type'] == 'textarea') {

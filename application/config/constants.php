@@ -90,7 +90,7 @@ define('ADMIN_LOGIN_PATH', ADMIN_PATH . 'login/');
 define('ADMIN_VIEWS_PATH', 'admin/');
 define('ADMIN_ASSETS_PATH', 'assets/admin/');
 
-define('ADMIN_LOGIN_REDIRECT', ADMIN_PATH . 'home/profile');
+define('ADMIN_LOGIN_REDIRECT', ADMIN_PATH . 'home/config_profile');
 
 define('BANNER_UPLOAD_PATH', 'assets/uploads/banners/');
 define('GALLERY_UPLOAD_PATH', 'assets/uploads/gallery/');
@@ -136,6 +136,7 @@ define('date_format', 'Y-m-d');
 define('time_format', 'H:i:s');
 define('date_time_format', 'Y-m-d H:i:s');
 define('user_date', 'jS M Y');
+define('user_date_d', 'D, jS M Y');
 define('user_time', 'g:i A');
 define('user_date_time', 'jS M Y, g:i A');
 define('input_date', 'd-m-Y');

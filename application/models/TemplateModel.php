@@ -29,7 +29,7 @@ class TemplateModel extends MY_Model {
 		return [
 			'head' => 'Profile',
 			'links' => [
-				'view' => 'home/profile',
+				'view' => 'home/config_profile',
 			],
 		];
 	}

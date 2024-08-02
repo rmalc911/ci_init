@@ -12,7 +12,7 @@ function html_string_add_new_lines($html) {
 function wysiwyg_to_preview_text($html, $length) {
 	if (!function_exists('ellipsize')) {
 		$ci = &get_instance();
-		$ci->load->library('text_helper');
+		$ci->load->helper('text');
 	}
 	return ellipsize(html_string_add_new_lines($html), $length);
 }
@@ -47,6 +47,13 @@ function user_date($time_string) {
 		return null;
 	}
 	return date(user_date, strtotime($time_string));
+}
+
+function user_date_d($time_string) {
+	if (!$time_string) {
+		return null;
+	}
+	return date(user_date_d, strtotime($time_string));
 }
 
 function user_time($time_string) {
@@ -93,7 +100,7 @@ function input_date_time($time_string) {
 
 function relative_time(?string $time_string) {
 	if (!$time_string) {
-		return '';
+		return null;
 	}
 	$now = new DateTime();
 	$dateObj = new DateTime("$time_string");
