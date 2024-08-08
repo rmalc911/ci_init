@@ -12,7 +12,7 @@ class Home extends MY_Controller {
 	}
 
 	public function email_config() {
-		$this->TemplateModel->verify_access('email_config', 'view_data');
+		$this->TemplateModel->verify_access('email', 'view_data');
 		$this->form_validation->set_rules('sendmail_mode', 'Sendmail Mode', 'required');
 		$config_items = [
 			'sendmail_mode',
@@ -108,7 +108,8 @@ class Home extends MY_Controller {
 	}
 
 	public function get_create_table($config_name) {
-		header('Content-Type: application/json');
+		$this->TemplateModel->verify_admin();
+		// header('Content-Type: application/json');
 		if (!property_exists($this->TemplateModel, "{$config_name}_config")) {
 			echo 'No config';
 			return;
@@ -232,6 +233,18 @@ class Home extends MY_Controller {
 				$type = 'TIME';
 				$interface_prop_type = "time";
 			}
+			if ((($template['class_list'] ?? null) == 'numeric') || ($template['type'] == 'number')) {
+				$type = 'INT(11)';
+				$interface_prop_type = "int";
+				if (($template['attributes']['data-currency'] ?? false)) {
+					$type = 'DECIMAL(10, 2)';
+					$interface_prop_type = "float";
+				}
+				if (($template['attributes']['data-precision'] ?? false)) {
+					$type = "DECIMAL(10, {$template['attributes']['data-precision']})";
+					$interface_prop_type = "float";
+				}
+			}
 			if ($template['type'] == 'date-widget') {
 				$type = 'DATE';
 				$interface_prop_type = "date";
@@ -244,7 +257,8 @@ class Home extends MY_Controller {
 				$map_key_name = $template['key'] ?? (singular($table_name) . "_id");
 				$input_table_fields = $this->TemplateModel->{$template['fields']}();
 				$mapping_interface_fields = [];
-				$mapping_table_fields = array_map(function ($field) use (&$mapping_interface_fields) {
+				$mapping_table_unique_key_fields = [];
+				$mapping_table_fields = array_map(function ($field) use (&$mapping_interface_fields, &$mapping_table_unique_key_fields) {
 					if ($field['ignore_field'] ?? false) return null;
 					$field_type = "VARCHAR(250)";
 					$field_type_null = "NOT NULL";
@@ -267,21 +281,28 @@ class Home extends MY_Controller {
 							$interface_prop_comment = "/** @var enum `" . implode("`|`", array_keys($options)) . "` */ ";
 						}
 					}
-					if (($field['class_list'] ?? null) == 'numeric') {
+					if ((($field['class_list'] ?? null) == 'numeric') || ($field['type'] == 'number')) {
 						$field_type = 'INT(11)';
 						$interface_prop_type = "int";
 						if (($field['attributes']['data-currency'] ?? false)) {
 							$field_type = 'DECIMAL(10, 2)';
 							$interface_prop_type = "float";
 						}
+						if (($field['attributes']['data-precision'] ?? false)) {
+							$field_type = "DECIMAL(10, {$field['attributes']['data-precision']})";
+							$interface_prop_type = "float";
+						}
 					}
 					$mapping_interface_fields[] = "{$interface_prop_comment}public {$interface_prop_type} \${$field['name']};";
+					if (($field['unique_key_field'] ?? false)) {
+						$mapping_table_unique_key_fields[] = $field['name'];
+					}
 					return "`{$field['name']}` {$field_type} {$field_type_null}";
 				}, $input_table_fields);
 				$mapping_table_fields[] = "`{$map_key_name}` INT(11) NOT NULL";
-				$mapping_table_fields[] = "UNIQUE `{$template['name']}`(\n\t\t`{$map_key_name}`, \n\t\t`" . join("`, \n\t\t`", array_column(array_filter($input_table_fields, function ($field) {
-					return !($field['ignore_field'] ?? false);
-				}), 'name')) . "`\n\t)";
+				if (count($mapping_table_unique_key_fields) > 0) {
+					$mapping_table_fields[] = "UNIQUE `{$template['name']}`(\n\t\t`{$map_key_name}`, \n\t\t`" . join("`, \n\t\t`", $mapping_table_unique_key_fields) . "`\n\t)";
+				}
 				$mapping_table_name = $template['table'] ?? ($template['name'] . '_map');
 				$mapping_interface_fields[] = "public int \${$map_key_name};";
 				$mapping_tables[] = [
@@ -362,23 +383,49 @@ class Home extends MY_Controller {
 		$create_query = "CREATE TABLE `{$table_name}`(\n\t";
 		$create_query .= implode(",\n\t", $create_table_fields);
 		$create_query .= "\n) ENGINE = INNODB;";
+		$drop_query = "DROP TABLE `{$table_name}`;";
 		// echo json_encode($create_table_fields);
 		$mapping_table_create_query = "";
-		$interface_body = "\n\ninterface {$table_name} extends table {\n\t";
+		$interface_body = "interface {$table_name} extends table {\n\t";
 		$interface_body .= implode("\n\t", $interface_props);
 		$interface_body .= "\n}";
 		$mapping_interface = "";
+		$mapping_table_drop_query = "";
 		foreach ($mapping_tables as $m => $map) {
-			$mapping_table_create_query .= "\nCREATE TABLE `{$map['table']}`(\n\t";
+			$mapping_table_create_query .= "\n\nCREATE TABLE `{$map['table']}`(\n\t";
 			$mapping_table_create_query .= implode(",\n\t", array_filter($map['fields']));
 			$mapping_table_create_query .= "\n) ENGINE = INNODB;";
 			$mapping_interface .= "\n\ninterface {$interface_mapping_tables[$m]['table']} extends table {\n\t";
 			$mapping_interface .= implode("\n\t", $interface_mapping_tables[$m]['fields']);
 			$mapping_interface .= "\n}";
+			$mapping_table_drop_query .= "DROP TABLE `{$map['table']}`;";
 		}
-		echo $create_query;
-		echo $mapping_table_create_query;
-		echo $interface_body;
-		echo $mapping_interface;
+		$data['form_template'] = $form_template;
+		$data['create_query'] = $create_query;
+		$data['mapping_table_create_query'] = $mapping_table_create_query;
+		$data['interface_body'] = $interface_body;
+		$data['mapping_interface'] = $mapping_interface;
+		$data['migration_up'] = array_filter([$create_query, trim($mapping_table_create_query)], 'strlen');
+		$data['migration_down'] = array_filter([$mapping_table_drop_query, $drop_query], 'strlen');
+		$data['mapping_interface'] = ($mapping_interface);
+		$this->load->view('admin/setup/create', $data);
+	}
+
+	public function run_query() {
+		$this->TemplateModel->verify_admin();
+		$sql = $this->input->post('sql') ?? false;
+		$referrer = $_SERVER['HTTP_REFERER'] ?? false;
+		if (!$referrer || !$sql) {
+			redirect_base(ADMIN_LOGIN_REDIRECT);
+		}
+		$this->db = @DB('migrator');
+		$queries = explode("\r\n\r\n", $sql);
+		foreach ($queries as $query) {
+			$query = trim($query);
+			if (empty($query)) continue;
+			$this->db->query($query);
+		}
+		$this->db->close();
+		redirect($referrer);
 	}
 }

@@ -46,7 +46,7 @@ class TemplateModel extends MY_Model {
 			['type' => 'image', 'label' => 'Company Logo', 'name' => PROFILE_LOGO_FIELD, 'size' => [500, 500], 'accept' => ['jpeg', 'png', 'webp'], 'path' => PROFILE_LOGO_UPLOAD_PATH],
 			['type' => 'image', 'label' => 'Site Favicon', 'name' => PROFILE_FAVICON_FIELD, 'size' => [200, 200], 'accept' => ['jpeg', 'png', 'webp'], 'path' => PROFILE_LOGO_UPLOAD_PATH, 'help_text' => 'Square required'],
 			// ['type' => 'input-table', 'label' => 'Contact Persons', 'name' => 'company_contact_persons', 'fields' => 'company_contact_persons', 'table-inline' => true],
-			['type' => 'input-table', 'label' => 'Social Links', 'name' => 'contact_social_links', 'fields' => 'contact_social_links', 'table-inline' => true],
+			['type' => 'input-table', 'label' => 'Social Links', 'name' => 'contact_social_links', 'fields' => 'contact_social_links', 'table-inline' => true, 'validation' => false, 'table' => 'contact_social_links'],
 		];
 	}
 
@@ -68,6 +68,7 @@ class TemplateModel extends MY_Model {
 	public function profile_img_config() {
 		return [
 			PROFILE_LOGO_FIELD => PROFILE_LOGO_UPLOAD_PATH,
+			PROFILE_FAVICON_FIELD => PROFILE_LOGO_UPLOAD_PATH,
 		];
 	}
 	#endregion
