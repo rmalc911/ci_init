@@ -242,9 +242,13 @@ $(function () {
 		var currencyType = this.hasAttribute("data-currency");
 		var input = e.target.value;
 
-		if (currencyType) {
+		var precision = this.getAttribute("data-precision");
+		if (currencyType || precision) {
+			if (!precision) {
+				precision = 2;
+			}
 			input = input.replace(/[^0-9.]/gi, "");
-			var ex = /^[0-9]+\.?[0-9]{0,2}$/;
+			var ex = new RegExp(`^[0-9]+\.?[0-9]{0,${precision}}$`, "g");
 			if (ex.test(input) == false) {
 				input = input.substring(0, input.length - 1);
 			}

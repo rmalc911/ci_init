@@ -225,6 +225,12 @@ class Ajax extends MY_Controller {
 		}
 	}
 
+	public function get_config_options($config_name){
+		$filter = $this->input->get();
+		/** @var TemplateConfig */ $config = $this->TemplateModel->{"{$config_name}_config"};
+		echo json_encode($config->get_options($filter));
+	}
+
 	public function placeholder_img() {
 
 		// Dimensions

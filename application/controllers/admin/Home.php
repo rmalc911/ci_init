@@ -221,6 +221,12 @@ class Home extends MY_Controller {
 				}
 				$comment = substr($comment, 0, -2) . "'";
 			}
+			if ($template['type'] == 'checkbox') {
+				$type = "ENUM('1','0')";
+				$null = "NOT NULL DEFAULT '0'";
+				$interface_prop_type = "enum";
+				$interface_prop_comment = "/** @var enum  `1`|`0` */ ";
+			}
 			if ($template['type'] == 'textarea') {
 				$type = 'VARCHAR(1000)';
 				$interface_prop_type = "varchar";
