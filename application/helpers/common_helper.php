@@ -9,6 +9,12 @@ function html_string_add_new_lines($html) {
 	return $text;
 }
 
+function remove_html_comments($html) {
+	// Use regex to remove HTML comments
+	$cleanedHtml = preg_replace('/<!--.*?-->/s', '', $html);
+	return $cleanedHtml;
+}
+
 function wysiwyg_to_preview_text($html, $length) {
 	if (!function_exists('ellipsize')) {
 		$ci = &get_instance();

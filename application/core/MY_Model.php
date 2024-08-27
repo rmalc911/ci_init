@@ -477,7 +477,7 @@ class MY_Model extends CI_Model {
 				continue;
 			}
 			$field_name = $field['name'];
-			if (($field['type'] == 'image' || $field['type'] == 'image-list' || $field['type'] == 'file' || $field['type'] == 'input-table' || empty($field_name)) && !isset($post_data[$field_name])) {
+			if (($field['type'] == 'image' || $field['type'] == 'image-list' || $field['type'] == 'file' || $field['type'] == 'input-table' || $field['type'] == 'list' || empty($field_name)) && !isset($post_data[$field_name])) {
 				continue;
 			}
 			$field_data = $post_data[$field_name];
@@ -489,6 +489,9 @@ class MY_Model extends CI_Model {
 			}
 			if ($field['type'] == 'time') {
 				$field_data = date(time_format, strtotime($post_data[$field_name]));
+			}
+			if ($field['type'] == 'wysiwyg') {
+				$field_data = remove_html_comments($post_data[$field_name]);
 			}
 			if (isset($field['allow_null']) && $field['allow_null'] == true && $post_data[$field_name] == '') {
 				$field_data = null;
@@ -860,7 +863,7 @@ class MY_Model extends CI_Model {
 		foreach ($config_items as $config) {
 			$set_config = [
 				'config_key' => $config,
-				'config_value' => $post_data[$config],
+				'config_value' => remove_html_comments($post_data[$config]),
 				'config_date' => date(date_time_format),
 				'config_user' => $this->session->userdata('user')['id'] ?? "",
 			];
@@ -882,6 +885,7 @@ class MY_Model extends CI_Model {
 		$table_alias = $this->TemplateModel->{$config->table_template}()['table_alias'] ?? "a";
 		$view_filters = $this->TemplateModel->{$config->view_template}()['filter'] ?? [];
 		$sort_order = $this->TemplateModel->{$config->table_template}()['sort_order'] ?? "$table_alias.{$config->id} DESC";
+		$where = $this->TemplateModel->{$config->table_template}()['where'] ?? null;
 		foreach ($view_filters as &$filter) {
 			$filter_name = $filter['name'];
 			$filter_value = $filter_data[$filter_name] ?? "";
@@ -899,6 +903,10 @@ class MY_Model extends CI_Model {
 		$this->db
 			->select(array_keys($table_heads))
 			->from("{$config->table} {$table_alias}");
+
+		if ($where) {
+			$this->db->where($where);
+		}
 
 		foreach ($joins as $join) {
 			$join_table = $join['table'];

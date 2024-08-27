@@ -5,7 +5,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<title>Admin</title>
 	<meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
-	<link rel="icon" type="image/x-icon" href="<?= base_url(LOGO_IMG_MIN) ?>">
+	<link rel="icon" type="image/x-icon" href="<?= base_url(($config[PROFILE_FAVICON_FIELD] ?? null) ? (PROFILE_LOGO_UPLOAD_PATH . $config[PROFILE_FAVICON_FIELD]) : LOGO_IMG_MIN) ?>">
 
 	<!-- Fonts and icons -->
 	<script src="<?= as_base_url('plugins/webfont/webfont.min.js') ?>"></script>
@@ -51,7 +51,7 @@
 			<div class="logo-header">
 
 				<a href="<?= ad_base_url() ?>" class="logo">
-					<img src="<?= base_url(LOGO_IMG) ?>" height="40" alt="<?= CLIENT_NAME ?>" class="navbar-brand">
+					<img src="<?= base_url((PROFILE_LOGO_UPLOAD_PATH . $config[PROFILE_LOGO_FIELD]) ?? LOGO_IMG) ?>" height="45" width="175" alt="<?= $config['company_name'] ?? CLIENT_NAME ?>" class="navbar-brand">
 					<!-- <h1 class="navbar-brand text-light"><?= CLIENT_NAME ?></h1> -->
 				</a>
 				<button class="navbar-toggler sidenav-toggler ml-auto" type="button" data-toggle="collapse" data-target="collapse" aria-expanded="false" aria-label="Toggle navigation">

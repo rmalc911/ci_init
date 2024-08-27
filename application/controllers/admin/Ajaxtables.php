@@ -8,7 +8,7 @@ class Ajaxtables extends MY_Controller {
 	}
 
 	public function user_table() {
-		$this->db->where('user_name !=', 'admin');
+		$this->db->where('user_type', 'user');
 		$this->datatables
 			->add_column(
 				'password',

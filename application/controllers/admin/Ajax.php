@@ -67,8 +67,8 @@ class Ajax extends MY_Controller {
 			$key = $data[2];
 		}
 		$delete_fk = [
-			'products' => [
-				'product_size_map' => 'product_id',
+			'users' => [
+				'user_access_map' => 'user',
 			],
 		];
 		if (isset($delete_fk[$table])) {

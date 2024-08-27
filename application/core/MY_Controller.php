@@ -407,7 +407,7 @@ class MY_Controller extends CI_Controller {
 			/** @var TemplateConfig */
 			$options = $this->TemplateModel->{"{$option}_config"};
 			$table_template = $this->TemplateModel->{$options->table_template}();
-			$text_fields = $table_template['text_fields'];
+			$text_fields = array_filter($table_template['text_fields']);
 			$select_fields = $table_template['select_fields'] ?? "";
 			$search_fields = range(1, count($text_fields) + count(explode(',', $select_fields)) - 1);
 			$this->_ajaxtable_template($options, $search_fields, $select_fields);
@@ -470,7 +470,7 @@ class MY_Controller extends CI_Controller {
 	protected function _ajaxtable_template(TemplateConfig $options, array $searchable_columns, string $select_fields = "") {
 		$template = $this->TemplateModel->{$options->view_template}(false);
 		$view_filters = $template['filter'] ?? [];
-		$text_fields = $this->TemplateModel->{$options->table_template}()['text_fields'] ?? [];
+		$text_fields = array_filter($this->TemplateModel->{$options->table_template}()['text_fields'] ?? []);
 		$img_fields = $this->TemplateModel->{$options->table_template}()['img_fields'] ?? [];
 		$table_alias = $this->TemplateModel->{$options->table_template}()['table_alias'] ?? "a";
 		$default_sort_order = "ASC";

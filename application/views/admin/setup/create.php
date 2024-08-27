@@ -1,3 +1,7 @@
+<?php
+/** @var string[] $migration_up */
+/** @var string[] $migration_down */
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,7 +9,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>Setup</title>
     <meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
-    <link rel="icon" type="image/x-icon" href="<?= base_url(LOGO_IMG_MIN) ?>">
+    <link rel="icon" type="image/x-icon" href="<?= base_url(($config[PROFILE_FAVICON_FIELD] ?? null) ? (PROFILE_LOGO_UPLOAD_PATH . $config[PROFILE_FAVICON_FIELD]) : LOGO_IMG_MIN) ?>">
 
     <!-- Fonts and icons -->
     <script src="<?= as_base_url('plugins/webfont/webfont.min.js') ?>"></script>

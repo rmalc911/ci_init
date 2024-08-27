@@ -3,6 +3,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class TemplateModel extends MY_Model {
 	/** @var TemplateConfig */ public $profile_config;
+	/** @var TemplateConfig */ public $user_config;
 	/** @var TemplateConfig */ public $testimonial_config;
 	/** @var TemplateConfig */ public $blog_config;
 	/** @var TemplateConfig */ public $banner_config;
@@ -15,6 +16,7 @@ class TemplateModel extends MY_Model {
 	public function __construct() {
 		parent::__construct();
 		$this->profile_config = new TemplateConfig('profile', 'profile_form', null, 'profile_view', null,);
+		$this->user_config = new TemplateConfig('users', 'user_add', 'user_table', 'user_view', 'users', 'id', 'user_name', 'user_status',);
 		$this->testimonial_config = new TemplateConfig('testimonials', 'testimonial_add', 'testimonial_table', 'testimonial_view', 'testimonials', 'id', 'testimonial_title', 'testimonial_status',);
 		$this->blog_config = new TemplateConfig('blogs', 'blog_add', 'blog_table', 'blog_view', 'blogs', 'id', 'blog_title', 'blog_status',);
 		$this->banner_config = new TemplateConfig('web_banners', 'web_banner_add', 'web_banner_table', 'web_banner_view', 'web_banners', 'id', 'banner_name', 'status');
@@ -44,7 +46,7 @@ class TemplateModel extends MY_Model {
 			['type' => 'input', 'label' => 'Contact Email', 'name' => 'company_email', 'required' => true],
 			['type' => 'input', 'label' => 'Website URL', 'name' => 'company_website', 'required' => false],
 			['type' => 'image', 'label' => 'Company Logo', 'name' => PROFILE_LOGO_FIELD, 'size' => [500, 500], 'accept' => ['jpeg', 'png', 'webp'], 'path' => PROFILE_LOGO_UPLOAD_PATH],
-			['type' => 'image', 'label' => 'Site Favicon', 'name' => PROFILE_FAVICON_FIELD, 'size' => [200, 200], 'accept' => ['jpeg', 'png', 'webp'], 'path' => PROFILE_LOGO_UPLOAD_PATH, 'help_text' => 'Square required'],
+			['type' => 'image', 'label' => 'Site Favicon', 'name' => PROFILE_FAVICON_FIELD, 'size' => [200, 200], 'accept' => ['jpeg', 'png', 'webp'], 'path' => PROFILE_LOGO_UPLOAD_PATH, 'help_text' => 'Must be square'],
 			// ['type' => 'input-table', 'label' => 'Contact Persons', 'name' => 'company_contact_persons', 'fields' => 'company_contact_persons', 'table-inline' => true],
 			['type' => 'input-table', 'label' => 'Social Links', 'name' => 'contact_social_links', 'fields' => 'contact_social_links', 'table-inline' => true, 'validation' => false, 'table' => 'contact_social_links'],
 		];
@@ -92,7 +94,7 @@ class TemplateModel extends MY_Model {
 		return [
 			'heads' => ['Sl. no', 'Name', 'Mobile', 'Password', 'Action'],
 			'src' => 'ajax',
-			'data' => 'ajaxtables/users',
+			'data' => 'ajaxtables/dt_users',
 			'text_fields' => ['display_name', 'user_mobile'],
 		];
 	}
@@ -117,6 +119,8 @@ class TemplateModel extends MY_Model {
 			'Masters' => [
 				// profile
 				['options' => ['v', 'e'], 'config' => $this->profile_config, 'icon' => 'fas fa-user'],
+				// users
+				['options' => ['v', 'a', 'e', 'b', 'd'], 'config' => $this->user_config, 'icon' => 'fas fa-user-cog'],
 			],
 			'Enquiries' => [
 				// contact us
@@ -148,7 +152,7 @@ class TemplateModel extends MY_Model {
 					'updated_by' => $login_user_id,
 				];
 				if ($page_access) {
-					$this->db->update('user_access_map', $page_update, ['id' => $user_id, 'page' => $page_name,]);
+					$this->db->update('user_access_map', $page_update, ['id' => $page_access['id'], 'user' => $user_id, 'page' => $page_name,]);
 				} else {
 					$this->db->insert('user_access_map', $page_update);
 				}

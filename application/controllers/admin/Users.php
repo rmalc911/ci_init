@@ -13,9 +13,18 @@ class Users extends MY_Controller {
 
 	public function user_process_submit($post_data) {
 		$post_data['user_name'] = $post_data['display_name'];
-		$user_data = $this->session->userdata('user');
-		$this->TemplateModel->save_user_access_map($post_data['id'], $post_data, $user_data['id']);
+		if ($post_data['login_password'] == '') {
+			$this->load->library('encription_utility');
+			$pw = $this->encription_utility->getSaltPassword('password');
+			$post_data['login_password'] = $pw;
+		}
 		return $post_data;
+	}
+
+	public function user_after_submit($post_data, $update) {
+		$user_data = $this->session->userdata('user');
+		$this->TemplateModel->save_user_access_map($update, $post_data, $user_data['id']);
+		return true;
 	}
 
 	public function user_edit_map($edit) {

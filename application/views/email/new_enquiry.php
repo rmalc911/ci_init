@@ -1,3 +1,7 @@
+<?php
+
+/** @var array<string,string> $table */
+?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 
@@ -269,7 +273,7 @@
 																<tr>
 																	<td class="v-text-align" style="padding-right: 0px;padding-left: 0px;" align="center">
 
-																		<img align="center" border="0" src="<?= base_url(LOGO_IMG) ?>" alt="<?= CLIENT_NAME ?>" title="<?= CLIENT_NAME ?>" style="outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;clear: both;display: inline-block !important;border: none;height: auto;float: none;width: 65%;max-width: 180px;" width="180" class="v-src-width v-src-max-width" />
+																		<img align="center" border="0" src="<?= base_url($profile_config[PROFILE_LOGO_FIELD] ? (PROFILE_LOGO_UPLOAD_PATH . $profile_config[PROFILE_LOGO_FIELD]) : LOGO_IMG) ?>" alt="<?= $profile_config['company_name'] ?? CLIENT_NAME ?>" title="<?= $profile_config['company_name'] ?? CLIENT_NAME ?>" style="outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;clear: both;display: inline-block !important;border: none;height: auto;float: none;width: 65%;max-width: 180px;" width="180" class="v-src-width v-src-max-width" />
 
 																	</td>
 																</tr>
@@ -395,7 +399,7 @@
 														<td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:10px 10px 15px;font-family:'Lato',sans-serif;" align="left">
 
 															<div class="v-text-align" style="color: #7e8c8d; line-height: 140%; text-align: center; word-wrap: break-word;">
-																<p style="font-size: 14px; line-height: 140%;">&copy; <?= date('Y') ?> <?= CLIENT_NAME ?>. All Rights Reserved.</p>
+																<p style="font-size: 14px; line-height: 140%;">&copy; <?= date('Y') ?> <?= $profile_config['company_name'] ?>. All Rights Reserved.</p>
 															</div>
 
 														</td>
