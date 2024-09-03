@@ -141,13 +141,28 @@ const summernoteConfig = {
 		},
 	},
 };
+
+const dateWidgetDefaults = {
+	format: "DD-MM-YYYY",
+};
+
+const timeWidgetDefaults = {
+	format: "hh:mm A",
+	showClose: true,
+};
+const dateTimeWidgetDefaults = {
+	format: "DD-MM-YYYY hh:mm A",
+	sideBySide: true,
+	showClose: true,
+};
 $(function () {
 	// $('.datatable-view').DataTable();
 	$.validator.methods.email = function (value, element) {
 		return this.optional(element) || /^.+@.+\..+$/.test(value);
 	};
+	let validator;
 	if ($(".validate-form #form_ajax").val() == "true") {
-		const validator = $(".validate-form").validate({
+		validator = $(".validate-form").validate({
 			...validatorConfig,
 			submitHandler: function (form) {
 				Processing.fire({
@@ -170,19 +185,44 @@ $(function () {
 							});
 							window.location.href = res.return_url;
 						} else {
-							validator.showErrors(res.errors);
-							Toast.fire({
-								title: "Form has errors",
-								icon: "error",
-							});
+							const errorGroups = {
+								input: {},
+								non_input: {},
+							};
+							for (const [key, value] of Object.entries(res.errors)) {
+								let input = $(".form-control[name='" + key + "']");
+								if (input.length > 0) {
+									errorGroups.input[key] = value;
+								} else {
+									errorGroups.non_input[key] = value;
+								}
+							}
+							if (Object.keys(errorGroups.input).length > 0) {
+								validator.showErrors(errorGroups.input);
+								Toast.fire({
+									title: "Form has errors",
+									icon: "error",
+								});
+							} else if (Object.keys(errorGroups.non_input).length > 0) {
+								Toast.fire({
+									text: Object.values(errorGroups.non_input)[0], // errorGroups.non_input[0],
+									icon: "error",
+								});
+							}
 						}
+					},
+					error: function (x, s, e) {
+						Toast.fire({
+							title: "Error",
+							icon: "error",
+						});
 					},
 				});
 				return false;
 			},
 		});
 	} else {
-		const validator = $(".validate-form").validate({
+		validator = $(".validate-form").validate({
 			...validatorConfig,
 		});
 	}
@@ -194,19 +234,12 @@ $(function () {
 	$(document).on("select2:open", () => {
 		document.querySelector(".select2-container--open .select2-search__field").focus();
 	});
-	$(".date-widget").datetimepicker({
-		format: "DD-MM-YYYY",
-	});
-	$(".time-widget").datetimepicker({
-		format: "hh:mm A",
-	});
-	$(".datetime-widget").datetimepicker({
-		format: "DD-MM-YYYY hh:mm A",
-		sideBySide: true,
-	});
+	$(".date-widget").datetimepicker(dateWidgetDefaults);
+	$(".time-widget").datetimepicker(timeWidgetDefaults);
+	$(".datetime-widget").datetimepicker(dateTimeWidgetDefaults);
 	if ($(".datepicker").length > 0) {
 		$(".datepicker").datetimepicker({
-			format: "DD-MM-YYYY",
+			...dateWidgetDefaults,
 			useCurrent: false,
 		});
 	}
@@ -661,9 +694,7 @@ $(function () {
 									...select2Config,
 									dropdownParent: $("#swal2-html-container"),
 								});
-								$("#swal2-html-container .date-widget").datetimepicker({
-									format: "DD-MM-YYYY",
-								});
+								$("#swal2-html-container .date-widget").datetimepicker(dateWidgetDefaults);
 								if (res.script) {
 									var head = document.getElementsByTagName("head")[0];
 									var js = document.createElement("script");
@@ -726,58 +757,35 @@ $(function () {
 	$("body").on("click", ".input-list-add", function () {
 		var inputListContainer = $(this).parents(".input-list-container");
 		var inputList = $(".input-group-list", inputListContainer);
-		$(".select-widget", inputListContainer).select2("destroy");
-		$(".select-widget", inputListContainer).removeAttr("data-live-search").removeAttr("data-select2-id").removeAttr("aria-hidden").removeAttr("tabindex");
-		$("[data-select2-id]", inputListContainer).removeAttr("data-select2-id");
-		$(".wysiwyg-editor", inputListContainer).summernote("destroy");
-		var inputListItem = $(".input-group-list-item:first-child", inputList).clone();
-		var resetSrc = $(".reset-src", inputListItem).val();
-		$(".form-control", inputListItem).val("");
-		$("[type=radio], [type=checkbox]", inputListItem).prop("checked", false);
-		$(".img-upload-preview", inputListItem).attr("src", resetSrc);
-		$(".date-widget", inputListContainer).datetimepicker("destroy");
-		$(".time-widget", inputListContainer).datetimepicker("destroy");
-		$(".datetime-widget", inputListContainer).datetimepicker("destroy");
-		inputList.append(inputListItem);
-		$(".select-widget", inputListContainer).select2(select2Config);
-		$(".select-widget[data-ajax-options]").select2({
-			...select2Config,
-			...select2AjaxConfig,
-		});
-		$(".date-widget", inputListContainer).datetimepicker({
-			format: "DD-MM-YYYY",
-		});
-		$(".time-widget", inputListContainer).datetimepicker({
-			format: "hh:mm A",
-		});
-		$(".datetime-widget", inputListContainer).datetimepicker({
-			format: "DD-MM-YYYY hh:mm A",
-			sideBySide: true,
-		});
-		$(".wysiwyg-editor", inputListContainer).summernote(summernoteConfig);
-		updateInputListIndex(inputListContainer);
+		inputListDestroy(inputListContainer);
+		const inputListItem = inputListItemClone(inputList);
+		inputListInit(inputListContainer);
+		$(inputListContainer).trigger("list.change", { type: "add", name: $(inputListContainer).data("name"), newItem: inputListItem.get(0) });
 	});
 
 	$("body").on("click", ".input-list-remove", function () {
 		var inputListContainer = $(this).parents(".input-list-container");
 		var inputList = $(".input-group-list", inputListContainer);
 		var inputListLength = $(".input-group-list-item", inputList).length;
-		if (inputListLength > 1) {
-			$(this).parents(".input-group-list-item").remove();
+		inputListDestroy(inputListContainer);
+		if (inputListLength == 1) {
+			const inputListItem = inputListItemClone(inputList);
 		}
-		updateInputListIndex(inputListContainer);
-	});
-
-	function updateInputListIndex(inputListContainer) {
-		$(".input-group-list-item", inputListContainer).each(function (ix, ie) {
-			$(".input-list-serial", ie).text(ix + 1);
-			$(".input-list-serial-value", ie).val(ix);
-			$(".input-list-serial-index", ie).each(function (sx, se) {
-				let attr = $(se).data("serial-index-name");
-				$(se).attr("name", attr + "[" + ix + "]");
-			});
+		const item = $(this).parents(".input-group-list-item");
+		if (item.attr("readonly")) {
+			return false;
+		}
+		const row = $(".form-control[name]", item).map(function () {
+			return {
+				[$(this).attr("name").replace("[]", "")]: $(this).val(),
+			};
 		});
-	}
+		const rowValues = Object.assign({}, ...row);
+
+		item.remove();
+		inputListInit(inputListContainer);
+		$(inputListContainer).trigger("list.change", { type: "remove", value: rowValues, name: $(inputListContainer).data("name") });
+	});
 
 	var pickrList = [];
 	$(".color-picker-btn").each(function (ix, ie) {
@@ -799,6 +807,105 @@ $(function () {
 		});
 	});
 });
+
+function inputListItemClone(inputList) {
+	var inputListItem = $(".input-group-list-item:first-child", inputList).clone();
+	if (!!inputListItem.attr("readonly")) {
+		$(".form-control", inputListItem).removeAttr("readonly");
+		$(inputListItem).removeAttr("readonly");
+	}
+	var resetSrc = $(".reset-src", inputListItem).val();
+	$(".form-control", inputListItem).val("");
+	$("[type=radio], [type=checkbox]", inputListItem).prop("checked", false);
+	$(".img-upload-preview", inputListItem).attr("src", resetSrc);
+	inputList.append(inputListItem);
+	return inputListItem;
+}
+
+function inputListDestroy(inputListContainer) {
+	try {
+		$(".select-widget", inputListContainer).select2("destroy");
+		$(".select-widget", inputListContainer).removeAttr("data-live-search").removeAttr("data-select2-id").removeAttr("aria-hidden").removeAttr("tabindex");
+		$("[data-select2-id]", inputListContainer).removeAttr("data-select2-id");
+		$(".wysiwyg-editor", inputListContainer).summernote("destroy");
+		$(".date-widget", inputListContainer).datetimepicker("destroy");
+		$(".time-widget", inputListContainer).datetimepicker("destroy");
+		$(".datetime-widget", inputListContainer).datetimepicker("destroy");
+		$(".bootstrap-datetimepicker-widget", inputListContainer).remove();
+	} catch (error) {}
+}
+
+function inputListInit(inputListContainer) {
+	$(".select-widget", inputListContainer).select2(select2Config);
+	$(".select-widget[data-ajax-options]").select2({
+		...select2Config,
+		...select2AjaxConfig,
+	});
+	$(".date-widget", inputListContainer).datetimepicker(dateWidgetDefaults);
+	$(".time-widget", inputListContainer).datetimepicker(timeWidgetDefaults);
+	$(".datetime-widget", inputListContainer).datetimepicker(dateTimeWidgetDefaults);
+	$(".wysiwyg-editor", inputListContainer).summernote(summernoteConfig);
+	updateInputListIndex(inputListContainer);
+}
+
+function updateInputListIndex(inputListContainer) {
+	$(".input-group-list-item", inputListContainer).each(function (ix, ie) {
+		$(".input-list-serial", ie).text(ix + 1);
+		$(".input-list-serial-value", ie).val(ix);
+		$(".input-list-serial-index", ie).each(function (sx, se) {
+			let attr = $(se).data("serial-index-name");
+			$(se).attr("name", attr + "[" + ix + "]");
+		});
+	});
+}
+
+function inputListValues(inputListContainer) {
+	const values = $(".input-group-list-item", inputListContainer)
+		.map(function () {
+			const row = $(".form-control[name]", this).map(function () {
+				return {
+					[$(this).attr("name").replace("[]", "")]: $(this).val(),
+				};
+			});
+
+			return Object.assign({}, ...row);
+		})
+		.toArray();
+
+	return values;
+}
+
+function inputListSetValues(values, inputListContainer, deleteExtras = false) {
+	let inputList = $(".input-group-list", inputListContainer);
+	let inputListItem = null;
+	values.forEach(function (value, ix) {
+		inputListItem = $(".input-group-list-item:nth(" + ix + ")", inputListContainer);
+		if (inputListItem.length == 0) {
+			inputListItem = inputListItemClone(inputList);
+		}
+
+		Object.keys(value).forEach(function (key) {
+			const val = value[key];
+			const keyVal = typeof val === "object" ? val.value : val;
+			const readonly = typeof val === "object" ? val.readonly : false;
+			const keyInput = $("[name^=" + key + "]", inputListItem);
+			keyInput.val(keyVal);
+			if (readonly) {
+				keyInput.prop("readonly", true);
+				keyInput.parents(".input-group-list-item").attr("readonly", true);
+			}
+		});
+	});
+	if (deleteExtras) {
+		let inputListLength = $(".input-group-list-item", inputListContainer).length;
+		if (inputListLength > values.length) {
+			for (let ix = values.length; ix < inputListLength; ix++) {
+				$(".input-group-list-item:nth(" + ix + ")", inputListContainer).remove();
+			}
+		}
+	}
+	updateInputListIndex(inputListContainer);
+}
 
 const Toast = Swal.mixin({
 	toast: true,

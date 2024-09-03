@@ -104,6 +104,7 @@ class Login extends CI_Controller {
 
 	public function login_roles() {
 		$this->load->helper('inflector');
+		$data['config'] = $this->TemplateModel->get_config();
 		$data['message'] = $this->session->flashdata('login');
 		$data['roles'] = explode(',', $this->input->get('roles'));
 		$data['username'] = $this->input->get('username');
@@ -115,22 +116,5 @@ class Login extends CI_Controller {
 		$this->session->unset_userdata('user');
 		$this->session->unset_userdata('company_login');
 		redirect_base(ADMIN_PATH);
-	}
-
-	public function admin_access_update() {
-		$navs = $this->TemplateModel->get_user_access_navs();
-		$post = [];
-
-		foreach ($navs as $pages) {
-			foreach ($pages as $page) {
-				$post[$page['name'] . '~v'] = '1';
-				$post[$page['name'] . '~a'] = '1';
-				$post[$page['name'] . '~e'] = '1';
-				$post[$page['name'] . '~b'] = '1';
-				$post[$page['name'] . '~d'] = '1';
-			}
-		}
-		$admin_id = $this->TemplateModel->get_edit_row('users', 'admin', 'user_name');
-		$this->TemplateModel->save_user_access_map($admin_id['id'], $post);
 	}
 }

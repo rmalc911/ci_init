@@ -19,6 +19,7 @@ class MY_Exceptions extends CI_Exceptions {
 				"Assets/uploads",
 				"Assets/admin",
 				"Assets/plugins",
+				"Assets/images",
 			])
 			&&
 			$log_error
