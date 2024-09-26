@@ -37,6 +37,7 @@ class TemplateModel extends MY_Model {
 	}
 
 	public function profile_form() {
+		$config = $this->profile_config;
 		// $city_options = $this->state_city_options();
 		return [
 			['type' => 'input', 'label' => 'Company Name', 'name' => 'company_name', 'required' => true],

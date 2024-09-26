@@ -23,6 +23,7 @@ class Home extends MY_Controller {
 			'sendinblue_api_key',
 		];
 		if ($this->form_validation->run()) {
+			$this->TemplateModel->verify_access('email', 'edit_data');
 			$post_data = $this->input->post();
 			$status = $this->TemplateModel->set_config($config_items, $post_data);
 			$alert = $status ? $this->TemplateModel->show_alert('suc', 'Successfully updated') : $this->TemplateModel->show_alert('err', 'Failed to update');

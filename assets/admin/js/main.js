@@ -149,11 +149,13 @@ const dateWidgetDefaults = {
 const timeWidgetDefaults = {
 	format: "hh:mm A",
 	showClose: true,
+	useCurrent: false,
 };
 const dateTimeWidgetDefaults = {
 	format: "DD-MM-YYYY hh:mm A",
 	sideBySide: true,
 	showClose: true,
+	useCurrent: false,
 };
 $(function () {
 	// $('.datatable-view').DataTable();

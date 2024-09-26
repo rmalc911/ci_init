@@ -10,7 +10,6 @@ class MY_Controller extends CI_Controller {
 	public function __construct() {
 		parent::__construct();
 		$this->load->helper('inflector');
-		$this->load->helper('text');
 		// $this->load->helper('access');
 		$this->load->library('Excel_export');
 		$this->popover_btn = '<button class="btn btn-$3 btn-border btn-sm btn-rounded json-format txn-id-btn" type="button" data-toggle="popover" data-content=\'$2\' data-label="$1" data-original-title="$1 <span class=\'close \'>&times;</span">$1</button>';
@@ -28,7 +27,7 @@ class MY_Controller extends CI_Controller {
 				return ($val['validation'] ?? true);
 			}
 		), 'name');
-		$config_icons = $this->TemplateModel->{"{$option}_img_config"}() ?? [];
+		$config_icons = (method_exists("TemplateModel", "{$option}_img_config")) ? $this->TemplateModel->{"{$option}_img_config"}() : [];
 		if (method_exists($this, "config_{$option}_edit")) {
 			$this->data['message'] = $this->session->flashdata('message');
 			$this->data['edit'] = $this->{"config_{$option}_edit"}();

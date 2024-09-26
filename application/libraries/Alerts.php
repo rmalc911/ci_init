@@ -97,7 +97,7 @@ class Alerts {
 		return $CI->email->send();
 	}
 
-	public function sendTransactionalEmail($subject, $message, $touser, $cc = [], $bcc) {
+	public function sendTransactionalEmail($subject, $message, $touser, $cc = [], $bcc = []) {
 
 		$log = "SendinBlueApi sendTransactionalEmail called";
 		$apiInstance = new SendinBlue\Client\Api\TransactionalEmailsApi(

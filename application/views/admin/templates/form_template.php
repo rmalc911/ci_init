@@ -328,7 +328,7 @@ foreach ($template as $template_row) {
 		<div class="form-group row">
 			<?= get_label($template_row) ?>
 			<div class="col-lg-8">
-				<textarea name="<?= $template_row['name'] ?>" id="editor-<?= $template_row['name'] ?>" class="wysiwyg-editor" <?= $attributes ?>><?= $value ?></textarea>
+				<textarea name="<?= $template_row['name'] ?>" id="editor-<?= $template_row['name'] ?>" class="wysiwyg-editor" <?= $attributes ?> <?= $readonly ?>><?= $value ?></textarea>
 				<?= form_error($template_row['name']) ?>
 			</div>
 		</div>
@@ -341,7 +341,7 @@ foreach ($template as $template_row) {
 			<?= get_label($template_row) ?>
 			<div class="<?= $col_class ?>">
 				<input type="hidden" name="<?= $template_row['name'] ?>" value="0">
-				<input type="checkbox" <?= $value == '1' ? 'checked' : '' ?> name="<?= $template_row['name'] ?>" value="1" id="checkbox-<?= $template_row['name'] ?>" data-toggle="toggle" data-onstyle="success" data-on="<?= $template_row['on_state'] ?? 'Allowed' ?>" data-off="<?= $template_row['off_state'] ?? 'Blocked' ?>">
+				<input type="checkbox" <?= $value == '1' ? 'checked' : '' ?> name="<?= $template_row['name'] ?>" value="1" id="checkbox-<?= $template_row['name'] ?>" <?= $readonly ?> data-toggle="toggle" data-onstyle="success" data-on="<?= $template_row['on_state'] ?? 'Allowed' ?>" data-off="<?= $template_row['off_state'] ?? 'Blocked' ?>">
 				<?= form_error($template_row['name']) ?>
 			</div>
 		</div>
@@ -359,7 +359,7 @@ foreach ($template as $template_row) {
 						$radio_checked = $value == $to ? 'checked' : '';
 					?>
 						<div class="custom-control custom-radio">
-							<input type="radio" id="radio-<?= $template_row['name'] ?>-<?= $to ?>" name="<?= $template_row['name'] ?>" class="custom-control-input" value="<?= $to ?>" <?= $radio_checked ?>>
+							<input type="radio" id="radio-<?= $template_row['name'] ?>-<?= $to ?>" name="<?= $template_row['name'] ?>" class="custom-control-input" value="<?= $to ?>" <?= $radio_checked ?> <?= $readonly ?>>
 							<label class="custom-control-label" for="radio-<?= $template_row['name'] ?>-<?= $to ?>"><?= $option ?></label>
 						</div>
 					<?php
@@ -391,7 +391,7 @@ foreach ($template as $template_row) {
 		<div class="form-group row">
 			<?= get_label($template_row) ?>
 			<div class="<?= $col_class ?>">
-				<input type="file" class="form-control p-2 h-auto <?= $class_list ?>" id="input-<?= $template_row['name'] ?>" accept="<?= $accept_type ?>" name="<?= $template_row['name'] . ($multiple ? '[]' : '') ?>" <?= $required ?> <?= $attributes ?>>
+				<input type="file" class="form-control p-2 h-auto <?= $class_list ?>" id="input-<?= $template_row['name'] ?>" accept="<?= $accept_type ?>" name="<?= $template_row['name'] . ($multiple ? '[]' : '') ?>" <?= $required ?> <?= $attributes ?> <?= $readonly ? ' disabled' : '' ?> <?= $multiple ?>>
 				<?= ($accept_types != '') ? ('<p class="text-muted mb-0">Format: ' . $accept_types . '</p>') : '' ?>
 				<p class="text-muted mb-0">Max size: <?= $max_file_size ?></p>
 				<?= form_error($template_row['name']) ?>
@@ -415,7 +415,7 @@ foreach ($template as $template_row) {
 		<div class="form-group row">
 			<?= get_label($template_row) ?>
 			<div class="<?= $col_class ?>">
-				<div class="input-list-container">
+				<div class="input-list-container" data-name="<?= $template_row['name'] ?>">
 					<div class="input-group-list" id="input-list-<?= $template_row['name'] ?>">
 						<?php
 						$input_row = 0;
@@ -474,7 +474,7 @@ foreach ($template as $template_row) {
 					<?= ($accept_types != '') ? ('<p class="text-muted mb-0">Format: ' . $accept_types . '</p>') : '' ?>
 					<p class="text-muted mb-0">Max size: <?= $max_file_size ?></p>
 				</div>
-				<table class="input-list-container table table-bordered table-sm m-0">
+				<table class="input-list-container table table-bordered table-sm m-0" data-name="<?= $template_row['name'] ?>">
 					<thead>
 						<tr>
 							<th>Sl. No</th>
@@ -574,7 +574,7 @@ foreach ($template as $template_row) {
 				<?php
 				}
 				?>
-				<table class="table table-sm table-bordered input-list-container" id="input-table-<?= $template_row['name'] ?>">
+				<table class="table table-sm table-bordered input-list-container" id="input-table-<?= $template_row['name'] ?>" data-name="<?= $template_row['name'] ?>">
 					<thead>
 						<tr>
 							<th width="50px">Sl. No</th>

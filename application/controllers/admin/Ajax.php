@@ -232,7 +232,6 @@ class Ajax extends MY_Controller {
 	}
 
 	public function placeholder_img() {
-
 		// Dimensions
 		$getsize    = $this->input->get('size') ?? '100x100';
 		$height = $this->input->get('height') ?? 150;
@@ -273,6 +272,13 @@ class Ajax extends MY_Controller {
 
 		// Generate text
 		imagestring($image, $fontsize, $xpos, $ypos, $text, $setfg);
+
+		// cache images
+		$seconds_to_cache = 60 * 60 * 24 * 30; // s*m*h*d
+		$ts = gmdate("D, d M Y H:i:s", time() + $seconds_to_cache) . " GMT";
+		header("Expires: $ts");
+		header("Pragma: cache");
+		header("Cache-Control: max-age=$seconds_to_cache");
 
 		header('Content-Type: image/png');
 		// Render image

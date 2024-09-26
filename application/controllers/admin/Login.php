@@ -17,7 +17,7 @@ class Login extends CI_Controller {
 				'user_email' => NULL,
 				'user_type' => 'admin',
 				'user_status' => '1',
-				'created_date' => date(date_time_format),
+				'created_date' => date_time_format('now'),
 				'updated_date' => NULL,
 				'login_password' => $pw,
 				'last_login' => NULL,

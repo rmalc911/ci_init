@@ -19,6 +19,11 @@
 	background: var(--theme-color);
 }
 
+.logo-header .navbar-brand {
+	height: 90%;
+	margin-block: 5%;
+}
+
 .nav-pills.nav-theme .nav-link {
 	transition: ease 0.3s;
 	transition-property: background-color, color;
@@ -45,6 +50,10 @@
 	margin-bottom: 0;
 }
 
+.form-group label small.text-muted {
+	white-space: normal;
+}
+
 .select2-input label.error,
 .select2-input label.success {
 	bottom: -25px;
@@ -61,6 +70,22 @@
 
 .select2-input .select-widget.error ~ .select2 {
 	margin-bottom: 25px;
+}
+
+select[readonly].select-widget + .select2-container {
+	pointer-events: none;
+	touch-action: none;
+}
+
+select[readonly].select-widget + .select2-container .select2-selection {
+	background: #e8e8e8;
+	box-shadow: none;
+	opacity: 0.6;
+}
+
+select[readonly].select-widget + .select2-container .select2-selection__arrow,
+select[readonly].select-widget + .select2-container .select2-selection__clear {
+	display: none;
 }
 
 .table-sm td,
@@ -278,6 +303,11 @@ body.swal2-shown > .select2-container--bootstrap {
 	max-width: 50%;
 	max-height: 150px;
 	height: auto;
+	object-fit: contain;
+}
+
+.input-group-list-item td {
+	/* vertical-align: top !important; */
 }
 
 .pickr .pcr-button {

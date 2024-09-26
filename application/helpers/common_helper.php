@@ -27,84 +27,144 @@ function single_db_image($images, $key) {
 	return explode(IMG_SPLIT, $images)[$key] ?? '';
 }
 
-function date_format_c($time_string) {
+/**
+ * @template T of string|null
+ * @param ?T $time_string
+ * @return T
+ */
+function date_format_c($time_string = null) {
 	if (!$time_string) {
 		return null;
 	}
 	return date(date_format, strtotime($time_string));
 }
 
-function time_format($time_string) {
+/**
+ * @template T of string|null
+ * @param ?T $time_string
+ * @return T
+ */
+function time_format($time_string = null) {
 	if (!$time_string) {
 		return null;
 	}
 	return date(time_format, strtotime($time_string));
 }
 
-function date_time_format($time_string) {
+/**
+ * @template T of string|null
+ * @param ?T $time_string
+ * @return T
+ */
+function date_time_format($time_string = null) {
 	if (!$time_string) {
 		return null;
 	}
 	return date(date_time_format, strtotime($time_string));
 }
 
-function user_date($time_string) {
+/**
+ * @template T of string|null
+ * @param ?T $time_string
+ * @return T
+ */
+function user_date($time_string = null) {
 	if (!$time_string) {
 		return null;
 	}
 	return date(user_date, strtotime($time_string));
 }
 
-function user_date_d($time_string) {
+/**
+ * @template T of string|null
+ * @param ?T $time_string
+ * @return T
+ */
+function user_date_d($time_string = null) {
 	if (!$time_string) {
 		return null;
 	}
 	return date(user_date_d, strtotime($time_string));
 }
 
-function user_time($time_string) {
+/**
+ * @template T of string|null
+ * @param ?T $time_string
+ * @return T
+ */
+function user_time($time_string = null) {
 	if (!$time_string) {
 		return null;
 	}
 	return date(user_time, strtotime($time_string));
 }
 
-function user_date_time($time_string) {
+/**
+ * @template T of string|null
+ * @param ?T $time_string
+ * @return T
+ */
+function user_date_time($time_string = null) {
 	if (!$time_string) {
 		return null;
 	}
 	return date(user_date_time, strtotime($time_string));
 }
 
-function db_user_time($time_string) {
+/**
+ * @template T of string|null
+ * @param ?T $time_string
+ * @return T
+ */
+function db_user_time($time_string = null) {
 	if (!$time_string) {
 		return null;
 	}
 	return date(db_user_time, strtotime($time_string));
 }
 
-function input_date($time_string) {
+/**
+ * @template T of string|null
+ * @param ?T $time_string
+ * @return T
+ */
+function input_date($time_string = null) {
 	if (!$time_string) {
 		return null;
 	}
 	return date(input_date, strtotime($time_string));
 }
 
-function input_time($time_string) {
+/**
+ * @template T of string|null
+ * @param ?T $time_string
+ * @return T
+ */
+function input_time($time_string = null) {
 	if (!$time_string) {
 		return null;
 	}
 	return date(input_time, strtotime($time_string));
 }
 
-function input_date_time($time_string) {
+/**
+ * @template T of string|null
+ * @param ?T $time_string
+ * @return T
+ */
+function input_date_time($time_string = null) {
 	if (!$time_string) {
 		return null;
 	}
 	return date(input_date_time, strtotime($time_string));
 }
 
-function relative_time(?string $time_string) {
+/**
+ * @template T of string|null
+ * @param ?T $time_string
+ * @return T
+ */
+function relative_time(?string $time_string = null) {
 	if (!$time_string) {
 		return null;
 	}
@@ -127,9 +187,14 @@ function relative_time(?string $time_string) {
 	}
 }
 
-function remaining_days($time_string) {
+/**
+ * @template T of string|null
+ * @param ?T $time_string
+ * @return T
+ */
+function remaining_days($time_string = null) {
 	if (!$time_string) {
-		return '';
+		return null;
 	}
 	$now = new DateTime();
 	$now->setTime(0, 0, 0);
