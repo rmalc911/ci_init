@@ -171,6 +171,7 @@ class Home extends MY_Controller {
 						foreach ($options as $option_key => $option) {
 							$comment .= $option_key . " - " . $option . ", ";
 						}
+						$null = "NOT NULL DEFAULT '" . array_keys($options)[0] . "'";
 						$comment = substr($comment, 0, -2) . "'";
 						$interface_prop_comment = "/** @var enum `" . implode("`|`", array_keys($options)) . "` */ ";
 					} else {
@@ -402,7 +403,7 @@ class Home extends MY_Controller {
 			$mapping_table_create_query .= "\n\nCREATE TABLE `{$map['table']}`(\n\t";
 			$mapping_table_create_query .= implode(",\n\t", array_filter($map['fields']));
 			$mapping_table_create_query .= "\n) ENGINE = INNODB;";
-			$mapping_interface .= "\n\ninterface {$interface_mapping_tables[$m]['table']} extends table {\n\t";
+			$mapping_interface .= "\n\ntrait {$interface_mapping_tables[$m]['table']} {\n\t";
 			$mapping_interface .= implode("\n\t", $interface_mapping_tables[$m]['fields']);
 			$mapping_interface .= "\n}";
 			$mapping_table_drop_query .= "DROP TABLE `{$map['table']}`;";
