@@ -18,7 +18,6 @@ function remove_html_comments($html) {
 function wysiwyg_to_preview_text($html, $length) {
 	if (!function_exists('ellipsize')) {
 		$ci = &get_instance();
-		$ci->load->helper('text');
 	}
 	return ellipsize(html_string_add_new_lines($html), $length);
 }
@@ -205,9 +204,14 @@ function remaining_days($time_string = null) {
 
 function getMaximumFileUploadSize() {
 	$max_size = min(convertPHPSizeToBytes(ini_get('post_max_size')), convertPHPSizeToBytes(ini_get('upload_max_filesize')));
-	$hard_limit = convertPHPSizeToBytes('8M');
-	// $hard_limit = true; // use server limit
+	$hard_limit = convertPHPSizeToBytes(UPLOAD_MAX_SIZE);
 	return convertBytesToPHPSize(min($max_size, $hard_limit)) . 'B';
+}
+
+function getMaximumFileUploadSizeKB() {
+	$max_size = min(convertPHPSizeToBytes(ini_get('post_max_size')), convertPHPSizeToBytes(ini_get('upload_max_filesize')));
+	$hard_limit = convertPHPSizeToBytes(UPLOAD_MAX_SIZE);
+	return min($max_size, $hard_limit) / 1024;
 }
 
 /**
@@ -244,7 +248,7 @@ function convertPHPSizeToBytes($sSize) {
 }
 
 function convertBytesToPHPSize($iBytes) {
-	$aSize = array('B', 'K', 'M', 'G', 'T', 'P');
+	$aSize = array('', 'K', 'M', 'G', 'T', 'P');
 	$i = 0;
 
 	while ($iBytes >= 1024 && $i < (count($aSize) - 1)) {

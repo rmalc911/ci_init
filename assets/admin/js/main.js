@@ -545,6 +545,9 @@ $(function () {
 			} else {
 				$(statusBtn).removeClass(disabledStatusClass).addClass(enabledStatusClass).html(enabledStatusIcon);
 			}
+			$(".dt-image-col[data-original='']:not([data-fallback='']", nRow).each(function () {
+				$(this).attr("src", $(this).data("fallback"));
+			})
 		},
 		fnServerData: function (sSource, aoData, fnCallback) {
 			var filter = null;
@@ -601,6 +604,7 @@ $(function () {
 	$("[data-visibility-name]").each(function () {
 		var s = this;
 		var vname = $(s).data("visibility-name");
+		var required = (!!$(s).data("required") && $(s).attr('type') != 'file');
 		var vvalue = $(s).data("visibility-value")?.toString();
 		var vvalues = vvalue.split("||");
 		var vis = $("[name='" + vname + "']");
@@ -613,10 +617,13 @@ $(function () {
 				curVal = vis.val();
 			}
 			if (curVal == vvalue || vvalues.includes(curVal)) {
+				$(s).prop('required', required);
+
 				$(sgroup).show();
 			} else {
 				// $(s).val('');
 				$(s).trigger("change");
+				$(s).prop('required', false);
 				$(sgroup).hide();
 			}
 		});

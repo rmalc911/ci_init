@@ -5,6 +5,8 @@ class Home extends MY_Controller {
 	public function __construct() {
 		parent::__construct();
 		$this->data['message'] = $this->session->flashdata('message');
+		$this->load->model('WebModel');
+		$this->data['contact_data'] = $this->WebModel->get_profile_config();
 	}
 
 	public function index() {
@@ -30,7 +32,7 @@ class Home extends MY_Controller {
 			$this->session->set_flashdata('message', $alert);
 			redirect(base_url(uri_string()));
 		}
-		$this->data['config'] = $this->TemplateModel->get_config($config_items);
+		$this->data['edit'] = $this->TemplateModel->get_config($config_items);
 		$this->template('config/manage', $this->data);
 	}
 
@@ -75,28 +77,32 @@ class Home extends MY_Controller {
 	}
 
 	public function payment_config() {
-		$this->TemplateModel->verify_access('payment_config', 'view_data');
-		$this->form_validation->set_rules('razorpay_key_state', 'Payment Keys', 'required');
+		$this->TemplateModel->verify_access('payment', 'view_data');
+		$this->form_validation->set_rules('payment_key_state', 'Active Payment Keys', 'required');
 		$post_data = $this->input->post();
 		if ($post_data) {
-			if ($post_data['razorpay_key_state'] == 'live') {
+			if ($post_data['payment_key_state'] == 'live') {
 				$this->form_validation->set_rules('razp_live_key_id', 'Razorpay Live Key ID', 'required');
 				$this->form_validation->set_rules('razp_live_key_secret', 'Razorpay Live Key Secret', 'required');
+				$this->form_validation->set_rules('razp_live_account_no', 'Razorpay Live Account Number', 'required');
 				// $this->form_validation->set_rules('razp_live_wh_secret', 'Razorpay Live Webhook Secret', 'required');
-			} else if ($post_data['razorpay_key_state'] == 'test') {
+			} else if ($post_data['payment_key_state'] == 'test') {
 				$this->form_validation->set_rules('razp_test_key_id', 'Razorpay Test Key ID', 'required');
 				$this->form_validation->set_rules('razp_test_key_secret', 'Razorpay Test Key Secret', 'required');
+				$this->form_validation->set_rules('razp_test_account_no', 'Razorpay Test Account Number', 'required');
 				// $this->form_validation->set_rules('razp_test_wh_secret', 'Razorpay Test Webhook Secret', 'required');
 			}
 		}
 		$config_items = [
-			'razorpay_key_state',
+			'payment_key_state',
 			'razp_live_key_id',
 			'razp_live_key_secret',
-			// 'razp_live_wh_secret',
+			'razp_live_wh_secret',
+			'razp_live_account_no',
 			'razp_test_key_id',
 			'razp_test_key_secret',
-			// 'razp_test_wh_secret',
+			'razp_test_wh_secret',
+			'razp_test_account_no',
 		];
 		if ($this->form_validation->run()) {
 			$status = $this->TemplateModel->set_config($config_items, $post_data);
@@ -104,7 +110,7 @@ class Home extends MY_Controller {
 			$this->session->set_flashdata('message', $alert);
 			redirect(base_url(uri_string()));
 		}
-		$this->data['config'] = $this->TemplateModel->get_config($config_items);
+		$this->data['edit'] = $this->TemplateModel->get_config($config_items);
 		$this->template('config/payment', $this->data);
 	}
 
@@ -394,7 +400,7 @@ class Home extends MY_Controller {
 		$drop_query = "DROP TABLE `{$table_name}`;";
 		// echo json_encode($create_table_fields);
 		$mapping_table_create_query = "";
-		$interface_body = "interface {$table_name} extends table {\n\t";
+		$interface_body = "trait {$table_name} {\n\t";
 		$interface_body .= implode("\n\t", $interface_props);
 		$interface_body .= "\n}";
 		$mapping_interface = "";
@@ -408,15 +414,15 @@ class Home extends MY_Controller {
 			$mapping_interface .= "\n}";
 			$mapping_table_drop_query .= "DROP TABLE `{$map['table']}`;";
 		}
-		$data['form_template'] = $form_template;
-		$data['create_query'] = $create_query;
-		$data['mapping_table_create_query'] = $mapping_table_create_query;
-		$data['interface_body'] = $interface_body;
-		$data['mapping_interface'] = $mapping_interface;
-		$data['migration_up'] = array_filter([$create_query, trim($mapping_table_create_query)], 'strlen');
-		$data['migration_down'] = array_filter([$mapping_table_drop_query, $drop_query], 'strlen');
-		$data['mapping_interface'] = ($mapping_interface);
-		$this->load->view('admin/setup/create', $data);
+		$this->data['form_template'] = $form_template;
+		$this->data['create_query'] = $create_query;
+		$this->data['mapping_table_create_query'] = $mapping_table_create_query;
+		$this->data['interface_body'] = $interface_body;
+		$this->data['mapping_interface'] = $mapping_interface;
+		$this->data['migration_up'] = array_filter([$create_query, trim($mapping_table_create_query)], 'strlen');
+		$this->data['migration_down'] = array_filter([$mapping_table_drop_query, $drop_query], 'strlen');
+		$this->data['mapping_interface'] = ($mapping_interface);
+		$this->load->view('admin/setup/create', $this->data);
 	}
 
 	public function run_query() {

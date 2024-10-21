@@ -30,8 +30,9 @@ class MY_Model extends CI_Model {
 				$navs = $this->TemplateModel->get_user_access_navs();
 				foreach ($navs as $pages) {
 					foreach ($pages as $page) {
-						$access['page_access'][$page['config']->access] = [
-							'page' => $page['config']->access,
+						/** @var \TemplateConfig */ $config = $page['config'];
+						$access['page_access'][$config->access] = [
+							'page' => $config->access,
 							'view_data' => '1',
 							'add_data' => '1',
 							'edit_data' => '1',
@@ -83,25 +84,20 @@ class MY_Model extends CI_Model {
 		if (!$this->db_setup) {
 			return true;
 		}
-		if (!$this->session->userdata('user')) {
-			return false;
-		}
-		$username = $this->session->userdata('user')['user_mobile'];
-		// if ($username == 'admin') {
-		// 	return true;
-		// }
-		$user = $this->session->userdata('user');
-		$username = $user['user_mobile'];
-		$login_id = $user['id'];
-		$login_type = $user['user_type'];
 		$access_verified = false;
-		if ($login_type == 'admin') {
+		$user = $this->session->userdata('user');
+		if ($user) {
+			$username = $user['user_mobile'];
+			$login_id = $user['id'];
+			$login_type = $user['user_type'];
+		}
+		if ($user && $login_type == 'admin') {
 			$access_verified = $this->get_user_access()[$access_page][$access_type] ?? '0';
 		}
-		if ($login_type == 'type') {
+		if ($user && $login_type == 'type') {
 			$access_verified = $this->get_type_access()[$access_page][$access_type] ?? '0';
 		}
-		if ($login_type == 'user') {
+		if ($user && $login_type == 'user') {
 			$access_data = $this->db->get_where('user_access_map', ['user' => $login_id, 'page' => $access_page], 1)->row_array();
 			$access_verified = $access_data[$access_type] ?? '0' == '1';
 		}
@@ -298,6 +294,9 @@ class MY_Model extends CI_Model {
 			$field_name = $field['name'];
 			if (isset($field['required']) && $field['required'] == true && $field['type'] != 'image' && $field['type'] != 'file') {
 				$rules[] = 'required';
+			}
+			if ($field['type'] == 'image') {
+				$rules[] = 'is_image';
 			}
 			if (isset($field['unique'])) {
 				$unique = $field['unique'];
@@ -576,7 +575,7 @@ class MY_Model extends CI_Model {
 				$accept = 'jpg|png|jpeg|webp';
 			}
 			if ($max_size == null) {
-				$max_size = '4096';
+				$max_size = getMaximumFileUploadSizeKB();
 			}
 			$this->load->library('upload');
 			$config['upload_path'] = dirname($_SERVER["SCRIPT_FILENAME"]) . '/' . $path . '/';
@@ -622,7 +621,7 @@ class MY_Model extends CI_Model {
 			$accept = 'jpg|png|jpeg|webp';
 		}
 		if ($max_size == null) {
-			$max_size = '4096';
+			$max_size = getMaximumFileUploadSizeKB();
 		}
 		$config['upload_path'] = dirname($_SERVER["SCRIPT_FILENAME"]) . '/' . $path;
 		$config['allowed_types'] = $accept;

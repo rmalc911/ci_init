@@ -1,3 +1,43 @@
+function addFormValidator(f) {
+	$(f).validate({
+		submitHandler: function (form) {
+			var fd = new FormData(form);
+			var postUrl = $(form).data("url");
+			var postCallback = $(form).data("callback");
+			swal.fire({
+				title: "Submitting",
+				text: "Please Wait",
+				icon: "info",
+				didOpen: () => {
+					swal.showLoading();
+				},
+			});
+			$.post({
+				url: BASEURL + postUrl,
+				data: fd,
+				dataType: "JSON",
+				processData: false,
+				contentType: false,
+				success: function (res) {
+					if (!res.success) {
+						let errorMsg = res.message;
+						swal.fire("An error occurred, please check the form or try again", errorMsg, "error");
+						return;
+					}
+					form.reset();
+					if (postCallback) {
+						window[postCallback]();
+					}
+					swal.fire(res.message, "", "success");
+				},
+				error: function (r) {
+					console.log("error", r);
+				},
+			});
+		},
+	});
+}
+
 $(function (e) {
 	$(".toggle-menu-btn").on("click", function (e) {
 		if ($("html").hasClass("menu-active")) {
@@ -8,35 +48,7 @@ $(function (e) {
 	});
 
 	var validator = $(".ajaxform").each(function (key, form) {
-		$(this).validate({
-			submitHandler: function (form) {
-				var fd = new FormData(form);
-				var postUrl = $(form).data("url");
-				var postCallback = $(form).data("callback");
-				$.post({
-					url: BASEURL + postUrl,
-					data: fd,
-					dataType: "JSON",
-					processData: false,
-					contentType: false,
-					success: function (res) {
-						if (!res.success) {
-							let errorMsg = res.message;
-							swal.fire("An error occurred, please check the form or try again", errorMsg, "error");
-							return;
-						}
-						form.reset();
-						if (postCallback) {
-							window[postCallback]();
-						}
-						swal.fire(res.message, "", "success");
-					},
-					error: function (r) {
-						console.log("error", r);
-					},
-				});
-			},
-		});
+		addFormValidator(form);
 	});
 
 	window.addEventListener("scroll", scrollCheck);
@@ -47,6 +59,56 @@ $(function (e) {
 
 	$(".scroll-link").on("click", function (e) {
 		$("html").removeClass("menu-active");
+	});
+
+	$("body").on("input", ".numeric", function (e) {
+		var currencyType = this.hasAttribute("data-currency");
+		var input = e.target.value;
+
+		if (currencyType) {
+			input = input.replace(/[^0-9.]/gi, "");
+			var ex = /^[0-9]+\.?[0-9]{0,2}$/;
+			if (ex.test(input) == false) {
+				input = input.substring(0, input.length - 1);
+			}
+		} else {
+			input = input.replace(/\D/g, "");
+		}
+
+		e.target.value = input;
+	});
+
+	$("body").on("input", ".alphanumeric", function (e) {
+		var input = e.target.value;
+
+		input = input.replace(/[^0-9a-z]/gi, "");
+
+		e.target.value = input;
+	});
+
+	$("body").on("input", ".alphabetic", function (e) {
+		var input = e.target.value;
+
+		input = input.replace(/[^a-z]/gi, "");
+
+		e.target.value = input;
+	});
+
+	$("[data-copy-text]").on("click", function () {
+		let btn = $(this);
+		let copyText = btn.data("copy-text");
+		let btnBody = btn.html();
+		let btnCopiedText = btn.data("copied-text") ?? "Copied";
+		let $temp = $("<input>");
+		$("body").append($temp);
+		$temp.val(copyText).select();
+		document.execCommand("copy");
+		$temp.remove();
+		btn.html(btnCopiedText);
+
+		setTimeout(function () {
+			btn.html(btnBody);
+		}, 1000);
 	});
 
 	// Call the function to start lazy loading iframes

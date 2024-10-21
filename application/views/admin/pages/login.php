@@ -5,7 +5,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<title>Login</title>
 	<meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
-	<link rel="shortcut icon" href="<?= base_url(($config[PROFILE_FAVICON_FIELD] ?? null) ? (PROFILE_LOGO_UPLOAD_PATH . $config[PROFILE_FAVICON_FIELD]) : LOGO_IMG_MIN) ?>" type="image/x-icon">
+	<link rel="shortcut icon" href="<?= base_url(($config[PROFILE_FAVICON_FIELD] ?? null) ? (PROFILE_LOGO_UPLOAD_PATH . $config[PROFILE_FAVICON_FIELD]) : '') ?>" type="image/x-icon">
 
 	<!-- Fonts and icons -->
 	<script src="<?= as_base_url('plugins/webfont/webfont.min.js') ?>"></script>
@@ -32,8 +32,8 @@
 <body class="login">
 	<div class="wrapper wrapper-login">
 		<div class="container container-login animated fadeIn">
-			<img src="<?= base_url((PROFILE_LOGO_UPLOAD_PATH . $config[PROFILE_LOGO_FIELD]) ?? LOGO_IMG) ?>" height="45" alt="<?= $config['company_name'] ?? CLIENT_NAME ?>" style="display: block; margin: 0 auto 20px;">
-			<!-- <h1 class="display-4 text-center mb-4"><?= CLIENT_NAME ?></h1> -->
+			<img src="<?= base_url(PROFILE_LOGO_UPLOAD_PATH . ($config[PROFILE_LOGO_FIELD] ?? '')) ?>" height="45" alt="<?= $config['profile_business_name'] ?? '' ?>" style="display: block; margin: 0 auto 20px;">
+			<!-- <h1 class="display-4 text-center mb-4"><?= '' ?></h1> -->
 			<h3 class="text-center">Sign In To Admin</h3>
 			<form class="login-form" action="<?= ad_base_url('login/validate') ?>" method="POST">
 				<div class="form-group form-floating-label">

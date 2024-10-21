@@ -1,6 +1,6 @@
 <?php
 function get_label($template_row) {
-	$required = (isset($template_row['required']) && $template_row['required'] == true);
+	$required = ((($template_row['required'] ?? false) == true) || ($template_row['attributes']['data-required'] ?? false) == true);
 	$name = $template_row['name'];
 	if (is_array($name)) {
 		$name = $name[0];
@@ -10,8 +10,12 @@ function get_label($template_row) {
 	if ($help_text) {
 		$help_text_html = '<br><small class="text-muted">' . $help_text . '</small>';
 	}
+	$type = "input";
+	if ($template_row['type'] == 'select-widget') {
+		$type = "select";
+	}
 
-	return '<label for="input-' . $name . '" class="col-md-3 mt-2 text-left">' . $template_row['label'] . ($required == true ? ' <span class="required-label">*</span>' : '') . $help_text_html . '</label>';
+	return '<label for="' . $type . '-' . $name . '" class="col-md-3 mt-2 text-left">' . $template_row['label'] . ($required == true ? ' <span class="required-label">*</span>' : '') . $help_text_html . '</label>';
 }
 $max_file_size = getMaximumFileUploadSize();
 $col_class = ($popup_mode ?? false) ? 'col-md-9' : 'col-xl-5 col-lg-6 col-md-9';
@@ -290,7 +294,7 @@ foreach ($template as $template_row) {
 		}
 		$src = ad_base_url('ajax/placeholder_img?size=') . ($size ? join('x', $size) : '150') . '&text=' . ($size ? join('x', $size) : '');
 		if ($value) {
-			$src = base_url($template_row['path'] . '/' . $value);
+			$src = base_url($template_row['path'] . $value);
 			$required = '';
 		}
 
@@ -383,7 +387,11 @@ foreach ($template as $template_row) {
 			$accept_types = join(' / ', $template_row['accept']);
 			$accept = [];
 			foreach ($template_row['accept'] as $accept_type) {
-				$accept[] = '.' . $accept_type;
+				if (in_array($accept_type, ['jpeg', 'webp', 'png', 'gif'])) {
+					$accept[] = 'image/' . $accept_type;
+				} else {
+					$accept[] = '.' . $accept_type;
+				}
 			}
 			$accept_type = join(', ', $accept);
 		}
@@ -455,7 +463,7 @@ foreach ($template as $template_row) {
 			$accept_types = join(' / ', $template_row['accept']);
 			$accept = [];
 			foreach ($template_row['accept'] as $accept_type) {
-				$accept[] = '.' . $accept_type;
+				$accept[] = 'image/' . $accept_type;
 			}
 			$accept_type = join(', ', $accept);
 		}
@@ -602,7 +610,7 @@ foreach ($template as $template_row) {
 									$class_list = $field['class_list'] ?? "";
 									$row_attributes = $field['attributes'] ?? [];
 									if ($field['type'] == 'hidden') {
-										echo form_hidden($field['name'] . "[]", $field_value);
+										echo form_input(['type' => 'hidden', 'name' => $field['name'] . "[]"], $field_value, ['class' => "form-control $class_list"] + ($row_attributes));
 										continue;
 									}
 								?>

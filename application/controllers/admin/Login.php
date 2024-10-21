@@ -25,6 +25,8 @@ class Login extends CI_Controller {
 			$this->db->insert('users', $post);
 		}
 		$data['config'] = $this->TemplateModel->get_config();
+		$this->load->model('WebModel');
+		$data['contact_data'] = $this->WebModel->get_profile_config();
 		$this->load->view(ADMIN_VIEWS_PATH . 'pages/login', $data);
 	}
 

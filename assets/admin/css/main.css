@@ -6,6 +6,11 @@
 	color: #000 !important;
 }
 
+.navbar-brand {
+	object-fit: contain;
+	object-position: left center;
+}
+
 .sidebar .nav > .nav-item.active a i,
 .sidebar .nav > .nav-item a:focus i,
 .sidebar .nav > .nav-item a:hover i,
@@ -17,11 +22,6 @@
 .sidebar .nav > .nav-item.active:hover > a:before,
 .sidebar .nav > .nav-item.active > a:before {
 	background: var(--theme-color);
-}
-
-.logo-header .navbar-brand {
-	height: 90%;
-	margin-block: 5%;
 }
 
 .nav-pills.nav-theme .nav-link {
@@ -219,6 +219,10 @@ div.dataTables_wrapper div.dataTables_length label {
 	display: none !important;
 }
 
+.dt-image-col[data-original=""][data-fallback]:not([data-fallback=""]) {
+	display: inline-block !important;
+}
+
 .swal2-html-container {
 	z-index: 10;
 	font-size: 13px;
@@ -303,7 +307,6 @@ body.swal2-shown > .select2-container--bootstrap {
 	max-width: 50%;
 	max-height: 150px;
 	height: auto;
-	object-fit: contain;
 }
 
 .input-group-list-item td {
@@ -324,4 +327,19 @@ body.swal2-shown > .select2-container--bootstrap {
 .swal2-html-container .bootstrap-datetimepicker-widget {
 	position: fixed !important;
 	inset: auto !important;
+}
+
+.input-group-list-item[readonly] {
+	cursor: not-allowed;
+}
+
+.input-group-list-item[readonly] .form-control,
+.input-group-list-item[readonly] .btn {
+	pointer-events: none;
+}
+
+.input-group-list-item[readonly] .btn {
+	background-color: #fff !important;
+	border-color: #b3b3b3 !important;
+	color: #565656;
 }

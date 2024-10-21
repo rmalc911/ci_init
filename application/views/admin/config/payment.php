@@ -7,49 +7,79 @@
 	</div>
 	<form method="POST" class="validate-form">
 		<div class="card-body">
-			<div class="row">
+			<div class="row align-items-start">
 				<div class="col-md-5 mb-3">
 					<div class="card h-100 mb-0">
 						<div class="card-body">
 							<h5 class="card-title mb-2">Active Payment Keys <span class="required-label">*</span></h5>
+							<?= form_error('payment_key_state') ?>
 							<div class="mb-3">
 								<div class="form-check form-check-inline p-0">
 									<div class="custom-control custom-radio">
-										<input type="radio" id="sendmail_mode_live" name="razorpay_key_state" class="custom-control-input" value="live" <?= ($config['razorpay_key_state'] ?? '') == "live" ? 'checked' : '' ?> required>
-										<label class="custom-control-label mb-0" for="sendmail_mode_live">Live Keys</label>
+										<input type="radio" id="payment_key_state_live" name="payment_key_state" class="custom-control-input" value="live" <?= ($edit['payment_key_state'] ?? '') == "live" ? 'checked' : '' ?> required>
+										<label class="custom-control-label mb-0" for="payment_key_state_live">Live Keys</label>
 									</div>
 								</div>
 								<div class="form-check form-check-inline p-0">
 									<div class="custom-control custom-radio">
-										<input type="radio" id="sendmail_mode_test" name="razorpay_key_state" class="custom-control-input" value="test" <?= ($config['razorpay_key_state'] ?? '') == "test" ? 'checked' : '' ?> required>
-										<label class="custom-control-label mb-0" for="sendmail_mode_test">Test Keys</label>
+										<input type="radio" id="payment_key_state_test" name="payment_key_state" class="custom-control-input" value="test" <?= ($edit['payment_key_state'] ?? '') == "test" ? 'checked' : '' ?> required>
+										<label class="custom-control-label mb-0" for="payment_key_state_test">Test Keys</label>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-				<div class="col-md-7 mb-3">
-					<div class="card h-100 mb-0">
-						<div class="card-body">
-							<div class="form-group p-0 mb-3">
-								<label for="razp_live_key_id">Live Key ID <span class="required-label">*</span></label>
-								<input type="text" class="form-control" id="razp_live_key_id" name="razp_live_key_id" placeholder="" value="<?= $config['razp_live_key_id'] ?? '' ?>" required>
+				<div class="col-md-12 mb-3">
+					<div class="card mb-0">
+						<div class="row mx-0">
+							<div class="col-md-6 px-0 border-right">
+								<div class="card-body">
+									<div class="form-group p-0 mb-3">
+										<label for="razp_live_key_id">Live Key ID</label>
+										<input type="text" class="form-control" id="razp_live_key_id" name="razp_live_key_id" placeholder="" value="<?= $edit['razp_live_key_id'] ?? '' ?>">
+										<?= form_error('razp_live_key_id') ?>
+									</div>
+									<div class="form-group p-0 mb-3">
+										<label for="razp_live_key_secret">Live Key Secret</label>
+										<input type="text" class="form-control" id="razp_live_key_secret" name="razp_live_key_secret" placeholder="" value="<?= $edit['razp_live_key_secret'] ?? '' ?>">
+										<?= form_error('razp_live_key_secret') ?>
+									</div>
+									<div class="form-group p-0 mb-3">
+										<label for="razp_live_wh_secret">Live Webhook Secret</label>
+										<input type="text" class="form-control" id="razp_live_wh_secret" name="razp_live_wh_secret" placeholder="" value="<?= $edit['razp_live_wh_secret'] ?? '' ?>">
+										<?= form_error('razp_live_wh_secret') ?>
+									</div>
+									<div class="form-group p-0 mb-3">
+										<label for="razp_live_account_no">Live Payout Account No</label>
+										<input type="text" class="form-control" id="razp_live_account_no" name="razp_live_account_no" placeholder="" value="<?= $edit['razp_live_account_no'] ?? '' ?>">
+										<?= form_error('razp_live_account_no') ?>
+									</div>
+								</div>
 							</div>
-							<div class="form-group p-0 mb-0">
-								<label for="razp_live_key_secret">Live Key Secret <span class="required-label">*</span></label>
-								<input type="text" class="form-control" id="razp_live_key_secret" name="razp_live_key_secret" placeholder="" value="<?= $config['razp_live_key_secret'] ?? '' ?>" required>
-							</div>
-						</div>
-						<hr class="m-0">
-						<div class="card-body">
-							<div class="form-group p-0 mb-3">
-								<label for="razp_test_key_id">Test Key ID <span class="required-label">*</span></label>
-								<input type="text" class="form-control" id="razp_test_key_id" name="razp_test_key_id" placeholder="" value="<?= $config['razp_test_key_id'] ?? '' ?>" required>
-							</div>
-							<div class="form-group p-0 mb-0">
-								<label for="razp_test_key_secret">Test Key Secret <span class="required-label">*</span></label>
-								<input type="text" class="form-control" id="razp_test_key_secret" name="razp_test_key_secret" placeholder="" value="<?= $config['razp_test_key_secret'] ?? '' ?>" required>
+							<div class="col-md-6 px-0">
+								<div class="card-body">
+									<div class="form-group p-0 mb-3">
+										<label for="razp_test_key_id">Test Key ID</label>
+										<input type="text" class="form-control" id="razp_test_key_id" name="razp_test_key_id" placeholder="" value="<?= $edit['razp_test_key_id'] ?? '' ?>">
+										<?= form_error('razp_test_key_id') ?>
+									</div>
+									<div class="form-group p-0 mb-3">
+										<label for="razp_test_key_secret">Test Key Secret</label>
+										<input type="text" class="form-control" id="razp_test_key_secret" name="razp_test_key_secret" placeholder="" value="<?= $edit['razp_test_key_secret'] ?? '' ?>">
+										<?= form_error('razp_test_key_secret') ?>
+									</div>
+									<div class="form-group p-0 mb-3">
+										<label for="razp_test_wh_secret">Test Webhook Secret</label>
+										<input type="text" class="form-control" id="razp_test_wh_secret" name="razp_test_wh_secret" placeholder="" value="<?= $edit['razp_test_wh_secret'] ?? '' ?>">
+										<?= form_error('razp_test_wh_secret') ?>
+									</div>
+									<div class="form-group p-0 mb-3">
+										<label for="razp_test_account_no">Test Payout Account No</label>
+										<input type="text" class="form-control" id="razp_test_account_no" name="razp_test_account_no" placeholder="" value="<?= $edit['razp_test_account_no'] ?? '' ?>">
+										<?= form_error('razp_test_account_no') ?>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>

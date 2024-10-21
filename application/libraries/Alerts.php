@@ -1,5 +1,4 @@
 <?php
-include_once FCPATH . "vendor/autoload.php";
 
 if (!defined('BASEPATH'))
 	exit('No direct script access allowed');
@@ -49,14 +48,15 @@ class Alerts {
 		}
 	}
 
-	public function send_mail($subject, $message, $touser, $cc = [], $bcc = []) {
+	public function send_mail($subject, $message, $touser, $cc = [], $bcc = [], $attachments = []) {
+		$this->writeLog(json_encode(['subject' => $subject, 'touser' => $touser, ]), "SendMail");
 		if (ENVIRONMENT == "development") {
 			return true;
 		}
 		if ($this->sendmail_mode == 'local') {
 			return $this->send_mail_local($subject, $message, $touser, $cc, $bcc);
 		} elseif ($this->sendmail_mode == 'sendinblue') {
-			return $this->sendTransactionalEmail($subject, $message, $touser, $cc, $bcc);
+			return $this->sendTransactionalEmail($subject, $message, $touser, $cc, $bcc, $attachments);
 		}
 	}
 
@@ -97,7 +97,7 @@ class Alerts {
 		return $CI->email->send();
 	}
 
-	public function sendTransactionalEmail($subject, $message, $touser, $cc = [], $bcc = []) {
+	public function sendTransactionalEmail($subject, $message, $touser, $cc = [], $bcc, $attachments = []) {
 
 		$log = "SendinBlueApi sendTransactionalEmail called";
 		$apiInstance = new SendinBlue\Client\Api\TransactionalEmailsApi(
@@ -133,6 +133,17 @@ class Alerts {
 
 		if ($bcc != []) {
 			$sendSmtpEmail['bcc'] = $bcc;
+		}
+
+		if ($attachments != []) {
+			$log .= "\n\tAttachments: " . print_r($attachments, true);
+			$sendSmtpEmail['attachment'] = array_map(function ($attachment) {
+				$content = file_get_contents($attachment);
+				return new \SendinBlue\Client\Model\SendSmtpEmailAttachment([
+					'content' => base64_encode($content),
+					'name' => basename($attachment),
+				]);
+			}, $attachments);
 		}
 
 		try {
@@ -186,25 +197,67 @@ class Alerts {
 		}
 	}
 
-	function send_sms($mobile, $sms) {
-		if (ENVIRONMENT == "development") {
+	private $sms_templates = [
+		'welcome_default' => "",
+		'new_order' => "",
+		'otp_default' => "",
+	];
+	private $sms_api_key = "";
+	private $sms_sender_id = "";
+	private $sms_username = "";
+	private $sms_api_url = "";
+
+	function send_sms($mobile, $content, $template) {
+		return true;
+		if (ENVIRONMENT != "production") {
 			return true;
 		}
-		$sms = urlencode($sms);
+		$template_content = $this->sms_templates[$template] ?? null;
+		if ($template_content == null) {
+			return [
+				'status' => false,
+				'error' => "Invalid template",
+			];
+		}
+		$api_key = $this->sms_api_key;
+		$sender_id = $this->sms_sender_id;
+		$username = $this->sms_username;
 
-		$url = "";
+		$sms_content = $template_content;
+		foreach ($content as $var => $value) {
+			$sms_content = str_replace("{#var" . $var . "#}", $value, $sms_content);
+		}
+
+		$url = $this->sms_api_url;
+		$params = http_build_query([
+			'username' => $username,
+			'apikey' => $api_key,
+			'mobile' => $mobile,
+			'senderid' => $sender_id,
+			'message' => $sms_content,
+			// ]);
+		], '', '&', PHP_QUERY_RFC1738);
+
+		// $url_full = $url . '?' . join("&", $params);
+		$url_full = $url . '?' . $params;
 
 		$ch = curl_init();
-
-		curl_setopt($ch, CURLOPT_URL, $url);
-
+		curl_setopt($ch, CURLOPT_URL, $url_full);
+		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-
-		$data = curl_exec($ch);
-
+		$response = curl_exec($ch);
 		curl_close($ch);
+		$status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		$status = $status_code == 200;
 
-		return $data;
+		$log = "Request: " . $url_full . "\nResponse: " . $response;
+		$this->writeLog($log, "SMSAPI");
+
+		return [
+			'status' => $status,
+			'sms_content' => $sms_content,
+			'response' => $response,
+		];
 	}
 
 	private function writeLog($data, $file = "SendinBlueApi") {

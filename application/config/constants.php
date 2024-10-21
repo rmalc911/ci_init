@@ -94,9 +94,7 @@ define('ADMIN_LOGIN_REDIRECT', ADMIN_PATH . 'home/config_profile');
 
 define('BANNER_UPLOAD_PATH', 'assets/uploads/banners/');
 define('GALLERY_UPLOAD_PATH', 'assets/uploads/gallery/');
-define('PRODUCT_IMG_UPLOAD_PATH', 'assets/uploads/products/');
 define('RESUME_UPLOAD_PATH', 'assets/uploads/resume/');
-define('BLOG_IMAGE_UPLOAD_PATH', 'assets/uploads/blog/');
 define('PROFILE_LOGO_UPLOAD_PATH', 'assets/uploads/logo/');
 
 define('PROFILE_LOGO_FIELD', 'profile_logo');
@@ -119,15 +117,6 @@ define('SOCIAL_MEDIA_NAMES', [
 	'github' => 'Github',
 ]);
 
-define('CLIENT_NAME', '');
-define('CLIENT_NAME_SHORT', '');
-define('CLIENT_ADDRESS', '');
-define('DEFAULT_EMAIL_NAME', CLIENT_NAME);
-define('DEFAULT_EMAIL_ID', '');
-define('DEFAULT_PHONE', '');
-
-define('LOGO_IMG', 'assets/images/logo.png');
-define('LOGO_IMG_MIN', 'assets/images/logo-min.png');
 define('LOGO26', 'assets/images/26_footer_dark.png');
 define('LOGO26_LIGHT', 'assets/images/26_footer.png');
 define('LOGO26_URL', 'https://steed26.com/');
@@ -143,14 +132,35 @@ define('input_date', 'd-m-Y');
 define('input_time', 'g:i A');
 define('input_date_time', 'd-m-Y g:i A');
 define('db_user_date', '%D %b %Y');
-define('db_user_time', '%l:%i %p');
-define('db_user_date_time', '%D %b %Y - %l:%i %p');
+define('db_user_time', '%l:%i&nbsp;%p');
+define('db_user_date_time', '%D %b %Y -<wbr> %l:%i&nbsp;%p');
 define('db_date', '%Y-%m-%d');
 define('db_time', '%H:%i:%s');
 define('db_date_time', '%Y-%m-%d %H:%i:%s');
 define('db_input_date', '%d-%m-%Y');
-define('db_input_time', '%l:%i %p');
-define('db_input_date_time', '%d-%m-%Y %l:%i %p');
+define('db_input_time', '%l:%i&nbsp;%p');
+define('db_input_date_time', '%d-%m-%Y %l:%i&nbsp;%p');
 
 define('CATEGORY_VIEW_DEPTH', 3);
 define('IMG_SPLIT', '~##~');
+
+// UPLOAD_MAX_SIZE = true; // use server limit
+define('UPLOAD_MAX_SIZE', '8M');
+
+final class ShareUrl {
+	public static function facebook($url) {
+		return 'https://facebook.com/sharer/sharer.php?u=' . $url;
+	}
+	public static function twitter($url) {
+		return 'https://x.com/intent/post?url=' . $url;
+	}
+	public static function linkedin($url) {
+		return 'https://linkedin.com/shareArticle?mini=true&url=' . $url;
+	}
+	public static function whatsapp($url) {
+		return 'https://api.whatsapp.com/send?text=' . $url;
+	}
+	public static function pinterest($url) {
+		return 'https://pinterest.com/pin/create/button/?url=' . $url;
+	}
+}

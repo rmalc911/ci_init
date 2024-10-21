@@ -2,7 +2,7 @@
 	<thead>
 		<tr>
 			<?php
-			foreach ($template['heads'] as $table_head) {
+			foreach (array_filter($template['heads']) as $table_head) {
 			?>
 				<th><?= $table_head ?></th>
 			<?php

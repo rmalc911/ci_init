@@ -3,9 +3,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class TemplateModel extends MY_Model {
 	/** @var TemplateConfig */ public $profile_config;
-	/** @var TemplateConfig */ public $user_config;
-	/** @var TemplateConfig */ public $testimonial_config;
-	/** @var TemplateConfig */ public $blog_config;
 	/** @var TemplateConfig */ public $banner_config;
 	/** @var TemplateConfig */ public $career_config;
 	/** @var TemplateConfig */ public $career_application_config;
@@ -26,7 +23,8 @@ class TemplateModel extends MY_Model {
 		$this->email_config = new TemplateConfig('email', 'email_form', null, 'email_view', null,);
 	}
 
-	#region Profile config
+	#region Home
+	// Home / Profile
 	public function profile_view() {
 		return [
 			'head' => 'Profile',
@@ -38,7 +36,6 @@ class TemplateModel extends MY_Model {
 
 	public function profile_form() {
 		$config = $this->profile_config;
-		// $city_options = $this->state_city_options();
 		return [
 			['type' => 'input', 'label' => 'Company Name', 'name' => 'company_name', 'required' => true],
 			['type' => 'textarea', 'label' => 'Company Address', 'name' => 'company_address', 'required' => true],
@@ -117,9 +114,8 @@ class TemplateModel extends MY_Model {
 
 	public function get_user_access_navs() {
 		return  [
-			'Masters' => [
-				// profile
-				['options' => ['v', 'e'], 'config' => $this->profile_config, 'icon' => 'fas fa-user'],
+			'' => [
+				['config' => $this->profile_config, 'options' => ['v', 'e'], 'icon' => 'fa fa-user'],
 				// users
 				['options' => ['v', 'a', 'e', 'b', 'd'], 'config' => $this->user_config, 'icon' => 'fas fa-user-cog'],
 			],
@@ -127,6 +123,13 @@ class TemplateModel extends MY_Model {
 				// contact us
 				['options' => ['v'], 'config' => $this->contact_us_config, 'icon' => 'fas fa-phone'],
 			],
+			'About Us' => [
+				['config' => $this->about_us_config, 'options' => ['v', 'e'], 'icon' => 'fa fa-info'],
+			],
+			// 'Enquiries' => [
+			// 	['config' => $this->career_application_config, 'options' => ['v'], 'icon' => 'fa fa-user'],
+			// 	['config' => $this->contact_us_config, 'options' => ['v'], 'icon' => 'fa fa-user'],
+			// ],
 			'Config' => [
 				['options' => ['v', 'e'], 'config' => $this->email_config, 'icon' => 'fas fa-envelope'],
 			],
@@ -163,7 +166,7 @@ class TemplateModel extends MY_Model {
 	#endregion
 
 	#region Banners
-	public function web_banner_view() {
+	public function banner_view() {
 		return [
 			'head' => 'Website Banners',
 			'links' => [
@@ -177,7 +180,7 @@ class TemplateModel extends MY_Model {
 		];
 	}
 
-	public function web_banner_table() {
+	public function banner_table() {
 		return [
 			'heads' => ['Sl. no', 'Name', 'Image', 'Action'],
 			'src' => 'ajax',
@@ -188,10 +191,10 @@ class TemplateModel extends MY_Model {
 		];
 	}
 
-	public function web_banner_add() {
+	public function banner_add() {
 		return  [
 			['type' => 'image', 'label' => 'Web Image', 'name' => 'banner_img', 'path' => BANNER_UPLOAD_PATH, 'required' => true, 'size' => [600, 400], 'accept' => ['png', 'jpeg', 'webp']],
-			['type' => 'input', 'label' => 'Title', 'name' => 'banner_name', 'required' => true],
+			['type' => 'input', 'label' => 'Title', 'name' => 'banner_name', 'required' => false],
 			['type' => 'textarea', 'label' => 'Banner Text', 'name' => 'banner_text', 'required' => false, 'attributes' => ['maxlength' => 150]],
 			['type' => 'input', 'label' => 'Link', 'name' => 'banner_link', 'required' => false],
 			['type' => 'key', 'label' => 'ID', 'name' => 'id'],
@@ -201,6 +204,32 @@ class TemplateModel extends MY_Model {
 	public function banner_img_config() {
 		return [
 			'banner_img' => BANNER_UPLOAD_PATH,
+		];
+	}
+	#endregion
+
+	#region About Us
+	public function about_us_view() {
+		return [
+			'head' => 'About Us',
+			'links' => [
+				'view' => 'website/config_about_us',
+			],
+		];
+	}
+
+	public function about_us_form() {
+		return  [
+			['type' => 'image', 'label' => 'Image', 'name' => 'about_us_img', 'path' => ABOUTUS_UPLOAD_PATH, 'required' => true, 'size' => [600, 600], 'accept' => ['png', 'jpeg', 'webp']],
+			['type' => 'input', 'label' => 'Title', 'name' => 'about_us_title', 'required' => true],
+			['type' => 'wysiwyg', 'label' => 'Description', 'name' => 'about_us_description', 'required' => true],
+			['type' => 'key', 'label' => 'ID', 'name' => 'id'],
+		];
+	}
+
+	public function about_us_img_config() {
+		return [
+			'about_us_img' => ABOUTUS_UPLOAD_PATH,
 		];
 	}
 	#endregion

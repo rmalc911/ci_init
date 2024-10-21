@@ -72,7 +72,7 @@
 			<nav class="navbar navbar-header navbar-expand-lg">
 
 				<div class="container-fluid">
-					<h2 class="m-0 text-light"><?= $login_username ?></h2>
+					<h2 class="m-0"><?= $login_username ?></h2>
 					<ul class="navbar-nav topbar-nav ml-md-auto align-items-center">
 						<li class="nav-item dropdown hidden-caret">
 							<a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

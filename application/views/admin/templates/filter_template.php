@@ -9,7 +9,9 @@
 				<div class="col-md-4">
 					<div class="form-group">
 						<label for="filter-<?= $filter_col['name'] ?>" class="control-label"><?= $filter_col['label'] ?></label>
-						<?= form_dropdown(['name' => $filter_col['name']], array_column($filter_col['filter_options'], 'option_name', 'option_value'), [], ['id' => "filter-" . $filter_col['name'], 'class' => "form-control select-widget"]); ?>
+						<div class="select2-input">
+							<?= form_dropdown(['name' => $filter_col['name']], array_column($filter_col['filter_options'], 'option_name', 'option_value'), $filter[$filter_col['name']] ?? '', ['id' => "filter-" . $filter_col['name'], 'class' => "form-control select-widget"]); ?>
+						</div>
 					</div>
 				</div>
 			<?php
@@ -24,7 +26,7 @@
 							foreach ($filter_col['filter_options'] as $radio_option) {
 							?>
 								<div class="custom-control custom-radio">
-									<input type="radio" id="<?= $filter_col['name'] ?>_<?= $radio_option['option_value'] ?>" value="<?= $radio_option['option_value'] ?>" name="<?= $filter_col['name'] ?>" class="custom-control-input radio-<?= $filter_col['name'] ?>">
+									<input type="radio" id="<?= $filter_col['name'] ?>_<?= $radio_option['option_value'] ?>" value="<?= $radio_option['option_value'] ?>" name="<?= $filter_col['name'] ?>" class="custom-control-input radio-<?= $filter_col['name'] ?>" <?= $filter[$filter_col['name']] == $radio_option['option_value'] ? 'checked' : '' ?>>
 									<label class="custom-control-label" for="<?= $filter_col['name'] ?>_<?= $radio_option['option_value'] ?>"><?= $radio_option['option_name'] ?></label>
 								</div>
 							<?php
@@ -41,9 +43,24 @@
 					<div class="form-group">
 						<label for="filter-<?= $filter_col['name'] ?>" class="control-label"><?= $filter_col['label'] ?></label>
 						<div class="input-group">
-							<input class="form-control date-widget" type="text" name="<?= $filter_col['name'] ?>" id="filter-<?= $filter_col['name'] ?>">
+							<input class="form-control date-widget" type="text" name="<?= $filter_col['name'] ?>" id="filter-<?= $filter_col['name'] ?>" value="<?= input_date($filter[$filter_col['name']] ?? null) ?>">
 							<div class="input-group-append">
 								<span class="input-group-text"><i class="fa fa-calendar"></i></span>
+							</div>
+						</div>
+					</div>
+				</div>
+			<?php
+			}
+			if ($filter_col['type'] == 'time') {
+			?>
+				<div class="col-md-4">
+					<div class="form-group">
+						<label for="filter-<?= $filter_col['name'] ?>" class="control-label"><?= $filter_col['label'] ?></label>
+						<div class="input-group">
+							<input class="form-control time-widget" type="text" name="<?= $filter_col['name'] ?>" id="filter-<?= $filter_col['name'] ?>" value="<?= input_time($filter[$filter_col['name']] ?? null) ?>">
+							<div class="input-group-append">
+								<span class="input-group-text"><i class="fa fa-clock"></i></span>
 							</div>
 						</div>
 					</div>
@@ -71,6 +88,7 @@
 
 <script>
 	function reloadTable() {
+		if (!dtable) return;
 		dtable.ajax.reload();
 	}
 
@@ -78,7 +96,7 @@
 	foreach ($filter_columns as $fi => $filter_col) {
 	?>
 		<?php
-		if ($filter_col['type'] == 'date') {
+		if ($filter_col['type'] == 'date' || $filter_col['type'] == 'time') {
 		?>
 			$("#filter-<?= $filter_col['name'] ?>").on('dp.change', function() {
 				reloadTable();
@@ -121,13 +139,15 @@
 	}
 
 	$("#filter-reset").on('click', function() {
-		<?php
-		foreach ($filter_columns as $fi => $filter_col) {
-		?>
-			$("#filter-<?= $filter_col['name'] ?>").val('').trigger('change.select2');
-		<?php
-		}
-		?>
-		reloadTable();
+		setTimeout(() => {
+			<?php
+			foreach ($filter_columns as $fi => $filter_col) {
+			?>
+				$("#filter-<?= $filter_col['name'] ?>").val('').trigger('change.select2');
+			<?php
+			}
+			?>
+			reloadTable();
+		}, 10);
 	});
 </script>

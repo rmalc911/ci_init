@@ -3,7 +3,7 @@
 		display: block;
 		position: relative;
 		border: 1px dashed #dadada;
-		padding: 30px 10px;
+		padding: 6rem 1rem;
 		border-radius: 4px;
 		text-align: center;
 		background-color: #fafafa;
@@ -71,6 +71,25 @@
 	}
 
 	/* .file-select.is-loading {} */
+
+	.preview-frame {
+		position: relative;
+	}
+
+	.preview-frame::before {
+		content: "";
+		padding-top: 56.5%;
+		display: block;
+	}
+
+	.preview-frame iframe {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+	}
 </style>
 
 <div class="card">

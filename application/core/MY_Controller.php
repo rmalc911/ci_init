@@ -10,7 +10,6 @@ class MY_Controller extends CI_Controller {
 	public function __construct() {
 		parent::__construct();
 		$this->load->helper('inflector');
-		// $this->load->helper('access');
 		$this->load->library('Excel_export');
 		$this->popover_btn = '<button class="btn btn-$3 btn-border btn-sm btn-rounded json-format txn-id-btn" type="button" data-toggle="popover" data-content=\'$2\' data-label="$1" data-original-title="$1 <span class=\'close \'>&times;</span">$1</button>';
 		$this->data['config'] = $this->TemplateModel->get_config();
@@ -31,6 +30,16 @@ class MY_Controller extends CI_Controller {
 		if (method_exists($this, "config_{$option}_edit")) {
 			$this->data['message'] = $this->session->flashdata('message');
 			$this->data['edit'] = $this->{"config_{$option}_edit"}();
+			if ($this->data['edit']['flash_message'] ?? false) {
+				$this->data['message'] = $this->data['edit']['flash_message'];
+			}
+			if ($this->data['edit']['config_readonly_inputs'] ?? null) {
+				foreach ($this->data['form_template'] as &$template_row) {
+					if (in_array($template_row['name'], $this->data['edit']['config_readonly_inputs'])) {
+						$template_row['readonly'] = true;
+					}
+				}
+			}
 		} else {
 			$this->data['edit'] = $this->TemplateModel->get_config($config_items);
 		}
@@ -58,10 +67,18 @@ class MY_Controller extends CI_Controller {
 			);
 		}
 		if ($this->form_validation->run()) {
+			$form_template = array_column($this->TemplateModel->{$options->form_template}(), null, 'name');
 			$post_data = $this->input->post();
 			foreach ($config_icons as $icon => $path) {
 				$post_data[$icon] = $this->data['edit'][$icon] ?? "";
-				$icon_image = $this->TemplateModel->save_image($icon, $path, null, null, $post_data[$icon]);
+				$img_form_template = $form_template[$icon];
+				$accept = $img_form_template['accept'];
+				if (in_array('jpeg', $accept)) {
+					$accept[] = 'jpg';
+					$accept[] = 'jpe';
+				}
+				$accept = join("|", $accept);
+				$icon_image = $this->TemplateModel->save_image($icon, $path, $accept, null, $post_data[$icon]);
 				if ($icon_image) {
 					$post_data[$icon] = $icon_image;
 				}
@@ -113,6 +130,7 @@ class MY_Controller extends CI_Controller {
 		$this->TemplateModel->verify_access($options->access, 'view_data');
 		$this->data['table_template'] = $this->TemplateModel->{$options->table_template}();
 		$this->data['view_template'] = $this->TemplateModel->{$options->view_template}();
+		$this->data['filter_data'] = $this->input->get('filter');
 		$this->template('templates/view_template', $this->data);
 	}
 
@@ -196,7 +214,7 @@ class MY_Controller extends CI_Controller {
 
 	protected function _submit_template(TemplateConfig $options, callable $process_post_data = null, callable $after_submit = null) {
 		$this->data['form_template'] = $this->TemplateModel->{$options->form_template}();
-		$this->data['view_template'] = $this->TemplateModel->{$options->view_template}();
+		$this->data['view_template'] = $this->TemplateModel->{$options->view_template}(false);
 		$this->TemplateModel->set_validation($this->data['form_template']);
 		if ($this->form_validation->run()) {
 			$this->db->trans_start();
@@ -290,8 +308,8 @@ class MY_Controller extends CI_Controller {
 			$this->_submit_template($this->TemplateModel->{"{$option}_config"}, function ($post_data) use ($option) {
 				/** @var TemplateConfig */
 				$config = $this->TemplateModel->{"{$option}_config"};
+				$form_template = array_column($this->TemplateModel->{$config->form_template}(), null, 'name');
 				if (method_exists("TemplateModel", "{$option}_img_config")) {
-					$form_template = array_column($this->TemplateModel->{$config->form_template}(), null, 'name');
 					$img_configs = $this->TemplateModel->{"{$option}_img_config"}();
 					foreach ($img_configs as $img_field => $path) {
 						$edit = $this->TemplateModel->{$option . "_config"}->get_row($post_data['id']);
@@ -322,12 +340,31 @@ class MY_Controller extends CI_Controller {
 				if (method_exists($this, "{$option}_process_submit")) {
 					$post_data = $this->{"{$option}_process_submit"}($post_data);
 				}
+				$wysiwyg_editors = array_filter(
+					$form_template,
+					function ($val) {
+						return ($val['type'] == 'wysiwyg' && ($val['wysiwyg_preview'] ?? null) != null);
+					}
+				);
+				foreach ($wysiwyg_editors as $wysiwyg_editor) {
+					$post_data[$wysiwyg_editor['wysiwyg_preview']] = wysiwyg_to_preview_text($post_data[$wysiwyg_editor['name']], $wysiwyg_editor['preview_length']);
+				}
+				$url_title_fields = array_filter(
+					$form_template,
+					function ($val) {
+						return ($val['type'] == 'input' && ($val['url_title_field'] ?? null) != null);
+					}
+				);
+				foreach ($url_title_fields as $url_title_input) {
+					$post_data[$url_title_input['url_title_field']] = url_title($post_data[$url_title_input['name']], '-', true);
+				}
 				return $post_data;
 			}, function ($post_data, $update) use ($option) {
 				/** @var TemplateConfig */
 				$config = $this->TemplateModel->{"{$option}_config"};
+				$form_template = array_column($this->TemplateModel->{$config->form_template}(), null, 'name');
 				$input_tables = array_filter(
-					array_column($this->TemplateModel->{$config->form_template}(), null, 'name'),
+					$form_template,
 					function ($val) {
 						return $val['type'] == 'input-table' || $val['type'] == 'image-list';
 					}
@@ -357,7 +394,7 @@ class MY_Controller extends CI_Controller {
 					}
 				}
 				$array_lists = array_filter(
-					array_column($this->TemplateModel->{$config->form_template}(), null, 'name'),
+					$form_template,
 					function ($val) {
 						return ($val['type'] == 'select-widget' && ($val['multiple'] ?? false) == true) || ($val['type'] == 'list');
 					}
@@ -369,8 +406,9 @@ class MY_Controller extends CI_Controller {
 						$this->TemplateModel->save_table_map($array_list['table'], $array_list['key'], $update, $fields, $formatting);
 					}
 				}
+				$saved = true;
 				if (method_exists($this, "{$option}_after_submit")) {
-					return $this->{"{$option}_after_submit"}($post_data, $update);
+					$saved = $this->{"{$option}_after_submit"}($post_data, $update);
 				}
 				return true;
 			});
@@ -447,8 +485,8 @@ class MY_Controller extends CI_Controller {
 		return $action_col;
 	}
 
-	protected function add_image_col($path) {
-		return '<div class="text-center"><img src="' . base_url($path . '$1') . '" data-original="$1" class="dt-image-col"></div>';
+	protected function add_image_col($path, $fallback = '') {
+		return '<div class="text-center"><img src="' . base_url($path . '$1') . '" data-original="$1" data-fallback="' . $fallback . '" class="dt-image-col"></div>';
 	}
 
 	protected function setSearchableColumns(array $columns) {
@@ -582,10 +620,16 @@ class MY_Controller extends CI_Controller {
 			$filter_name = str_replace("--", ".", $filter_name);
 			if ($filter_value == '') continue;
 			if ($filter['type'] == 'date') {
-				$filter_value = date(date_format, strtotime($filter_value));
+				$filter_value = date_format_c($filter_value);
 				$filter_date_type = $filter['date_type'];
 				$filter_name = explode("-", $filter_name)[0];
 				$filter_name = "DATE({$filter_name}) {$filter_date_type}";
+			}
+			if ($filter['type'] == 'time') {
+				$filter_value = time_format($filter_value);
+				$filter_date_type = $filter['date_type'];
+				$filter_name = explode("-", $filter_name)[0];
+				$filter_name = "TIME({$filter_name}) {$filter_date_type}";
 			}
 			$this->datatables->filter($filter_name, $filter_value);
 		}

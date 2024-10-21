@@ -5,6 +5,20 @@ class Ajaxtables extends MY_Controller {
 	public function __construct() {
 		parent::__construct();
 		$this->load->library('datatables');
+		if (!$this->TemplateModel->db_setup) {
+			$this->generate_empty();
+			die();
+		}
+	}
+
+	public function album_table() {
+		/** @var TemplateConfig */ $config = $this->TemplateModel->album_config;
+		$this->datatables
+			->add_column(
+				'album_images',
+				'<a href="' . ad_base_url("website/view_gallery?edit=$1") . '" class="btn btn-primary btn-sm btn-round"><i class="fa fa-image"></i> View</a>',
+				"id",
+			);
 	}
 
 	public function user_table() {
@@ -65,6 +79,10 @@ class Ajaxtables extends MY_Controller {
 	}
 
 	function __destruct() {
+		if (!$this->TemplateModel->db_setup) {
+			// $this->generate_empty();
+			return;
+		}
 		$response = @$this->datatables->generate();
 		echo $response;
 	}

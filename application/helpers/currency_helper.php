@@ -72,8 +72,8 @@ function getIndianCurrency(float $number) {
 			$str[] = ($number < 21) ? $words[$number] . ' ' . $digits[$counter] . $plural . ' ' . $hundred : $words[floor($number / 10) * 10] . ' ' . $words[$number % 10] . ' ' . $digits[$counter] . $plural . ' ' . $hundred;
 		} else $str[] = null;
 	}
-	$Rupees = ucfirst(implode('', array_reverse($str)));
+	$Rupees = trim(ucfirst(implode('', array_reverse($str))));
 	$paise = ($decimal > 0) ? ". " . ucfirst($words[$decimal / 10] . " " . $words[$decimal % 10]) . ' Paise' : '';
-	return ($Rupees ? $Rupees . 'only' : '');
+	return ($Rupees ? ($Rupees . $paise) . ' only' : '');
 	//  . $paise;
 }
