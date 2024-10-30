@@ -618,7 +618,7 @@ class MY_Controller extends CI_Controller {
 			$filter_name = $filter['name'];
 			$filter_value = $filter_data[$filter_name] ?? "";
 			$filter_name = str_replace("--", ".", $filter_name);
-			if ($filter_value == '') continue;
+			if (empty($filter_value)) continue;
 			if ($filter['type'] == 'date') {
 				$filter_value = date_format_c($filter_value);
 				$filter_date_type = $filter['date_type'];
@@ -631,7 +631,11 @@ class MY_Controller extends CI_Controller {
 				$filter_name = explode("-", $filter_name)[0];
 				$filter_name = "TIME({$filter_name}) {$filter_date_type}";
 			}
-			$this->datatables->filter($filter_name, $filter_value);
+			if (is_array($filter_value)) {
+				$this->datatables->filter_in($filter_name, $filter_value);
+			} else {
+				$this->datatables->filter($filter_name, $filter_value);
+			}
 		}
 
 		$this->setSearchableColumns($searchable_columns);

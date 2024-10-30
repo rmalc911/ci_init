@@ -31,6 +31,7 @@ class Datatables {
   private $like           = array();
   private $or_like        = array();
   private $filter         = array();
+  private $filter_in      = array();
   private $add_columns    = array();
   private $edit_columns   = array();
   private $unset_columns  = array();
@@ -174,6 +175,19 @@ class Datatables {
    */
   public function filter($key_condition, $val = NULL, $backtick_protect = TRUE) {
     $this->filter[] = array($key_condition, $val, $backtick_protect);
+    return $this;
+  }
+
+  /**
+   * Generates the WHERE IN portion of the query
+   *
+   * @param mixed $key_condition
+   * @param string $val
+   * @param bool $backtick_protect
+   * @return mixed
+   */
+  public function filter_in($key_condition, $val = NULL, $backtick_protect = TRUE) {
+    $this->filter_in[] = array($key_condition, $val, $backtick_protect);
     return $this;
   }
 
@@ -322,6 +336,9 @@ class Datatables {
 
     foreach ($this->filter as $val)
       $this->ci->db->where($val[0], $val[1], $val[2]);
+
+    foreach ($this->filter_in as $val)
+      $this->ci->db->where_in($val[0], $val[1], $val[2]);
   }
 
   /**

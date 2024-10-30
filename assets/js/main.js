@@ -151,3 +151,14 @@ function lazyLoadIframes() {
 		iframeObserver.observe(iframe);
 	});
 }
+
+const respSizes = (size) => {
+	const resp = {};
+	[...Array(Math.ceil(window.innerWidth / size))].forEach(
+		(i, ix) =>
+			(resp[(ix + 1) * size] = {
+				slidesPerView: ix + 1,
+			})
+	);
+	return resp;
+};
